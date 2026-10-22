@@ -6,11 +6,12 @@ fournit les vraies, les tests et les scripts de mesure fournissent des doubles.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import httpx
 
 from app.core.config import Settings
+from app.core.database import get_db
 from app.rag.embedding import SentenceTransformerEmbedder
 from app.rag.milvus_store import MetadataFilter, MilvusVectorStore
 from app.tools.base import ToolRegistry
@@ -20,6 +21,7 @@ from app.tools.lichess import LichessExplorer, build_opening_theory_tool
 from app.tools.position import build_inspect_position_tool
 from app.tools.resilience import Clock, Sleep
 from app.tools.stockfish import Analyzer, StockfishAnalyzer, build_evaluate_position_tool
+from app.tools.video_store import MemoryVideoStore, MongoVideoStore, VideoStore
 from app.tools.videos import YouTubeSearch, build_find_videos_tool
 
 
@@ -28,6 +30,8 @@ class ToolDependencies:
     http: httpx.AsyncClient
     analyzer: Analyzer
     knowledge: KnowledgeSearch
+    # Cache des vidéos et compteur de quota YouTube (mémoire par défaut, MongoDB en prod)
+    video_store: VideoStore = field(default_factory=MemoryVideoStore)
 
     def start_warm_up(self) -> None:
         """Préchauffe en arrière-plan ce qui est lent à charger (modèle d'embedding)."""
@@ -62,6 +66,7 @@ def default_dependencies(settings: Settings) -> ToolDependencies:
             hash_mb=settings.stockfish_hash_mb,
         ),
         knowledge=KnowledgeSearch(embedder, store, min_score=settings.rag_min_score),
+        video_store=MongoVideoStore(get_db()),
     )
 
 
@@ -79,7 +84,14 @@ def build_registry(
         min_games=settings.theory_min_games,
     )
     youtube = YouTubeSearch(
-        deps.http, api_key=settings.youtube_api_key, base_url=settings.youtube_api_url
+        deps.http,
+        api_key=settings.youtube_api_key,
+        base_url=settings.youtube_api_url,
+        store=deps.video_store,
+        quota_daily=settings.youtube_quota_daily,
+        quota_reserve=settings.youtube_quota_reserve,
+        cache_ttl_s=settings.youtube_cache_ttl_s,
+        **({"clock": clock} if clock else {}),
     )
     jobs = DeepAnalysisJobs(deps.analyzer, **({"clock": clock} if clock else {}))
 

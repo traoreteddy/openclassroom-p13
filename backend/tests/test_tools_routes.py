@@ -4,12 +4,20 @@ from __future__ import annotations
 
 from urllib.parse import quote
 
+import httpx
 import pytest
 from fastapi.testclient import TestClient
 
 from app.api.deps import get_registry
 from app.main import app
-from tests.conftest import ITALIAN_FEN, LICHESS_URL, START_FEN, StubAnalyzer, load_fixture
+from tests.conftest import (
+    ITALIAN_FEN,
+    LICHESS_URL,
+    START_FEN,
+    YOUTUBE_URL,
+    StubAnalyzer,
+    load_fixture,
+)
 
 
 @pytest.fixture
@@ -104,3 +112,77 @@ def test_lifespan_builds_the_real_registry_and_warms_up(monkeypatch):
         assert len(client.app.state.tool_registry.names) == 7
 
     assert len(warm_ups) == 1
+
+
+async def _wait_jobs(client):
+    jobs = app.dependency_overrides[get_registry]().get("start_deep_analysis").handler.__self__
+    for job_id in list(jobs._jobs):
+        await jobs.wait(job_id)
+
+
+def test_deep_analysis_is_started_then_polled(client):
+    started = client.post(url("analysis", START_FEN), params={"depth": 25})
+
+    assert started.status_code == 202
+    ticket = started.json()
+    assert ticket["status"] == "pending" and ticket["poll_after_s"] >= 1
+
+    import asyncio
+
+    asyncio.get_event_loop().run_until_complete(_wait_jobs(client))
+    state = client.get(f"/api/v1/analysis/{ticket['job_id']}")
+
+    assert state.status_code == 200
+    assert state.json()["status"] == "done"
+    assert state.json()["result"]["score_cp"] == 20  # évaluation du moteur simulé
+
+
+def test_deep_analysis_rejects_a_shallow_depth(client):
+    assert client.post(url("analysis", START_FEN), params={"depth": 10}).status_code == 422
+
+
+def test_unknown_job_is_404(client):
+    response = client.get("/api/v1/analysis/nope")
+
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "unknown_job"
+
+
+def test_videos_route_returns_quality_videos(client, respx_mock):
+    respx_mock.get(f"{YOUTUBE_URL}/search").mock(
+        side_effect=[
+            httpx.Response(200, json=load_fixture("youtube/search_italian_fr.json")),
+            httpx.Response(200, json=load_fixture("youtube/search_italian_en.json")),
+        ]
+    )
+    respx_mock.get(f"{YOUTUBE_URL}/videos").respond(
+        json=load_fixture("youtube/videos_italian.json")
+    )
+
+    response = client.get("/api/v1/videos/Italian Game", params={"max_results": 2})
+
+    assert response.status_code == 200
+    body = response.json()
+    assert [v["video_id"] for v in body["videos"]] == ["P1Pb7HTKjSY", "gfxAZIX8hC4"]
+    assert body["videos"][0]["embed_url"].startswith("https://www.youtube-nocookie.com/embed/")
+    assert body["queries"][0] == "partie italienne échecs ouverture explication"
+    assert "message" not in body
+
+
+def test_videos_route_explains_an_empty_result(client, respx_mock):
+    respx_mock.get(f"{YOUTUBE_URL}/search").respond(json={"items": []})
+
+    response = client.get("/api/v1/videos/Bird Opening")
+
+    assert response.status_code == 200
+    assert response.json()["videos"] == []
+    assert "Aucune vidéo" in response.json()["message"]
+
+
+def test_videos_route_without_key_is_503(make_registry):
+    app.dependency_overrides[get_registry] = lambda: make_registry(youtube_api_key=None)
+
+    response = TestClient(app).get("/api/v1/videos/Italian Game")
+
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "not_configured"

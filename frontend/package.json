@@ -5,7 +5,7 @@
     "ng": "ng",
     "build:board": "ng build ngx-chess-board",
     "prestart": "npm run build:board",
-    "start": "ng serve",
+    "start": "ng serve --proxy-config proxy.conf.json",
     "prebuild": "npm run build:board",
     "build": "ng build app",
     "pretest": "npm run build:board",

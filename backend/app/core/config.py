@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     app_name: str = "P13 Chess Openings API"
     app_env: str = "development"
     api_v1_prefix: str = "/api/v1"
+    # Origines autorisées (CORS) pour le front Angular, séparées par des virgules
+    cors_origins: str = "http://localhost:4200"
 
     mongodb_url: str = "mongodb://localhost:27017"
     mongodb_db_name: str = "p13"
@@ -25,6 +27,11 @@ class Settings(BaseSettings):
 
     youtube_api_url: str = "https://www.googleapis.com/youtube/v3"
     youtube_api_key: str | None = None
+    # Quota YouTube : 10 000 unités par jour (recherche 100, détails 1) ; la réserve est
+    # gardée pour les appels de l'agent en fin de journée. Résultats gardés 7 jours.
+    youtube_quota_daily: int = 10_000
+    youtube_quota_reserve: int = 500
+    youtube_cache_ttl_s: int = 7 * 24 * 3600
 
     http_timeout_s: float = 5.0
 

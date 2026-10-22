@@ -272,14 +272,14 @@ backend/app/
 - LangGraph peut orchestrer recherche Milvus puis mise en forme de la réponse
   (réutilisé par l'agent à l'étape 3).
 
-### Étape 3 : Agent LangGraph, YouTube et mode partie
+### Étape 3 : Agent LangGraph, YouTube et mode partie (agent ✅ `docs/outil-rag.md` phase 5 ; YouTube ✅ `docs/outil-videos.md` ; mode partie ⏳)
 
 - Graphe d'analyse (section 2) et graphe de partie (section 2 bis).
 - Service YouTube avec cache MongoDB : une recherche coûte 100 unités sur un quota
   de 10 000 par jour, soit environ 100 recherches par jour.
 - Tests de bout en bout sur 3 positions : en théorie, sortie de théorie, position invalide.
 
-### Étape 4 : Front Angular
+### Étape 4 : Front Angular ✅ (réalisation détaillée dans `docs/frontend.md`)
 
 **À livrer :** échiquier `ngx-chess-board`, panneau de recommandations (coups suggérés,
 contexte, vidéos), communication avec l'API par des services Angular.

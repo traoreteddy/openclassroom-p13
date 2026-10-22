@@ -120,7 +120,10 @@ async def test_position_in_theory_runs_the_full_pipeline(registry, tracing, resp
         json=load_fixture("lichess/masters_italian.json")
     )
     respx_mock.get(f"{YOUTUBE_URL}/search").respond(
-        json=load_fixture("youtube/search_italian.json")
+        json=load_fixture("youtube/search_italian_fr.json")
+    )
+    respx_mock.get(f"{YOUTUBE_URL}/videos").respond(
+        json=load_fixture("youtube/videos_italian.json")
     )
     agent, chat = make_agent(registry, tracing, [reply("Jouez Fc5, c'est l'Italienne.")])
 
@@ -140,6 +143,7 @@ async def test_position_in_theory_runs_the_full_pipeline(registry, tracing, resp
     assert result.data["theory"]["moves"][0]["san"] == "Bc5"
     assert result.data["evaluation"]["score_cp"] == 25
     assert result.data["context"]["found"] is True
+    assert result.tool_calls[4].arguments == {"opening": "Italian Game", "max_results": 2}
     assert len(result.data["videos"]["videos"]) == 2
     assert result.answer == "Jouez Fc5, c'est l'Italienne."
     assert len(chat.llm_calls) == 1  # le modèle ne fait que rédiger

@@ -34,3 +34,6 @@ backend/data/eval/cache/
 
 # Journal de décision de l'agent (sortie d'exécution)
 backend/data/journal/
+
+# Captures et instantanés Playwright (vérifications manuelles)
+.playwright-mcp/

@@ -8,6 +8,8 @@ son `ToolResult` en réponse HTTP.
 | ok                       | 200 + données                       |
 | erreur `input`           | 422 + erreur                        |
 | erreur `unavailable`     | 503 + erreur (+ en-tête Retry-After)|
+| analyse lancée           | 202 + ticket (job_id)               |
+| job inconnu              | 404 + erreur                        |
 """
 
 from typing import Annotated, Any, Literal
@@ -76,6 +78,55 @@ async def vector_search(
     if opening:
         arguments["opening"] = opening
     return to_response(await registry.execute("search_opening_knowledge", arguments))
+
+
+@router.get("/videos/{opening}", summary="Vidéos explicatives YouTube sur une ouverture")
+async def videos(
+    opening: Annotated[
+        str,
+        Path(min_length=3, max_length=100, description="Nom d'ouverture (Lichess, en anglais)."),
+    ],
+    registry: Registry,
+    max_results: Annotated[int, Query(ge=1, le=5)] = 3,
+    language: Annotated[str, Query(pattern=r"^[a-z]{2}$")] = "fr",
+) -> Any:
+    """200 avec la liste (vide + `message` si rien ne passe le filtre) ; 503 si YouTube est
+    non configuré ou le quota épuisé (`Retry-After` : secondes avant la remise à zéro)."""
+    result = await registry.execute(
+        "find_opening_videos",
+        {"opening": opening, "max_results": max_results, "language": language},
+    )
+    if result.ok and not (result.data or {}).get("videos"):
+        return {
+            **(result.data or {}),
+            "message": f"Aucune vidéo de qualité trouvée pour « {opening} » en « {language} ».",
+        }
+    return to_response(result)
+
+
+@router.post(
+    "/analysis/{fen:path}",
+    status_code=202,
+    summary="Lance une analyse Stockfish profonde en tâche de fond",
+)
+async def start_analysis(
+    fen: FenPath,
+    registry: Registry,
+    depth: Annotated[int, Query(ge=23, le=40)] = 28,
+) -> Any:
+    """Renvoie un `job_id` à interroger avec `GET /analysis/{job_id}` (202 Accepted)."""
+    result = await registry.execute("start_deep_analysis", {"fen": fen, "depth": depth})
+    return to_response(result)
+
+
+@router.get("/analysis/{job_id}", summary="État et résultat d'une analyse profonde")
+async def get_analysis(
+    job_id: Annotated[str, Path(min_length=1, max_length=64)], registry: Registry
+) -> Any:
+    result = await registry.execute("get_deep_analysis", {"job_id": job_id})
+    if not result.ok and result.error and result.error["code"] == "unknown_job":
+        return JSONResponse(status_code=404, content={"error": result.error})
+    return to_response(result)
 
 
 @router.get("/tools", summary="Catalogue des outils exposés à l'agent")

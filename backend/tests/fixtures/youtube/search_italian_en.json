@@ -1,0 +1,237 @@
+{
+  "kind": "youtube#searchListResponse",
+  "etag": "QKEZ9xX358hwi2NFO4fV9uoMbn8",
+  "nextPageToken": "CAUQAA",
+  "regionCode": "CI",
+  "pageInfo": {
+    "totalResults": 1000000,
+    "resultsPerPage": 5
+  },
+  "items": [
+    {
+      "kind": "youtube#searchResult",
+      "etag": "ZCnrmikc5RHaBPIKxJTpR3uZ5Yc",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "qUews8fEGkc"
+      },
+      "snippet": {
+        "publishedAt": "2024-12-13T14:00:52Z",
+        "channelId": "UCsKZ2yOsgfNxln8xH5WkGvg",
+        "title": "Italian Game Chess Opening Explained in 20 Minutes [Crash Course]",
+        "description": "Just released: My BRAND-NEW FREE Masterclass, created after coaching thousands of students ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/qUews8fEGkc/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/qUews8fEGkc/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/qUews8fEGkc/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/qUews8fEGkc/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/qUews8fEGkc/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "Remote Chess Academy",
+        "liveBroadcastContent": "none",
+        "publishTime": "2024-12-13T14:00:52Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "r5eC5cwZ2RFTKgkzEzZZi9tyfnY",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "MhNs8GLo894"
+      },
+      "snippet": {
+        "publishedAt": "2023-01-27T16:43:14Z",
+        "channelId": "UCsKZ2yOsgfNxln8xH5WkGvg",
+        "title": "Learn the Italian Game in 20 Minutes [Chess Opening Crash Course]",
+        "description": "The Italian Game is great for learning development, center control, and attacks—but you'll also learn how to handle other ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/MhNs8GLo894/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/MhNs8GLo894/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/MhNs8GLo894/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/MhNs8GLo894/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/MhNs8GLo894/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "Remote Chess Academy",
+        "liveBroadcastContent": "none",
+        "publishTime": "2023-01-27T16:43:14Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "FlUXSE3vmi4gE8Hc5ytCeCAg9gw",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "QBXk_AUmL2s"
+      },
+      "snippet": {
+        "publishedAt": "2025-09-25T17:25:38Z",
+        "channelId": "UCRxtTeoTNe_gHxks1G5Jnjw",
+        "title": "How I Master the ITALIAN GAME  to reach 2000 in Chess",
+        "description": "1 on 1 lessons with me https://www.chesswithakeem.com/ (limited slots) Want my exclusive videos only available for my private ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/QBXk_AUmL2s/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/QBXk_AUmL2s/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/QBXk_AUmL2s/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/QBXk_AUmL2s/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/QBXk_AUmL2s/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "ChesswithAkeem",
+        "liveBroadcastContent": "none",
+        "publishTime": "2025-09-25T17:25:38Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "kDcm2N9tLLixM2y-QVUlBvG9Sus",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "6ACqk117Q7U"
+      },
+      "snippet": {
+        "publishedAt": "2024-11-22T13:21:02Z",
+        "channelId": "UCsKZ2yOsgfNxln8xH5WkGvg",
+        "title": "Learn The Italian Game, ALL Variations Explained [Traps, Ideas, And Plans]",
+        "description": "The Italian Game is great for traps and attacking ideas—but you'll also learn how to handle openings through plans, not endless ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/6ACqk117Q7U/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/6ACqk117Q7U/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/6ACqk117Q7U/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/6ACqk117Q7U/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/6ACqk117Q7U/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "Remote Chess Academy",
+        "liveBroadcastContent": "none",
+        "publishTime": "2024-11-22T13:21:02Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "5IuctEES7-dtOMiFznPF4XaoMrE",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "2-iD3_M7104"
+      },
+      "snippet": {
+        "publishedAt": "2026-04-18T14:30:02Z",
+        "channelId": "UClE7RCE1XdClecOQPDOniOQ",
+        "title": "I Wish Someone Would&#39;ve Teach Me This Chess Opening Sooner",
+        "description": "How to Play the Italian Game The Best Chess Opening for Beginners in Hindi, The Italian Game Makes You Better at Chess ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/2-iD3_M7104/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/2-iD3_M7104/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/2-iD3_M7104/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/2-iD3_M7104/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/2-iD3_M7104/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          },
+          "fhd": {
+            "url": "https://i.ytimg.com/vi/2-iD3_M7104/fhddefault.jpg",
+            "width": 1920,
+            "height": 1080
+          }
+        },
+        "channelTitle": "ProfessorChess",
+        "liveBroadcastContent": "none",
+        "publishTime": "2026-04-18T14:30:02Z"
+      }
+    }
+  ]
+}

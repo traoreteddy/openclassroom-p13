@@ -1,8 +1,8 @@
 """Ré-enregistre les fixtures de test à partir des vraies API (« cassettes »).
 
 À lancer à la main, quand le format d'une API change ou pour remplacer les fixtures
-construites par des réponses réelles. Coût : 2 requêtes Lichess, 1 recherche YouTube
-(100 unités de quota).
+construites par des réponses réelles. Coût : 2 requêtes Lichess, 3 recherches YouTube
+et une lecture de détails (301 unités de quota).
 
     LICHESS_TOKEN=... YOUTUBE_API_KEY=... uv run python -m scripts.record_fixtures
 """
@@ -68,6 +68,39 @@ async def main() -> int:
         )
         videos.raise_for_status()
         save("youtube/search_italian.json", videos.json())
+
+        # Recherche combinée (FR + EN) puis détails des vidéos : ce que fait l'outil
+        found: list[str] = []
+        for name, query in [
+            ("fr", "partie italienne échecs ouverture explication"),
+            ("en", "Italian Game chess opening tutorial"),
+        ]:
+            response = await client.get(
+                "https://www.googleapis.com/youtube/v3/search",
+                params={
+                    "part": "snippet",
+                    "type": "video",
+                    "q": query,
+                    "maxResults": 5,
+                    "relevanceLanguage": "fr",
+                    "safeSearch": "strict",
+                    "videoEmbeddable": "true",
+                    "key": key,
+                },
+            )
+            response.raise_for_status()
+            save(f"youtube/search_italian_{name}.json", response.json())
+            found += [item["id"]["videoId"] for item in response.json().get("items", [])]
+        details = await client.get(
+            "https://www.googleapis.com/youtube/v3/videos",
+            params={
+                "part": "snippet,contentDetails,statistics,status",
+                "id": ",".join(dict.fromkeys(found)),
+                "key": key,
+            },
+        )
+        details.raise_for_status()
+        save("youtube/videos_italian.json", details.json())
 
     print("Relancer les tests : les valeurs attendues peuvent devoir être ajustées.")
     return 0
