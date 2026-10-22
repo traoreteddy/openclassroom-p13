@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     milvus_uri: str = "http://localhost:19530"
     milvus_collection: str = "openings"
     embedding_model: str = "Qwen/Qwen3-Embedding-0.6B"
+    # Périphérique de l'encodeur (None = choix automatique : GPU si disponible). « cpu »
+    # évite la concurrence avec Ollama sur le GPU du Mac pendant les évaluations.
+    embedding_device: str | None = None
     # Similarité cosinus minimale pour qu'un passage soit jugé pertinent (calibrée en phase 4)
     rag_min_score: float = 0.6
     # Niveau maximal visible par l'agent (public < interne < confidentiel) : réglé par le

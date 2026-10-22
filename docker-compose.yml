@@ -60,7 +60,7 @@ services:
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
       interval: 10s
-      timeout: 5s
+      timeout: 15s  # mongosh met plusieurs secondes à démarrer quand la machine est chargée
       retries: 5
       start_period: 10s
     restart: unless-stopped

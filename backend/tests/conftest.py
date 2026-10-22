@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from collections.abc import Callable
 from pathlib import Path
@@ -155,8 +156,9 @@ class StubVectorStore:
 
 
 def passage(text: str, score: float, opening: str = "Sicilian Defense") -> Passage:
+    digest = hashlib.sha1(text.encode()).hexdigest()[:8]  # identifiant unique par texte
     return Passage(
-        chunk_id=f"recursive:{opening.lower().replace(' ', '-')}:000",
+        chunk_id=f"parent:{opening.lower().replace(' ', '-')}:{digest}",
         article_id=opening.lower().replace(" ", "-"),
         title=opening,
         opening=opening,

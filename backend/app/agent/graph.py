@@ -489,7 +489,9 @@ class ChessAgent:
                 tokens_out=tokens_out,
                 outcome=str(response.content)[:120],
             )
-        return {"step": step, "messages": [AIMessage(content=str(response.content))]}
+        final = AIMessage(content=str(response.content))
+        final.usage_metadata = getattr(response, "usage_metadata", None)  # compté dans le résultat
+        return {"step": step, "messages": [final]}
 
     # --- Résultat ---------------------------------------------------------------------------
 

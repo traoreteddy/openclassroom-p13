@@ -66,6 +66,7 @@ def configure_tracing(
     langfuse_base_url: str | None = None,
     langfuse_public_key: str | None = None,
     langfuse_secret_key: str | None = None,
+    langfuse_timeout: int = 30,
     journal_path: Path | None = None,
     pricing: Pricing | None = None,
     exporter: SpanExporter | None = None,
@@ -91,6 +92,12 @@ def configure_tracing(
             base_url=langfuse_base_url,
             environment=environment,
             tracer_provider=provider,
+            # Par défaut, le SDK n'exporte que les spans de son propre traceur et des
+            # bibliothèques LLM connues : nos spans OpenTelemetry (`p13.agent`) seraient ignorés.
+            should_export_span=lambda span: True,
+            # Délai d'export OTLP : 5 s par défaut, trop court quand la machine est chargée
+            # (modèle local + encodeur) ; les lots dépassés sont perdus, pas rejoués.
+            timeout=langfuse_timeout,
         )
     return Tracing(provider=provider, journal=journal, langfuse=langfuse)
 

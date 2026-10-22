@@ -46,7 +46,9 @@ class ToolDependencies:
 
 def default_dependencies(settings: Settings) -> ToolDependencies:
     """Dépendances réelles. Rien n'est contacté ni chargé avant le premier appel d'outil."""
-    embedder = SentenceTransformerEmbedder(settings.embedding_model)
+    embedder = SentenceTransformerEmbedder(
+        settings.embedding_model, device=settings.embedding_device
+    )
     store = MilvusVectorStore(
         settings.milvus_uri,
         settings.milvus_collection,

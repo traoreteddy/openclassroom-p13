@@ -25,7 +25,7 @@ avec ses choix, ses résultats chiffrés et ses limites.
 | Modèle d'embedding | **`Qwen/Qwen3-Embedding-0.6B`** via `sentence-transformers` | Recommandation de l'énoncé ; multilingue, 1024 dimensions |
 | PyTorch | Version **CPU** dans le conteneur Linux | La version par défaut embarque CUDA (~2 Go inutiles sans GPU) |
 | LLM | Ollama **sur la machine hôte**, hors Docker ; **phi4-mini** comme modèle principal, modèle de l'agent choisi par la mesure en phase 5 | Ollama local profite du GPU du Mac, inaccessible depuis Docker. Le backend le joint via `host.docker.internal:11434` |
-| Traces | **Langfuse auto-hébergé** (conteneurs) + OpenTelemetry | Local, et OpenTelemetry est le standard d'instrumentation |
+| Traces | **OpenTelemetry** avec un journal de décision local (référence) ; export **Langfuse auto-hébergé optionnel** (profil Compose `tracing`, arrêté par défaut) | OpenTelemetry est le standard d'instrumentation ; Langfuse (6 conteneurs, ClickHouse gourmand) n'est lancé que pour visualiser des sessions, le journal local suffit aux mesures |
 | Corpus | **Wikipédia FR** (10 articles d'ouvertures), licence CC BY-SA | Wikichess.fr ne contient pas d'articles exploitables (application d'une seule page, 4 pages dans son plan de site). L'énoncé accepte « toutes sources pertinentes » |
 
 ---
@@ -816,7 +816,7 @@ cadre de la phase 4.
 corrections), 365 au total, couverture de branches 98 %. Test d'intégration Milvus
 (ingestion réelle, relance sans doublon, filtre) : réussi.
 
-### Phase 5 : retrieval décidé par l'agent + traces 🚧
+### Phase 5 : retrieval décidé par l'agent + traces ✅
 
 | Tâche | Détail |
 |---|---|
@@ -829,7 +829,7 @@ corrections), 365 au total, couverture de branches 98 %. Test d'intégration Mil
 | Choix du modèle de l'agent | phi4-mini (sortie structurée), qwen3:1.7b et qwen3:14b (appel natif) comparés sur Tâches-30 |
 | Mesures | **Appels d'outil corrects** sur Tâches-30 ; **appels inutiles** sur Décision-50 (les 20 questions hors corpus ne devraient déclencher aucune recherche) |
 
-#### Résultats de la phase 5 🚧
+#### Résultats de la phase 5 ✅
 
 ##### 5.0 Le graphe : la position commande, le modèle rédige
 
@@ -907,6 +907,75 @@ structuré, le catalogue est résumé à la première ligne de chaque descriptio
 Coût équivalent cloud (hypothèse 0,14 € / 0,55 € par million) : **< 0,01 €** pour les
 30 décisions, quelle que soit la configuration ; en local, 0 €.
 
+##### 5.2 Flot fixe ou retrieval décidé par l'agent : taux d'appels inutiles (Décision-50)
+
+Protocole (`scripts/eval_agent.py --decisions`, qwen3:14b, appel natif) : les 50 questions
+sont posées à l'agent complet dans les deux modes ; on note si `search_opening_knowledge`
+a été appelé. Un appel est **inutile** quand la recherche ne pouvait rien apporter
+(20 questions), **oublié** quand elle était utile et n'a pas eu lieu (30 questions).
+Résultats dans `data/eval/results/phase5-decision.json`.
+
+| Mode | Appels inutiles (20 questions) | Recherches oubliées (30) | Latence / question |
+|---|---|---|---|
+| Flot fixe (une recherche à chaque question) | **100 %** (20/20, par construction) | 0 % | 10,4 s |
+| **Décision de l'agent** | **20 %** (4/20) | 17 % (5/30) | 13,3 s |
+
+Détail des appels inutiles de l'agent, par catégorie :
+
+| Catégorie (20 questions sans recherche utile) | Appels inutiles | Lecture |
+|---|---|---|
+| Hors sujet (« capitale de l'Australie », « Bonjour ») | **0 / 6** | Évités |
+| Relevant d'un autre outil (« qui est mieux dans cette position ? ») | **0 / 6** | Évités : l'agent a appelé le bon outil |
+| Échecs hors corpus (« gambit letton », « règle des 50 coups ») | 4 / 8 | **Non évitables sans connaître le corpus** : la question est bien une question d'ouverture ; la recherche répond `found=false` et l'agent le dit |
+
+Les 5 recherches oubliées sont des questions du corpus auxquelles le modèle a répondu
+de mémoire (4) ou via `get_opening_theory` (1, question sur le code ECO).
+
+**Lecture.** Le retrieval décidé par l'agent supprime **tous** les appels évitables
+(12/12) au prix de 17 % de recherches oubliées ; le flot fixe ne rate rien mais cherche
+toujours, y compris pour « Bonjour ». Le coût réel du flot fixe n'est pas la recherche
+(50 à 100 ms) mais la **rédaction** sur des passages inutiles : 10 s par question, parce
+que le modèle reçoit jusqu'à 5 sections de contexte même quand elles sont hors sujet.
+Le choix dépend du produit : pour un coach où chaque question d'ouverture mérite une
+source, le flot fixe est défendable ; pour un assistant qui dialogue aussi (salutations,
+positions, vidéos), la décision de l'agent est préférable. **Retenu : décision de
+l'agent** pour le parcours « question », les positions suivant de toute façon leur
+parcours déterministe (5.0).
+
+##### 5.2 bis Parcours « position » de bout en bout dans Docker
+
+Image reconstruite avec **Stockfish 17.1** (paquet Debian, `/usr/games/stockfish`) ; jeton
+Lichess et clé YouTube transmis au conteneur depuis `.env`. Appel réel
+`POST /api/v1/agent/analyze` sur l'Italienne après 3.Fc4 :
+
+| Étape | Résultat |
+|---|---|
+| `inspect_position` | position valide, trait aux Noirs |
+| `get_opening_theory` (Lichess, jeton) | **en théorie**, « Italian Game » (C50) : Fc5 25 481 parties, Cf6 21 370, Fe7 1 043 |
+| `evaluate_position` (Stockfish 17.1, profondeur 12) | +0,17, « position équilibrée », meilleur coup Cf6 |
+| `search_opening_knowledge` (Milvus) | 1 passage sur l'Italienne |
+| `find_opening_videos` | `not_configured` (pas de clé YouTube) : signalé, pas bloquant |
+| Rédaction (qwen3:14b) | nomme l'ouverture, cite les 3 coups avec leurs effectifs, l'évaluation et le coup de Stockfish, signale l'absence de vidéo |
+
+59 s de bout en bout (encodeur chargé à froid dans le conteneur + rédaction par le
+modèle local). Limite observée : dans la rédaction, l'idée attribuée à Fc5 (« développer
+la dame ») est **inventée** par le modèle, le contexte RAG (1 passage) ne la contenant
+pas. La consigne « n'invente rien » ne suffit pas à un modèle de 14 milliards de
+paramètres ; piste pour la suite : ne rédiger l'« idée » d'un coup que si un passage la
+documente, sinon se limiter aux statistiques.
+
+**Incident GPU.** La première mesure Multi-10 a été invalidée : 11 recherches sur 15 en
+timeout, l'encodeur Qwen3-Embedding sur le GPU du Mac (MPS) étant privé de mémoire par
+Ollama (qwen3:14b) et par la construction de l'image Docker en parallèle. Correction :
+réglage `EMBEDDING_DEVICE` (`cpu` pour les mesures, l'encodage d'une question courte y
+prend moins d'une seconde) et **préchauffage** de l'encodeur au démarrage (chargement +
+une phrase encodée) pour que le premier appel ne paie pas le chargement du modèle.
+bfloat16 est conservé sur CPU : float32 a été mesuré plus lent sur cette machine.
+
+Incidents corrigés au passage : `uv sync` échouait à la précompilation en bytecode d'une
+dépendance (désactivée : `UV_COMPILE_BYTECODE=0`) ; le healthcheck MongoDB (5 s) expirait
+quand la machine est chargée, bloquant le démarrage du backend (porté à 15 s).
+
 ##### 5.3 Journal de décision et traces OpenTelemetry → Langfuse
 
 **Une seule instrumentation, deux sorties.** Chaque étape de l'agent ouvre un span
@@ -933,17 +1002,32 @@ Sans clés, rien ne sort de la machine.
 | `cost_eur` | 0 en local ; estimation « équivalent cloud » si un tarif est réglé | `0.000312` |
 | `outcome` | Issue courte : code d'erreur, nombre de passages, extrait de réponse | `[not_indexed] collection absente` |
 
+**Pièges rencontrés avec Langfuse auto-hébergé** (6 conteneurs : web, worker,
+PostgreSQL, ClickHouse, Redis, MinIO, profil Compose `tracing`) :
+
+| Symptôme | Cause | Correction |
+|---|---|---|
+| Aucune trace, « Dropping span due to should_export_span filter » (visible seulement avec `LANGFUSE_DEBUG=true`) | le SDK v5 n'exporte par défaut que les spans de son propre traceur et des bibliothèques LLM qu'il connaît ; nos spans `p13.agent` étaient ignorés en silence | `should_export_span=lambda span: True` à la création du client |
+| « Failed to export spans batch due to timeout » pendant les mesures, lots de spans perdus | délai d'export OTLP de **5 s** par défaut, dépassé quand la machine est chargée (modèle local, encodeur, ClickHouse) ; un lot en échec n'est pas rejoué | délai porté à 30 s (`langfuse_timeout`) |
+| `GET /api/public/traces` et `/sessions` répondent **404** alors que les spans sont bien dans ClickHouse (`events_core`) | Langfuse **v4** fonctionne en mode « events only » : l'ancienne API traces/sessions n'existe plus | lire `GET /api/public/v2/observations?sessionId=…`, qui liste les observations d'une session (traces racines portant `sessionId`, outils, générations) |
+
 Dans Langfuse, les spans portent `langfuse.session.id` (regroupement par session),
 `langfuse.trace.name` (`analyze_position`, `agent_turn`, `first_decision`) et le type
 d'observation (`tool` pour les appels d'outil). Les générations du modèle (entrées,
 sorties, tokens) sont ajoutées par le `CallbackHandler` LangChain de Langfuse.
+
+**Décision (phase 7).** Langfuse reste **optionnel** : son profil Compose n'est pas lancé
+par défaut, car ses 6 conteneurs pesaient autant que le reste de la pile pendant les
+mesures (ClickHouse à 1,5 à 2 cœurs en continu). Le journal de décision local est la
+source de référence des scripts d'évaluation et de la doc ; Langfuse sert à visualiser une
+session quand on le démarre (`docker compose --profile tracing up -d`).
 
 **Coût.** Les modèles tournent en local : coût réel 0 €. Le journal calcule un
 « équivalent cloud » à partir des tokens (tarif réglable, hypothèse 0,14 € / 0,55 € par
 million de tokens d'entrée / sortie), pour donner un ordre de grandeur de ce que
 coûterait le même trafic chez un fournisseur.
 
-### Phase 6 : recherche multi-sauts sous budget ⏳
+### Phase 6 : recherche multi-sauts sous budget ✅
 
 | Tâche | Détail |
 |---|---|
@@ -952,13 +1036,190 @@ coûterait le même trafic chez un fournisseur.
 | **Budget** | **3 recherches** et **6 000 tokens** de contexte récupéré au maximum |
 | Comparaison | Multi-sauts vs RAG en un seul passage sur Multi-10 |
 
-### Phase 7 : évaluer la boucle agentique ⏳
+#### Résultats de la phase 6 ✅
+
+##### 6.1 La boucle de recherche (`app/agent/multihop.py`)
+
+```
+question ──► plan : première sous-question (LLM, sortie structurée)
+               │
+               ▼
+      ┌─► search (search_opening_knowledge, 4 passages) ──► passages retenus
+      │        │                                            (dédoublonnés par section,
+      │        ▼                                             ajoutés par score tant que
+      │     judge (LLM) : assez d'informations ?             le budget le permet)
+      │        ├─ oui ────────────────────────────────────► answer
+      │        ├─ non, rien trouvé → reformuler ─────┐
+      │        └─ non → sous-question suivante ──────┤  (elle dépend de ce qui vient
+      └──────────────────────────────────────────────┘   d'être appris)
+      arrêts forcés : 3 recherches, ou 6 000 tokens de contexte
+```
+
+| Élément | Mise en œuvre |
+|---|---|
+| **Décomposition en sous-requêtes dépendantes** | `plan` produit la première sous-question ; après chaque recherche, `judge` reçoit la question, les sous-questions déjà posées et les passages retrouvés, et formule la suivante **à partir de ce qui a été trouvé** (ex. le nom « gambit Evans » découvert au saut 1 sert au saut 2) |
+| **Critère d'arrêt** | `judge` répond `enough=true` ; ou plus de sous-question possible ; ou garde-fous |
+| **Reformulation** | si la dernière recherche n'a rien retourné (`found=false`) ou rien de nouveau, le jugement est invité à **reformuler** avec d'autres mots ; une sous-question identique à une précédente est refusée (elle ne ferait que répéter) |
+| **Budget : 3 recherches** | compteur de recherches, arrêt `max_searches` ; aucun jugement n'est demandé après la 3ᵉ (un appel LLM économisé) |
+| **Budget : 6 000 tokens de contexte** | les passages d'une recherche sont ajoutés **par score décroissant** tant que le cumul (compté avec le tokenizer du modèle d'embedding) tient ; sinon arrêt `budget`. Un passage déjà retenu n'est jamais compté deux fois. C'est la réponse à la remarque du relecteur de la phase 4 : `limit` est désormais borné par le budget restant |
+| **Traces** | chaque sous-question = span `decision` (`plan`, `next_hop`, `reformulate`, `stop`) + span `tool_call` ; une session Langfuse par exécution |
+
+Tests (`tests/agent/test_multihop.py`, modèle scripté, base en stub) : deux sauts
+dépendants puis arrêt, plafond de 3 recherches, reformulation après une recherche vide,
+budget de contexte qui refuse le 3ᵉ passage, dédoublonnage, sous-question identique,
+erreur d'outil tolérée, JSON invalide toléré.
+
+##### 6.2 Multi-sauts contre un seul passage sur Multi-10 (`scripts/eval_multihop.py`)
+
+Protocole : pour chaque question de Multi-10 (deux informations enchaînées, la seconde
+dépend de la première), on compare **un seul passage** (la question entière envoyée telle
+quelle à `search_opening_knowledge`, 8 passages) et la **boucle multi-sauts** (budget 3
+recherches × 4 passages, 6 000 tokens). Modèle qwen3:14b pour planifier, juger et répondre ;
+encodeur sur CPU (voir l'incident GPU en 5.2 bis). Session Langfuse
+`eval-multi10-qwen3_14b-20261022T175455`, résultats dans
+`data/eval/results/phase6-multihop.json` (et `.rows.json` pour le détail par question).
+
+| Méthode | Les 2 sauts trouvés | Rappel des sauts | Réponse (termes clés) | Recherches | Tokens de contexte | Temps |
+|---|---|---|---|---|---|---|
+| Un passage | 30 % | 0,60 | 57 % | 1 | 1 208 | 13,0 s |
+| Multi-sauts | **40 %** | 0,60 | 40 % | 1,3 | 1 113 | 26,9 s |
+
+Motifs d'arrêt de la boucle : `enough` 8, `no_next_question` 2, `max_searches` 0,
+`budget` 0 ; 0 reformulation.
+
+Lecture par question (✓ = les deux informations retrouvées) :
+
+| Question | Un passage | Multi-sauts | Ce qui s'est passé |
+|---|---|---|---|
+| multi-02 (gambit joué par 4.b4 → qui est Evans) | 1/2 | **2/2** | décomposition dépendante réussie : saut 1 « qui a donné son nom au gambit 4.b4 ? » → saut 2 « qui est l'homme qui a donné son nom au gambit Evans ? » |
+| multi-10 (gambit du capitaine gallois → idée après 5…Fe7) | 1/2 | **2/2** | idem : le nom « gambit Evans » appris au saut 1 sert au saut 2 |
+| multi-03, multi-09 | 2/2 | 2/2 | questions courtes : une recherche suffit aux deux méthodes |
+| multi-01 (3…Cf6 dans l'italienne → code ECO) | **2/2** | 0/2 | le plan a réduit la question à « quelle défense répond 3…Cf6 ? », le passage ramené n'était pas celui attendu et le juge a déclaré **« assez »** sans chercher le code ECO ; la question entière, elle, tombait directement sur le bon passage |
+| multi-04, multi-05, multi-06, multi-07 | 1/2 | 1/2 | la seconde information n'est trouvée par aucune méthode ; dans 3 cas le juge s'arrête (« assez ») après **une** recherche alors qu'il manque la moitié de la réponse |
+| multi-08 (codes ECO E60–E99 → joueurs soviétiques) | 0/2 | 0/2 | la base ne ramène rien pour « défense dont les codes ECO vont de E60 à E99 » ; le juge renvoie `null` au lieu de reformuler (`no_next_question`) |
+
+**Ce que montre la première mesure.**
+
+- La **décomposition en sous-requêtes dépendantes fonctionne** quand la question l'exige
+  vraiment (multi-02, multi-10) : la boucle trouve ce que la recherche en un passage rate.
+- Le **critère d'arrêt est trop optimiste** : « assez » dans 8 cas sur 10, dont 7 après une
+  seule recherche. Le juge voit des passages qui répondent à la sous-question posée et
+  conclut que la question initiale est couverte (perte sur multi-01).
+- La **reformulation n'a jamais été déclenchée** : quand une recherche ne ramène rien
+  (multi-08), le modèle renvoie `null` plutôt qu'une nouvelle formulation, malgré la consigne.
+- Le **plan réécrit la question** avant la première recherche et perd des détails qu'elle
+  contenait (coups, noms) : sur Réf-30 (phase 7, première mesure), « pourquoi 4.c3 est-il
+  une erreur dans la défense des deux cavaliers ? » est devenu une suite de coups de la
+  Sicilienne.
+- Le **budget n'a jamais été atteint** (1,3 recherche en moyenne, 2 053 tokens au maximum).
+
+**Deux corrections** (`app/agent/multihop.py`, 3 tests ajoutés) :
+
+| Correction | Mise en œuvre |
+|---|---|
+| **Reformulation imposée** | si le juge répond « pas assez » sans proposer de sous-question, un appel dédié (`REFORMULATE_PROMPT`, schéma qui exige une sous-question) demande une autre formulation ; seule une répétition d'une sous-question déjà posée arrête la boucle (`no_next_question`) |
+| **Première recherche = la question telle quelle** | `Budget.first_hop="question"` (défaut) : aucune réécriture avant le premier saut, la phase 4 ayant mesuré un rappel à 5 de 0,87 avec la question brute ; la décomposition intervient au jugement, à partir de ce qui a été trouvé. `first_hop="plan"` conserve l'ancien comportement |
+
+**Seconde mesure** (session `eval-multi10-qwen3_14b-20261022T182137`, conteneurs étrangers
+arrêtés, aucun lot de traces perdu) :
+
+| Méthode | Les 2 sauts trouvés | Rappel des sauts | Réponse (termes clés) | Recherches | Reformulations | Tokens de contexte | Temps |
+|---|---|---|---|---|---|---|---|
+| Un passage | 30 % | 0,60 | 57 % | 1 | — | 1 208 | 12,0 s |
+| Multi-sauts, 1ʳᵉ mesure (plan, abandon) | 40 % | 0,60 | 40 % | 1,3 | 0 | 1 113 | 26,9 s |
+| Multi-sauts, 2ᵉ mesure (question brute, reformulation imposée) | 30 % | **0,65** | 50 % | 1,7 | 4 | 1 166 | 28,1 s |
+
+Arrêts de la 2ᵉ mesure : `enough` 7, `max_searches` 3, `no_next_question` 0.
+
+- **multi-01** repasse à 2/2 : la question brute tombe sur le bon passage, puis le juge
+  demande le code ECO (2 recherches).
+- **multi-08** n'est plus abandonné : 3 recherches, 2 reformulations, la défense est-indienne
+  est identifiée (1/2) ; les joueurs soviétiques restent introuvables.
+- **multi-02** régresse (2/2 → 1/2) : le juge formule le 2ᵉ saut comme « quel métier
+  exerçait l'homme… » là où le plan demandait « qui est l'homme… », et deux reformulations
+  ne retrouvent pas le passage sur le capitaine. La formulation de la sous-question suivante
+  reste le point sensible.
+- **multi-10** : la question brute ramène directement le passage de la 2ᵉ information
+  (l'idée après 5…Fe7) et le juge s'arrête : réponse juste (100 %), mais l'intermédiaire
+  (le gambit Evans) n'est pas « retrouvé » au sens de la métrique.
+- Les écarts de « réponse » sur une même recherche (multi-03 : 100 % → 20 %) tiennent à la
+  variabilité du rédacteur, pas à la recherche.
+
+**Décision.** La version corrigée est retenue : elle ne renonce plus jamais (0 abandon),
+obtient le meilleur rappel des sauts (0,65) et surtout corrige la phase 7 (rappel Réf-30
+de 0,67 à 0,87, voir ci-dessous). Le prix est un temps doublé par rapport à la recherche en
+un passage (jugement + rédaction par le modèle local). Les garde-fous (3 recherches, 6 000
+tokens) sont maintenant sollicités : 3 arrêts `max_searches`, le budget de tokens jamais.
+
+### Phase 7 : évaluer la boucle agentique ✅
 
 | Tâche | Détail |
 |---|---|
 | Métriques | **Rappel**, **précision**, **nombre moyen de sauts** |
 | Évaluation | Sur Réf-30, traces des appels d'outil et des sous-requêtes **par session** dans Langfuse |
 | Objectifs | **Rappel > 0,8** et **moins de 3 sauts** par question |
+
+#### Résultats de la phase 7 ✅
+
+##### 7.1 Métriques (`app/rag/eval/agentic.py`, 4 tests)
+
+| Métrique | Définition |
+|---|---|
+| **Rappel** | part des questions de Réf-30 dont l'extrait attendu figure dans un passage retenu par la boucle |
+| **Précision stricte** | moyenne par question de (passages retenus contenant l'extrait) / (passages retenus) ; un seul extrait est attendu, donc plafonnée à 1/n pour n passages retenus |
+| **Précision article** | idem en comptant pertinent tout passage du bon article (mesure le « bruit » hors sujet) |
+| **Sauts moyens** | nombre moyen de recherches par question (et maximum) |
+
+##### 7.2 Mesure sur Réf-30 (`scripts/eval_agentic_search.py`, qwen3:14b)
+
+| Mesure | 1ʳᵉ (plan + abandon possible) | 2ᵉ (question brute + reformulation imposée) |
+|---|---|---|
+| **Rappel** | 0,67 | **0,87** |
+| Précision stricte | 0,27 | 0,36 |
+| Précision article | 0,64 | **0,90** |
+| Sauts moyens (max) | 1,17 (3) | **1,20 (3)** |
+| Tokens de contexte retenus | 885 | 1 153 |
+| Temps par question | 37,5 s (machine saturée) | 26,9 s |
+| Arrêts | `enough` 22, `no_next_question` 7, `max_searches` 1 | `enough` 27, `max_searches` 3 |
+| Manquées | 10 | 4 : ref-07, ref-09, ref-10, ref-11 |
+| Tokens modèle (entrée / sortie) | 74 184 / 7 023 | 83 139 / 4 710 |
+| Coût réel / équivalent cloud | 0 € / 0,013 € | 0 € / 0,014 € |
+| Session Langfuse | `eval-agentic-qwen3_14b-20261022T180209` | `eval-agentic-qwen3_14b-20261022T182844` |
+
+**Objectifs : rappel 0,87 > 0,8 ✅ ; 1,2 saut en moyenne < 3 ✅.**
+
+Lecture :
+
+- Les 4 questions manquées sont **exactement celles que la recherche simple manquait déjà
+  en phase 4** (rappel à 5 de 0,87, mêmes identifiants) : la boucle n'a rien perdu par
+  rapport au RAG de référence, et 3 reformulations n'ont pas suffi à ramener ces passages
+  (ref-07 : suite de coups de l'est-indienne ; ref-09 et ref-11 : variantes de la française
+  nommées dans des chunks de liste ; ref-10 : le juge a dit « assez » sur un passage voisin).
+  C'est une limite de l'encodeur et du découpage, pas de la boucle.
+- La **précision article de 0,90** montre que les passages retenus viennent presque toujours
+  du bon article ; la précision stricte (0,36) est mécaniquement basse puisqu'un seul
+  extrait est attendu parmi 4 passages retenus par recherche.
+- La 1ʳᵉ mesure illustre l'intérêt d'une évaluation outillée : elle a révélé les deux
+  défauts (réécriture de la question, abandon) corrigés en phase 6, et un biais de
+  mesure (3 recherches en timeout, machine saturée par des conteneurs étrangers au
+  projet et par ClickHouse).
+
+##### 7.3 Traces par session dans Langfuse
+
+Chaque exécution de script est une **session** Langfuse (`eval-agentic-<modèle>-<date>`,
+`eval-multi10-…`) ; chaque question est une **trace** `multihop_search` portant
+`langfuse.session.id`, avec ses spans `decision:plan`, `decision:next_hop`,
+`decision:reformulate`, `decision:stop` (sous-requêtes), `tool_call:search_opening_knowledge`
+(appels d'outil) et `answer:answer`, plus les générations `ChatOllama` du callback
+LangChain. Vérifié pendant la mesure via `GET /api/public/v2/observations?sessionId=…`
+(traces racines de la session) et dans ClickHouse (`events_core`, regroupement par
+`session_id`). Après correction du délai d'export (30 s) et arrêt des conteneurs
+étrangers : **0 lot de spans perdu** sur les deux dernières sessions, contre 29 sur la
+première.
+
+Le même contenu est dans le **journal de décision local**
+(`data/journal/<session>.jsonl`, une ligne par étape), qui reste la source de référence
+des scripts ; Langfuse est optionnel (voir 5.3).
 
 ---
 
@@ -1008,4 +1269,6 @@ Chaque consigne est rattachée à la phase qui la traite.
 | Point | Quand le trancher |
 |---|---|
 | Modèle et mode de l'agent : phi4-mini (sortie structurée, 4/5) ou qwen3 (appel natif, 5/5) | Phase 5, par la mesure sur Tâches-30 |
+| Multi-sauts : la formulation de la sous-question suivante par le juge (multi-02 : « quel métier… » rate le passage que « qui est… » trouvait) ; piste : faire lister au plan toutes les informations à trouver et faire cocher chacune par le juge avant « assez » | Après la phase 7, si le mode question est étendu |
+| Les 4 questions de Réf-30 manquées par toutes les méthodes (ref-07, 09, 10, 11) : variantes nommées dans des chunks de liste et suite de coups ; piste : index lexical (BM25) en complément du vectoriel | Hors périmètre du projet |
 | ~~Faut-il ajouter des documents de chaque type (procédure, code, tableau, courriel) ?~~ Tranché en phase 4 : règles documentées pour les 6 types, appliquées aux 3 types présents dans le corpus (texte, liste, partie), vérifiées par des tests sur exemples fictifs pour les 3 autres, jamais indexés | — |

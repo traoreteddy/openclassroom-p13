@@ -38,8 +38,9 @@ class SentenceTransformerEmbedder:
         return self._model is not None
 
     async def warm_up(self) -> None:
-        """Charge le modèle et attend la fin du chargement (scripts, tests d'intégration)."""
+        """Charge le modèle, puis encode une phrase : la première vraie requête est rapide."""
         await asyncio.to_thread(self._load)
+        await asyncio.to_thread(self._encode, ["préchauffage de l'encodeur"], prompt_name="query")
 
     def start_warm_up(self) -> asyncio.Task[None]:
         """Lance le chargement en arrière-plan, sans l'attendre (démarrage de l'API)."""
@@ -94,6 +95,8 @@ class SentenceTransformerEmbedder:
                 try:
                     from sentence_transformers import SentenceTransformer
 
+                    # bfloat16 (défaut du modèle) gardé aussi sur CPU : mesuré plus rapide que
+                    # float32 sur Mac M (0,5 s contre 4,8 s par question une fois chaud)
                     self._model = SentenceTransformer(self.model_name, device=self._device)
                 except OSError as exc:  # modèle absent du cache et pas de réseau
                     raise ToolUnavailableError(

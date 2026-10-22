@@ -1,0 +1,375 @@
+[
+  {
+    "id": "multi-01",
+    "question": "Quel est le code ECO de la défense où les Noirs répondent 3...Cf6 dans la partie italienne ?",
+    "single": {
+      "hops_found": [
+        true,
+        true
+      ],
+      "context_tokens": 1443,
+      "answer_match": 1.0,
+      "answer": "Le code ECO de la défense des deux cavaliers, où les Noirs répondent 3...Cf6 dans la partie italienne, est C55 à C59.  \nCitation : Passage [5] - \"Défense des deux cavaliers\".",
+      "seconds": 40.0
+    },
+    "multihop": {
+      "hops_found": [
+        false,
+        false
+      ],
+      "sub_questions": [
+        "Quelle est la défense des Noirs qui répond 3...Cf6 dans la partie italienne ?"
+      ],
+      "searches": 1,
+      "reformulations": 0,
+      "stop_reason": "enough",
+      "context_tokens": 1088,
+      "answer_match": 0.0,
+      "answer": "Le code ECO de la défense des deux cavaliers, où les Noirs répondent 3...Cf6 dans la partie italienne, est **B20**.  \nCite : Passage [3] (\"Défense des deux cavaliers > Analyse\").",
+      "tokens_in": 2596,
+      "tokens_out": 220,
+      "seconds": 16.8
+    },
+    "terms": [
+      "c55",
+      "c59"
+    ]
+  },
+  {
+    "id": "multi-02",
+    "question": "Quel métier exerçait l'homme qui a donné son nom au gambit de la partie italienne joué par 4.b4 ?",
+    "single": {
+      "hops_found": [
+        true,
+        false
+      ],
+      "context_tokens": 1187,
+      "answer_match": 0.25,
+      "answer": "L'homme qui a donné son nom au gambit de la partie italienne joué par 4.b4 est **Evans**.  \nCitation : [1] Gambit Evans > Remarques générales.",
+      "seconds": 7.5
+    },
+    "multihop": {
+      "hops_found": [
+        true,
+        true
+      ],
+      "sub_questions": [
+        "Qui a donné son nom au gambit de la partie italienne joué par 4.b4 ?",
+        "Qui est l'homme qui a donné son nom au gambit Evans ?"
+      ],
+      "searches": 2,
+      "reformulations": 0,
+      "stop_reason": "enough",
+      "context_tokens": 1185,
+      "answer_match": 0.5,
+      "answer": "L'homme qui a donné son nom au gambit de la partie italienne joué par 4.b4 était un **capitaine de navire gallois**.  \nCitation : [5] Gambit Evans > Histoire.",
+      "tokens_in": 4256,
+      "tokens_out": 251,
+      "seconds": 29.2
+    },
+    "terms": [
+      "capitaine",
+      "davies",
+      "evans",
+      "william"
+    ]
+  },
+  {
+    "id": "multi-03",
+    "question": "En quelle année ont commencé les analyses des deux hommes qui ont donné leur nom à la défense 1.e4 c6 ?",
+    "single": {
+      "hops_found": [
+        true,
+        true
+      ],
+      "context_tokens": 1045,
+      "answer_match": 1.0,
+      "answer": "Les analyses de Horatio Caro et Marcus Kann ont commencé en 1886.  \nCitation : [1] Défense Caro-Kann.",
+      "seconds": 8.8
+    },
+    "multihop": {
+      "hops_found": [
+        true,
+        true
+      ],
+      "sub_questions": [
+        "Qui sont les deux hommes qui ont donné leur nom à la défense 1.e4 c6 ?"
+      ],
+      "searches": 1,
+      "reformulations": 0,
+      "stop_reason": "enough",
+      "context_tokens": 890,
+      "answer_match": 1.0,
+      "answer": "Les analyses de Horatio Caro et Marcus Kann ont commencé en 1886.  \nCitation : [1] Défense Caro-Kann.",
+      "tokens_in": 2508,
+      "tokens_out": 186,
+      "seconds": 16.0
+    },
+    "terms": [
+      "1886",
+      "caro",
+      "horatio",
+      "kann",
+      "marcus"
+    ]
+  },
+  {
+    "id": "multi-04",
+    "question": "La variante Steiner de la défense française peut transposer dans une autre défense après 2...c5 : par quels coups cette autre défense s'obtient-elle normalement ?",
+    "single": {
+      "hops_found": [
+        true,
+        false
+      ],
+      "context_tokens": 2254,
+      "answer_match": 0.5,
+      "answer": "La variante Steiner de la défense française, après 2...c5, transpose normalement dans la défense sicilienne. Cite : [2] Défense française > Variantes autres que 2.d4 d5 > Les blancs ne jouent pas 2.d4.",
+      "seconds": 11.3
+    },
+    "multihop": {
+      "hops_found": [
+        true,
+        false
+      ],
+      "sub_questions": [
+        "Quelle est la défense obtenue normalement après les coups 1.e4 c5 dans la variante Steiner de la défense française ?"
+      ],
+      "searches": 1,
+      "reformulations": 0,
+      "stop_reason": "enough",
+      "context_tokens": 1467,
+      "answer_match": 0.5,
+      "answer": "La variante Steiner de la défense française peut transposer dans la défense sicilienne après 2...c5. Cela est mentionné dans le passage [3], sous la rubrique \"Défense française > Variantes autres que 2.d4 d5 > Les blancs ne jouent pas 2.d4 > 2.c4, la variante Steiner\".",
+      "tokens_in": 3340,
+      "tokens_out": 258,
+      "seconds": 21.6
+    },
+    "terms": [
+      "1.e4",
+      "c5"
+    ]
+  },
+  {
+    "id": "multi-05",
+    "question": "La défense Caro-Kann peut s'obtenir par transposition depuis une autre ouverture : par quel coup cette ouverture commence-t-elle ?",
+    "single": {
+      "hops_found": [
+        true,
+        false
+      ],
+      "context_tokens": 1148,
+      "answer_match": 1.0,
+      "answer": "La défense Caro-Kann commence par le coup **1.e4 c6** (passage [2]). Elle peut aussi s'obtenir par transposition depuis l'ouverture anglaise après **1.c4, c6 ; 2.e4, d5** (passage [1]).",
+      "seconds": 9.2
+    },
+    "multihop": {
+      "hops_found": [
+        true,
+        false
+      ],
+      "sub_questions": [
+        "Quel est le premier coup de la défense Caro-Kann ?"
+      ],
+      "searches": 1,
+      "reformulations": 0,
+      "stop_reason": "enough",
+      "context_tokens": 951,
+      "answer_match": 0.0,
+      "answer": "La défense Caro-Kann commence par le coup **1.e4 c6**.  \nCitation : passage [1], \"Défense Caro-Kann\".",
+      "tokens_in": 2612,
+      "tokens_out": 168,
+      "seconds": 14.9
+    },
+    "terms": [
+      "1.c4"
+    ]
+  },
+  {
+    "id": "multi-06",
+    "question": "Quelle part de l'Encyclopédie des ouvertures d'échecs occupe l'ouverture dont la défense slave est une variante ?",
+    "single": {
+      "hops_found": [
+        true,
+        false
+      ],
+      "context_tokens": 750,
+      "answer_match": 0.0,
+      "answer": "La défense slave est une variante du gambit dame. Aucun passage ne précise la part de l'Encyclopédie des ouvertures d'échecs que cette ouverture occupe. Donc, l'information manque.",
+      "seconds": 9.2
+    },
+    "multihop": {
+      "hops_found": [
+        true,
+        false
+      ],
+      "sub_questions": [
+        "Quelle est l'ouverture dont la défense slave est une variante ?",
+        "Quelle est la catégorie ou le groupe de l'ouverture dont la défense slave est une variante dans l'Encyclopédie des ouvertures d'échecs ?"
+      ],
+      "searches": 2,
+      "reformulations": 0,
+      "stop_reason": "no_next_question",
+      "context_tokens": 691,
+      "answer_match": 0.0,
+      "answer": "La défense slave est une variante du **gambit dame**.  \nCite l'article : **Défense slave**.",
+      "tokens_in": 3144,
+      "tokens_out": 337,
+      "seconds": 31.7
+    },
+    "terms": [
+      "presque"
+    ]
+  },
+  {
+    "id": "multi-07",
+    "question": "En l'honneur de qui est nommée l'ouverture dans laquelle Karpov a joué la variante Zaïtsev contre Kasparov ?",
+    "single": {
+      "hops_found": [
+        true,
+        false
+      ],
+      "context_tokens": 2216,
+      "answer_match": 0.0,
+      "answer": "L'ouverture est nommée en l'honneur de **Viktor Kortchnoï**.  \nCitation : Passage [3], \"Espagnole ouverte (Karpov-Kortchnoï, 1981)\".",
+      "seconds": 15.3
+    },
+    "multihop": {
+      "hops_found": [
+        true,
+        false
+      ],
+      "sub_questions": [
+        "Quelle est l'ouverture dans laquelle Karpov a joué la variante Zaïtsev contre Kasparov ?"
+      ],
+      "searches": 1,
+      "reformulations": 0,
+      "stop_reason": "enough",
+      "context_tokens": 2053,
+      "answer_match": 0.0,
+      "answer": "L'ouverture est nommée en l'honneur de **Viktor Zaïtsev**.  \nCitation : [1] Partie espagnole > Joueurs emblématiques et exemples de parties > Variante Zaïtsev (Kasparov-Karpov, 1990).",
+      "tokens_in": 4950,
+      "tokens_out": 260,
+      "seconds": 39.6
+    },
+    "terms": [
+      "lópez",
+      "segura",
+      "xvie"
+    ]
+  },
+  {
+    "id": "multi-08",
+    "question": "Quels joueurs soviétiques ont enrichi la théorie de la défense dont les codes ECO vont de E60 à E99 ?",
+    "single": {
+      "hops_found": [
+        false,
+        false
+      ],
+      "context_tokens": 0,
+      "answer_match": 0.0,
+      "answer": "Les passages fournis sont insuffisants pour répondre à la question. Il manque des informations sur les joueurs soviétiques qui ont contribué à la théorie de la défense couverte par les codes E60 à E99 (défense king's indian).",
+      "seconds": 5.0
+    },
+    "multihop": {
+      "hops_found": [
+        false,
+        false
+      ],
+      "sub_questions": [
+        "Quelle est la défense dont les codes ECO vont de E60 à E99 ?"
+      ],
+      "searches": 1,
+      "reformulations": 0,
+      "stop_reason": "no_next_question",
+      "context_tokens": 0,
+      "answer_match": 0.0,
+      "answer": "Les passages fournis sont insuffisants pour répondre à la question. Il manque des informations sur les joueurs soviétiques qui ont contribué à la théorie de la défense couverte par les codes E60 à E99 (défense king's indian).",
+      "tokens_in": 604,
+      "tokens_out": 205,
+      "seconds": 17.9
+    },
+    "terms": [
+      "boleslavski",
+      "bronstein",
+      "david",
+      "efim",
+      "geller",
+      "issaak"
+    ]
+  },
+  {
+    "id": "multi-09",
+    "question": "Dans la variante de la Caro-Kann popularisée par Nigel Short, quel coup les Blancs jouent-ils le plus souvent au 5e coup ?",
+    "single": {
+      "hops_found": [
+        true,
+        true
+      ],
+      "context_tokens": 1582,
+      "answer_match": 1.0,
+      "answer": "Le coup le plus souvent joué par les Blancs au 5e coup dans la variante de la Caro-Kann popularisée par Nigel Short est **5.Fe2**.  \nCite : [2] Défense Caro-Kann > Analyse et variantes > Variante d'avance > Variante principale: 3...Ff5 > La Variante Short.",
+      "seconds": 16.1
+    },
+    "multihop": {
+      "hops_found": [
+        true,
+        true
+      ],
+      "sub_questions": [
+        "Quelle est la variante de la Caro-Kann popularisée par Nigel Short ?"
+      ],
+      "searches": 1,
+      "reformulations": 0,
+      "stop_reason": "enough",
+      "context_tokens": 1120,
+      "answer_match": 1.0,
+      "answer": "Le coup le plus souvent joué par les Blancs au 5e coup dans la variante de la Caro-Kann popularisée par Nigel Short est **5.Fe2**.  \nCite : [4] Défense Caro-Kann > Analyse et variantes > Variante d'avance > Variante principale: 3...Ff5.",
+      "tokens_in": 3030,
+      "tokens_out": 203,
+      "seconds": 31.6
+    },
+    "terms": [
+      "5.fe2",
+      "short"
+    ]
+  },
+  {
+    "id": "multi-10",
+    "question": "Dans le gambit qui porte le nom d'un capitaine de navire gallois, quelle est l'idée des Blancs après la retraite 5...Fe7 ?",
+    "single": {
+      "hops_found": [
+        false,
+        true
+      ],
+      "context_tokens": 457,
+      "answer_match": 1.0,
+      "answer": "L'idée des Blancs après 5...Fe7 est de jouer **Db3** et d'attaquer deux fois le pion faible en **f7**.  \nCite : **Gambit Evans > Les retraites du fou > 5...Fe7**.",
+      "seconds": 7.8
+    },
+    "multihop": {
+      "hops_found": [
+        true,
+        true
+      ],
+      "sub_questions": [
+        "Quel est le nom du gambit qui porte le nom d'un capitaine de navire gallois ?",
+        "Quelle est l'idée des Blancs après la retraite 5...Fe7 dans le Gambit Evans ?"
+      ],
+      "searches": 2,
+      "reformulations": 0,
+      "stop_reason": "enough",
+      "context_tokens": 1682,
+      "answer_match": 1.0,
+      "answer": "L'idée des Blancs après 5...Fe7 est de jouer **Db3** et d'attaquer deux fois le pion faible en **f7**.  \nCitation : *Gambit Evans > Les retraites du fou > 5...Fe7*",
+      "tokens_in": 5075,
+      "tokens_out": 316,
+      "seconds": 50.2
+    },
+    "terms": [
+      "db3",
+      "evans",
+      "f7",
+      "jouer"
+    ]
+  }
+]

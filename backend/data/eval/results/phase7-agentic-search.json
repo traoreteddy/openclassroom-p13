@@ -1,0 +1,456 @@
+{
+  "recall": 0.867,
+  "precision": 0.356,
+  "article_precision": 0.897,
+  "mean_hops": 1.2,
+  "max_hops": 3,
+  "mean_context_tokens": 1153,
+  "stop_reasons": {
+    "enough": 27,
+    "max_searches": 3
+  },
+  "missed": [
+    "ref-07",
+    "ref-09",
+    "ref-10",
+    "ref-11"
+  ],
+  "targets": {
+    "recall > 0.8": true,
+    "mean hops < 3": true
+  },
+  "questions": [
+    {
+      "id": "ref-01",
+      "found": true,
+      "retained": 4,
+      "relevant": 1,
+      "same_article": 4,
+      "hops": 1,
+      "context_tokens": 1113,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Dans la défense Caro-Kann, à quelle attaque mène la variante d'échange quand les Blancs poursuivent par c2-c4 ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-02",
+      "found": true,
+      "retained": 4,
+      "relevant": 1,
+      "same_article": 4,
+      "hops": 1,
+      "context_tokens": 1146,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Dans la variante Short de la défense Caro-Kann, quel coup les Blancs jouent-ils le plus souvent au 5e coup, et dans quel but ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-03",
+      "found": true,
+      "retained": 1,
+      "relevant": 1,
+      "same_article": 1,
+      "hops": 1,
+      "context_tokens": 321,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Dans la défense des deux cavaliers, quel coup typique de l'école berlinoise a été analysé en profondeur au XIXe siècle par Paul Rudolf von Bilguer ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-04",
+      "found": true,
+      "retained": 4,
+      "relevant": 1,
+      "same_article": 4,
+      "hops": 1,
+      "context_tokens": 2490,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Contre la défense des deux cavaliers, pourquoi le coup 4.Cg5 est-il inhabituel dans une ouverture ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-05",
+      "found": true,
+      "retained": 4,
+      "relevant": 1,
+      "same_article": 4,
+      "hops": 1,
+      "context_tokens": 2353,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Dans la défense des deux cavaliers, pourquoi le coup 4.c3 est-il une erreur pour les Blancs ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-06",
+      "found": true,
+      "retained": 2,
+      "relevant": 1,
+      "same_article": 2,
+      "hops": 1,
+      "context_tokens": 1088,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Quels joueurs soviétiques ont fait de la défense est-indienne une arme redoutable après la Seconde Guerre mondiale ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-07",
+      "found": false,
+      "retained": 8,
+      "relevant": 0,
+      "same_article": 0,
+      "hops": 3,
+      "context_tokens": 2519,
+      "stop_reason": "max_searches",
+      "sub_questions": [
+        "Quelle ouverture commence par 1.d4 Cf6 2.c4 g6 3.Cc3 Fg7 ?",
+        "Quelle ouverture est associée à la suite 1.d4 Cf6 2.c4 g6 3.Cc3 Fg7 ?",
+        "Quelle ouverture est connue pour les coups 1.d4 Cf6 2.c4 g6 3.Cc3 Fg7 et est souvent jouée par des joueurs comme Garry Kasparov ?"
+      ],
+      "reformulations": 1
+    },
+    {
+      "id": "ref-08",
+      "found": true,
+      "retained": 4,
+      "relevant": 1,
+      "same_article": 2,
+      "hops": 1,
+      "context_tokens": 1321,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Dans la défense est-indienne, comment s'appelle la variante où les Blancs jouent 5.f3 ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-09",
+      "found": false,
+      "retained": 6,
+      "relevant": 0,
+      "same_article": 4,
+      "hops": 3,
+      "context_tokens": 2060,
+      "stop_reason": "max_searches",
+      "sub_questions": [
+        "Dans la défense française, quel est le nom de la variante 2.Fb5 et quel coup empêche-t-elle ?",
+        "Quel est le nom de la variante 2.Fb5 dans la défense française ?",
+        "Quel est le nom de la variante où le blanc joue 2.Fb5 dans la défense française, et quel coup noir est visé par cette ouverture ?"
+      ],
+      "reformulations": 1
+    },
+    {
+      "id": "ref-10",
+      "found": false,
+      "retained": 4,
+      "relevant": 0,
+      "same_article": 4,
+      "hops": 1,
+      "context_tokens": 1652,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Quelle variante de la défense française est jouée après 3...dxe4 ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-11",
+      "found": false,
+      "retained": 4,
+      "relevant": 0,
+      "same_article": 3,
+      "hops": 3,
+      "context_tokens": 1425,
+      "stop_reason": "max_searches",
+      "sub_questions": [
+        "Dans la défense française, comment s'appelle la variante avec 5...Fa5 6.b4 ?",
+        "Dans la défense française, quelle est la variante qui commence par 5...Fa5 6.b4 ?",
+        "Quelle est la dénomination de la variante de la défense française où les coups 5...Fa5 et 6.b4 sont joués ?"
+      ],
+      "reformulations": 1
+    },
+    {
+      "id": "ref-12",
+      "found": true,
+      "retained": 1,
+      "relevant": 1,
+      "same_article": 1,
+      "hops": 1,
+      "context_tokens": 444,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Dans la défense scandinave, la retraite de la dame 3...Dd8 est-elle encore jouée aujourd'hui ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-13",
+      "found": true,
+      "retained": 4,
+      "relevant": 1,
+      "same_article": 3,
+      "hops": 1,
+      "context_tokens": 1575,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Contre la défense scandinave, que se passe-t-il quand les Blancs avancent leur pion par 2.e5 ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-14",
+      "found": true,
+      "retained": 2,
+      "relevant": 1,
+      "same_article": 2,
+      "hops": 1,
+      "context_tokens": 430,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Pourquoi la défense sicilienne est-elle si populaire auprès des joueurs des Noirs ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-15",
+      "found": true,
+      "retained": 1,
+      "relevant": 1,
+      "same_article": 1,
+      "hops": 1,
+      "context_tokens": 135,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "À quel compositeur Eric Schiller compare-t-il la variante du dragon de la défense sicilienne ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-16",
+      "found": true,
+      "retained": 3,
+      "relevant": 1,
+      "same_article": 3,
+      "hops": 1,
+      "context_tokens": 1241,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Dans le gambit slave, quel coup a récemment regagné en popularité au plus haut niveau ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-17",
+      "found": true,
+      "retained": 4,
+      "relevant": 1,
+      "same_article": 4,
+      "hops": 1,
+      "context_tokens": 747,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Par quels coups obtient-on la variante Alapine de la défense slave ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-18",
+      "found": true,
+      "retained": 4,
+      "relevant": 1,
+      "same_article": 4,
+      "hops": 1,
+      "context_tokens": 778,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Quelle variante de la défense slave, surnommée Slave Caméléon, est atteinte après 3.Cf3 Cf6 4.Cc3 a6 ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-19",
+      "found": true,
+      "retained": 4,
+      "relevant": 1,
+      "same_article": 3,
+      "hops": 1,
+      "context_tokens": 899,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Quelle part de l'Encyclopédie des ouvertures d'échecs le gambit dame occupe-t-il ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-20",
+      "found": true,
+      "retained": 4,
+      "relevant": 1,
+      "same_article": 4,
+      "hops": 1,
+      "context_tokens": 719,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Depuis quand le gambit dame est-il connu ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-21",
+      "found": true,
+      "retained": 3,
+      "relevant": 1,
+      "same_article": 3,
+      "hops": 1,
+      "context_tokens": 817,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "D'où vient le nom du gambit Evans ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-22",
+      "found": true,
+      "retained": 4,
+      "relevant": 1,
+      "same_article": 4,
+      "hops": 1,
+      "context_tokens": 1247,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Dans le gambit Evans, dans quelle situation le coup Ca5 devient-il important ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-23",
+      "found": true,
+      "retained": 4,
+      "relevant": 1,
+      "same_article": 4,
+      "hops": 1,
+      "context_tokens": 1203,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Dans le gambit Evans, après la retraite 5...Fe7, quelle est l'idée des Blancs ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-24",
+      "found": true,
+      "retained": 4,
+      "relevant": 1,
+      "same_article": 4,
+      "hops": 1,
+      "context_tokens": 1138,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Par quel coup commence l'ouverture anglaise ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-25",
+      "found": true,
+      "retained": 4,
+      "relevant": 1,
+      "same_article": 4,
+      "hops": 1,
+      "context_tokens": 1512,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Quelle est l'intention principale des Blancs avec le coup 1.c4 dans l'ouverture anglaise ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-26",
+      "found": true,
+      "retained": 4,
+      "relevant": 1,
+      "same_article": 4,
+      "hops": 1,
+      "context_tokens": 1099,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Dans l'ouverture anglaise, à quoi ressemble la ligne 1.c4 e5 2.Cc3 ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-27",
+      "found": true,
+      "retained": 2,
+      "relevant": 1,
+      "same_article": 2,
+      "hops": 1,
+      "context_tokens": 809,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Dans la partie espagnole, comment s'appelle la réponse rare 3...g5 ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-28",
+      "found": true,
+      "retained": 1,
+      "relevant": 1,
+      "same_article": 1,
+      "hops": 1,
+      "context_tokens": 234,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Selon Reuben Fine, quel est le plus fort début ouvert pour les Blancs ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-29",
+      "found": true,
+      "retained": 4,
+      "relevant": 1,
+      "same_article": 2,
+      "hops": 1,
+      "context_tokens": 1707,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "Quelle variante de la partie espagnole Anatoli Karpov a-t-il jouée sept fois contre Garry Kasparov en championnat du monde ?"
+      ],
+      "reformulations": 0
+    },
+    {
+      "id": "ref-30",
+      "found": true,
+      "retained": 2,
+      "relevant": 1,
+      "same_article": 2,
+      "hops": 1,
+      "context_tokens": 368,
+      "stop_reason": "enough",
+      "sub_questions": [
+        "La partie italienne est-elle une ouverture adaptée aux débutants ?"
+      ],
+      "reformulations": 0
+    }
+  ],
+  "session": "eval-agentic-qwen3_14b-20261022T182844",
+  "model": "qwen3:14b",
+  "tokens_in": 83139,
+  "tokens_out": 4710,
+  "cloud_equivalent_eur": 0.01423,
+  "seconds": 808
+}

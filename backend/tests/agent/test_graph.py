@@ -205,7 +205,7 @@ async def test_native_agent_calls_a_tool_then_answers(registry, tracing):
     assert "2 passage(s)" in result.tool_calls[0].outcome
     assert result.answer == "Les Noirs contestent le centre avec c5."
     assert result.decisions == 2
-    assert result.tokens_in == 200 and result.tokens_out == 40
+    assert result.tokens_in == 200 and result.tokens_out == 40  # décision + rédaction
     assert chat.calls[0]["bound_tools"] == registry.names
     assert len(result.trace_id) == 32
 
