@@ -321,7 +321,7 @@ class ChessAgent:
         return await self._call(
             state,
             "find_opening_videos",
-            {"query": f"{opening} échecs ouverture explication", "max_results": 2},
+            {"opening": opening, "max_results": 2},
             key="videos",
         )
 

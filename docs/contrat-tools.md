@@ -324,40 +324,46 @@ Position terminée (mat, pat) : pas d'erreur, `lines` est vide et `assessment` l
 
 ### 4.5 `find_opening_videos` ✅
 
-**Rôle** : vidéos explicatives YouTube sur l'ouverture.
+**Rôle** : vidéos explicatives YouTube sur l'ouverture (requêtes combinées FR + EN, filtre
+qualité, cache et quota : voir `docs/outil-videos.md`).
 
 **Description donnée au modèle :**
 > Cherche sur YouTube des vidéos explicatives sur une ouverture ou une idée d'échecs.
-> Renvoie titre, chaîne, lien et miniature. Préférer des requêtes précises (nom de
-> l'ouverture + variante + « explication ») et des vidéos courtes ou moyennes.
+> Renvoie titre, chaîne, lien, lien de lecteur intégré, durée, vues et miniature, après
+> un filtre de qualité (vidéos intégrables de 3 à 45 minutes, suffisamment vues, dans la
+> langue demandée).
 >
-> À utiliser : quand le joueur veut **voir** une explication, ou pour compléter une
-> réponse sur une ouverture identifiée.
-> Exemple : « Tu as une vidéo sur l'Italienne ? » →
-> `find_opening_videos(query="partie italienne explication ouverture", duration="medium")`
+> À utiliser : quand le joueur veut voir une explication, ou pour compléter une réponse
+> sur une ouverture identifiée. Donner `opening` (nom Lichess) dès qu'il est connu.
+> Exemple : « Tu as une vidéo sur l'Italienne ? » → `find_opening_videos(opening="Italian Game")`
+> Sinon, `query` : une recherche libre.
 >
-> Ne pas utiliser : pour une position hors théorie sans nom d'ouverture (les résultats
-> seraient hors sujet), ni pour obtenir des coups (→ `get_opening_theory`).
-> Chaque appel consomme du quota : ne pas répéter la même recherche.
+> Ne pas utiliser : pour une position hors théorie sans nom d'ouverture, ni pour obtenir
+> des coups (→ `get_opening_theory`). Chaque recherche nouvelle consomme du quota
+> (résultats gardés 7 jours) : ne pas répéter.
 
-**Entrée**
+**Entrée** (`opening` ou `query` obligatoire)
 
 | Champ | Type | Défaut | Contraintes |
 |---|---|---|---|
-| `query` | string | — | 3 à 120 caractères |
+| `opening` | string | — | 3 à 100 caractères, nom Lichess (« Sicilian Defense ») : requêtes FR + EN construites |
+| `query` | string | — | 3 à 120 caractères, recherche libre |
 | `max_results` | int | 3 | 1 à 5 |
-| `duration` | `short` \| `medium` \| `any` | `medium` | `short` < 4 min, `medium` 4 à 20 min |
+| `duration` | `short` \| `medium` \| `any` | `any` | contrainte YouTube ; `any` = filtre qualité seul (3 à 45 min) |
 | `language` | string | `fr` | Code ISO 639-1 |
 
 **Sortie**
 
 | Champ | Type | Description |
 |---|---|---|
-| `videos[]` | `{video_id, title, channel, url, thumbnail_url, published_at}` | Titres décodés (entités HTML), recherche en mode `safeSearch=strict` (public jeune) |
+| `videos[]` | `{video_id, title, channel, url, embed_url, thumbnail_url, published_at, duration_s, views, likes, language}` | Filtrées et classées (langue demandée, puis vues) ; titres décodés ; `safeSearch=strict` |
+| `queries[]` | string | Requêtes envoyées (traçabilité) |
+| `from_cache` | bool | Servi par le cache (0 unité) |
+| `quota_used_today` | int | Unités consommées ce jour (heure Pacifique) |
 
 | Effets | Idempotent | Erreurs | Résilience |
 |---|---|---|---|
-| Lecture de l'API YouTube : **100 unités de quota par appel** sur 10 000 par jour | Oui | `invalid_arguments`, `not_configured` (pas de clé), `quota_exceeded`, `auth_required`, `timeout`, `network_error`, `upstream_error`, `retries_exhausted`, `circuit_open` | Timeout 5 s, 2 tentatives (jamais sur quota), disjoncteur 3 / 60 s, **cache** des résultats par requête (MongoDB, à l'étape 3) |
+| Lecture de l'API YouTube : **201 unités** par ouverture non cachée (2 × `search.list` à 100 + `videos.list` à 1) sur 10 000 par jour | Oui | `invalid_arguments`, `not_configured`, `quota_exceeded` (local avec `Retry-After`, ou Google), `auth_required`, `timeout`, `network_error`, `upstream_error`, `retries_exhausted`, `circuit_open` | Timeout 8 s, 2 tentatives (jamais sur quota), disjoncteur 3 / 60 s, **cache MongoDB 7 jours**, **compteur de quota** avec réserve |
 
 **Repli** : liste vide, et l'agent répond sans vidéo.
 

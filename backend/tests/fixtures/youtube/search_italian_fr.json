@@ -1,0 +1,237 @@
+{
+  "kind": "youtube#searchListResponse",
+  "etag": "tvfcTmBS9TLFqQRAMsi5G7V0fik",
+  "nextPageToken": "CAUQAA",
+  "regionCode": "CI",
+  "pageInfo": {
+    "totalResults": 181839,
+    "resultsPerPage": 5
+  },
+  "items": [
+    {
+      "kind": "youtube#searchResult",
+      "etag": "CK1H9J7jSsJItvUsflIYhZLnc6Y",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "gfxAZIX8hC4"
+      },
+      "snippet": {
+        "publishedAt": "2023-02-15T08:50:05Z",
+        "channelId": "UCho9uPByw7z1mOhTqEnfWUA",
+        "title": "Devenez un PRO de l&#39;ouverture ITALIENNE",
+        "description": "Dans cette vidéo nous vous proposons un concentré des plans à connaître dans l'ouverture Italienne. Les connaissances ici ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/gfxAZIX8hC4/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/gfxAZIX8hC4/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/gfxAZIX8hC4/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/gfxAZIX8hC4/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/gfxAZIX8hC4/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "Blitzstream Facile",
+        "liveBroadcastContent": "none",
+        "publishTime": "2023-02-15T08:50:05Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "SPtdgX0xb6Gu5R7F3t3aBbz2aJM",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "P1Pb7HTKjSY"
+      },
+      "snippet": {
+        "publishedAt": "2021-11-12T18:26:41Z",
+        "channelId": "UC3FXGTXQqx9cc2T7EDhslIQ",
+        "title": "LE PLAN à connaitre dans l&#39;ITALIENNE",
+        "description": "Rejoins la communauté et obtiens des conseils pour progresser aux échecs sur https://liens.juliensong.com ! Pour jouer aux ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/P1Pb7HTKjSY/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/P1Pb7HTKjSY/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/P1Pb7HTKjSY/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/P1Pb7HTKjSY/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/P1Pb7HTKjSY/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "Julien Song",
+        "liveBroadcastContent": "none",
+        "publishTime": "2021-11-12T18:26:41Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "6t_tvcSBbP2PyiwSQUWy9jV8RwQ",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "_tltitUIyX8"
+      },
+      "snippet": {
+        "publishedAt": "2026-03-20T18:45:47Z",
+        "channelId": "UCwBtfnsZ-z5d0kCY1_szv-Q",
+        "title": "L’ÉCHANGE à connaître dans l’ouverture italienne",
+        "description": "Partie d'échecs pédagogique, commentée au coup par coup avec analyses tactiques et stratégiques. L'ouverture est une partie ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/_tltitUIyX8/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/_tltitUIyX8/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/_tltitUIyX8/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/_tltitUIyX8/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/_tltitUIyX8/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          },
+          "qhd": {
+            "url": "https://i.ytimg.com/vi/_tltitUIyX8/qhddefault.jpg",
+            "width": 2560,
+            "height": 1440
+          }
+        },
+        "channelTitle": "Progresser aux échecs avec Marc Quenehen",
+        "liveBroadcastContent": "none",
+        "publishTime": "2026-03-20T18:45:47Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "p5sxZy1jp7Bld-bL8JQxrgyUjAM",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "5Ny8I1Bj-ek"
+      },
+      "snippet": {
+        "publishedAt": "2025-01-10T17:18:37Z",
+        "channelId": "UCAVjSfCSqTQaK8kO_j2EHcw",
+        "title": "L&#39;OUVERTURE ITALIENNE aux Échecs : Dominez Rapidement avec les Blancs ! ♟️",
+        "description": "Découvrez comment jouer l'Ouverture Italienne, une ouverture classique et efficace pour prendre l'avantage dès les premiers ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/5Ny8I1Bj-ek/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/5Ny8I1Bj-ek/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/5Ny8I1Bj-ek/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/5Ny8I1Bj-ek/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/5Ny8I1Bj-ek/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "Dingo Chess",
+        "liveBroadcastContent": "none",
+        "publishTime": "2025-01-10T17:18:37Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "iT64EbUmXzyA5j5_5l2UKpMsRWU",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "wpIcyDhdGKs"
+      },
+      "snippet": {
+        "publishedAt": "2021-03-25T23:31:35Z",
+        "channelId": "UCwBtfnsZ-z5d0kCY1_szv-Q",
+        "title": "Ouverture italienne (1) : Partie d&#39;échecs pédagogique",
+        "description": "Me soutenir sur Tipeee ❤️: https://fr.tipeee.com/marc-quenehen-le-divin-chauve ▻ Mes livres ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/wpIcyDhdGKs/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/wpIcyDhdGKs/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/wpIcyDhdGKs/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/wpIcyDhdGKs/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/wpIcyDhdGKs/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "Progresser aux échecs avec Marc Quenehen",
+        "liveBroadcastContent": "none",
+        "publishTime": "2021-03-25T23:31:35Z"
+      }
+    }
+  ]
+}

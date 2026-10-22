@@ -272,7 +272,7 @@ backend/app/
 - LangGraph peut orchestrer recherche Milvus puis mise en forme de la réponse
   (réutilisé par l'agent à l'étape 3).
 
-### Étape 3 : Agent LangGraph, YouTube et mode partie
+### Étape 3 : Agent LangGraph, YouTube et mode partie (agent ✅ `docs/outil-rag.md` phase 5 ; YouTube ✅ `docs/outil-videos.md` ; mode partie ⏳)
 
 - Graphe d'analyse (section 2) et graphe de partie (section 2 bis).
 - Service YouTube avec cache MongoDB : une recherche coûte 100 unités sur un quota

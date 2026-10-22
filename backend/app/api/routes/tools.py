@@ -80,6 +80,30 @@ async def vector_search(
     return to_response(await registry.execute("search_opening_knowledge", arguments))
 
 
+@router.get("/videos/{opening}", summary="Vidéos explicatives YouTube sur une ouverture")
+async def videos(
+    opening: Annotated[
+        str,
+        Path(min_length=3, max_length=100, description="Nom d'ouverture (Lichess, en anglais)."),
+    ],
+    registry: Registry,
+    max_results: Annotated[int, Query(ge=1, le=5)] = 3,
+    language: Annotated[str, Query(pattern=r"^[a-z]{2}$")] = "fr",
+) -> Any:
+    """200 avec la liste (vide + `message` si rien ne passe le filtre) ; 503 si YouTube est
+    non configuré ou le quota épuisé (`Retry-After` : secondes avant la remise à zéro)."""
+    result = await registry.execute(
+        "find_opening_videos",
+        {"opening": opening, "max_results": max_results, "language": language},
+    )
+    if result.ok and not (result.data or {}).get("videos"):
+        return {
+            **(result.data or {}),
+            "message": f"Aucune vidéo de qualité trouvée pour « {opening} » en « {language} ».",
+        }
+    return to_response(result)
+
+
 @router.post(
     "/analysis/{fen:path}",
     status_code=202,

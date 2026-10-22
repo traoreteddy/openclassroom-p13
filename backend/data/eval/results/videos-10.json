@@ -1,0 +1,317 @@
+{
+  "openings": 10,
+  "with_videos": 10,
+  "retained_total": 29,
+  "named_share": 0.86,
+  "french_share": 1.0,
+  "quota_used_today": 2010,
+  "seconds": 10.8,
+  "rows": [
+    {
+      "opening": "Italian Game",
+      "queries": [
+        "partie italienne échecs ouverture explication",
+        "Italian Game chess opening tutorial"
+      ],
+      "from_cache": false,
+      "retained": 3,
+      "named": 3,
+      "languages": [
+        "fr",
+        "fr",
+        "fr"
+      ],
+      "durations_min": [
+        21,
+        30,
+        24
+      ],
+      "views": [
+        433024,
+        242321,
+        105975
+      ],
+      "titles": [
+        "LE PLAN à connaitre dans l'ITALIENNE",
+        "Devenez un PRO de l'ouverture ITALIENNE",
+        "Ouverture italienne (1) : Partie d'échecs pédagogique"
+      ],
+      "quota_used_today": 201
+    },
+    {
+      "opening": "Ruy Lopez",
+      "queries": [
+        "partie espagnole échecs ouverture explication",
+        "Ruy Lopez chess opening tutorial"
+      ],
+      "from_cache": false,
+      "retained": 3,
+      "named": 1,
+      "languages": [
+        "fr",
+        "fr",
+        "fr"
+      ],
+      "durations_min": [
+        10,
+        7,
+        23
+      ],
+      "views": [
+        1266242,
+        355929,
+        255488
+      ],
+      "titles": [
+        "Les 3 principes de l'ouverture à connaître aux échecs - Partie pédagogique",
+        "Comment TRAVAILLER les OUVERTURES aux échecs",
+        "L'ouverture Espagnole - Partie pédagogique #1"
+      ],
+      "quota_used_today": 402
+    },
+    {
+      "opening": "Sicilian Defense",
+      "queries": [
+        "défense sicilienne échecs ouverture explication",
+        "Sicilian Defense chess opening tutorial"
+      ],
+      "from_cache": false,
+      "retained": 2,
+      "named": 2,
+      "languages": [
+        "fr",
+        "fr"
+      ],
+      "durations_min": [
+        7,
+        12
+      ],
+      "views": [
+        218937,
+        178493
+      ],
+      "titles": [
+        "Introduction à la Défense sicilienne, quelques variantes et lignes intéressantes.",
+        "La Sicilienne - Partie pédagogique #1 - Echecs"
+      ],
+      "quota_used_today": 603
+    },
+    {
+      "opening": "French Defense",
+      "queries": [
+        "défense française échecs ouverture explication",
+        "French Defense chess opening tutorial"
+      ],
+      "from_cache": false,
+      "retained": 3,
+      "named": 3,
+      "languages": [
+        "fr",
+        "fr",
+        "fr"
+      ],
+      "durations_min": [
+        17,
+        9,
+        33
+      ],
+      "views": [
+        111864,
+        109353,
+        99900
+      ],
+      "titles": [
+        "Les enjeux de la Française",
+        "La Française avec les noirs - Un répertoire facile et solide",
+        "Défense française (9) : Partie d'échecs pédagogique"
+      ],
+      "quota_used_today": 804
+    },
+    {
+      "opening": "Caro-Kann Defense",
+      "queries": [
+        "défense Caro-Kann échecs ouverture explication",
+        "Caro-Kann Defense chess opening tutorial"
+      ],
+      "from_cache": false,
+      "retained": 3,
+      "named": 3,
+      "languages": [
+        "fr",
+        "fr",
+        "fr"
+      ],
+      "durations_min": [
+        30,
+        24,
+        12
+      ],
+      "views": [
+        200871,
+        132639,
+        57392
+      ],
+      "titles": [
+        "LA CARO KANN ❤️ SIMPLE, SOLIDE et PARFAITE pour DÉBUTER !",
+        "La défense Caro-Kann - Partie pédagogique #1 - Echecs",
+        "CARO KANN [5 Combinaisons] quelques idées sur 5 lignes différents"
+      ],
+      "quota_used_today": 1005
+    },
+    {
+      "opening": "Scandinavian Defense",
+      "queries": [
+        "défense scandinave échecs ouverture explication",
+        "Scandinavian Defense chess opening tutorial"
+      ],
+      "from_cache": false,
+      "retained": 3,
+      "named": 3,
+      "languages": [
+        "fr",
+        "fr",
+        "fr"
+      ],
+      "durations_min": [
+        26,
+        12,
+        13
+      ],
+      "views": [
+        147559,
+        22849,
+        8544
+      ],
+      "titles": [
+        "Défense scandinave (1) : Partie d'échecs pédagogique",
+        "Comment JOUER la DEFENSE SCANDINAVE aux ECHECS?",
+        "Scandinave : 7 Pièges Tactiques à Connaître Absolument"
+      ],
+      "quota_used_today": 1206
+    },
+    {
+      "opening": "Queen's Gambit",
+      "queries": [
+        "gambit dame échecs ouverture explication",
+        "Queen's Gambit chess opening tutorial"
+      ],
+      "from_cache": false,
+      "retained": 3,
+      "named": 3,
+      "languages": [
+        "fr",
+        "fr",
+        "fr"
+      ],
+      "durations_min": [
+        8,
+        16,
+        26
+      ],
+      "views": [
+        447320,
+        94179,
+        66595
+      ],
+      "titles": [
+        "Comment JOUER le GAMBIT DAME aux échecs",
+        "Comprendre les enjeux du Gambit Dame accepté",
+        "🔥Apprends le GAMBIT DAME 👉En 20 Minutes"
+      ],
+      "quota_used_today": 1407
+    },
+    {
+      "opening": "Slav Defense",
+      "queries": [
+        "défense slave échecs ouverture explication",
+        "Slav Defense chess opening tutorial"
+      ],
+      "from_cache": false,
+      "retained": 3,
+      "named": 3,
+      "languages": [
+        "fr",
+        "fr",
+        "fr"
+      ],
+      "durations_min": [
+        12,
+        16,
+        15
+      ],
+      "views": [
+        59255,
+        10195,
+        3096
+      ],
+      "titles": [
+        "Parties pédagogiques - Slave anti pleutres",
+        "Apprendre la théorie des ouvertures - Défense Semi-Slave",
+        "Partie pédagogique #16 - Slave d'échange"
+      ],
+      "quota_used_today": 1608
+    },
+    {
+      "opening": "King's Indian Defense",
+      "queries": [
+        "défense est-indienne échecs ouverture explication",
+        "King's Indian Defense chess opening tutorial"
+      ],
+      "from_cache": false,
+      "retained": 3,
+      "named": 2,
+      "languages": [
+        "fr",
+        "fr",
+        "fr"
+      ],
+      "durations_min": [
+        15,
+        13,
+        15
+      ],
+      "views": [
+        182401,
+        76923,
+        76354
+      ],
+      "titles": [
+        "Ce système FACILE à apprendre avec les BLANCS est la SEULE ouverture qu'il te faut",
+        "L'Est Indienne - Partie pédagogique #1 - Echecs",
+        "Défense est indienne (1) : Partie d'échecs pédagogique"
+      ],
+      "quota_used_today": 1809
+    },
+    {
+      "opening": "English Opening",
+      "queries": [
+        "ouverture anglaise échecs ouverture explication",
+        "English Opening chess opening tutorial"
+      ],
+      "from_cache": false,
+      "retained": 3,
+      "named": 2,
+      "languages": [
+        "fr",
+        "fr",
+        "fr"
+      ],
+      "durations_min": [
+        10,
+        14,
+        41
+      ],
+      "views": [
+        521717,
+        82041,
+        65940
+      ],
+      "titles": [
+        "La MEILLEURE ouverture pour DÉBUTANTS aux échecs",
+        "Ouverture anglaise (1) : Partie d'échecs pédagogique",
+        "Jouer L'ouverture ANGLAISE - Une bonne idée à BAS ELO ??"
+      ],
+      "quota_used_today": 2010
+    }
+  ]
+}

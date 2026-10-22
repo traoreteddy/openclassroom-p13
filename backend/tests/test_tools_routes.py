@@ -4,12 +4,20 @@ from __future__ import annotations
 
 from urllib.parse import quote
 
+import httpx
 import pytest
 from fastapi.testclient import TestClient
 
 from app.api.deps import get_registry
 from app.main import app
-from tests.conftest import ITALIAN_FEN, LICHESS_URL, START_FEN, StubAnalyzer, load_fixture
+from tests.conftest import (
+    ITALIAN_FEN,
+    LICHESS_URL,
+    START_FEN,
+    YOUTUBE_URL,
+    StubAnalyzer,
+    load_fixture,
+)
 
 
 @pytest.fixture
@@ -138,3 +146,43 @@ def test_unknown_job_is_404(client):
 
     assert response.status_code == 404
     assert response.json()["error"]["code"] == "unknown_job"
+
+
+def test_videos_route_returns_quality_videos(client, respx_mock):
+    respx_mock.get(f"{YOUTUBE_URL}/search").mock(
+        side_effect=[
+            httpx.Response(200, json=load_fixture("youtube/search_italian_fr.json")),
+            httpx.Response(200, json=load_fixture("youtube/search_italian_en.json")),
+        ]
+    )
+    respx_mock.get(f"{YOUTUBE_URL}/videos").respond(
+        json=load_fixture("youtube/videos_italian.json")
+    )
+
+    response = client.get("/api/v1/videos/Italian Game", params={"max_results": 2})
+
+    assert response.status_code == 200
+    body = response.json()
+    assert [v["video_id"] for v in body["videos"]] == ["P1Pb7HTKjSY", "gfxAZIX8hC4"]
+    assert body["videos"][0]["embed_url"].startswith("https://www.youtube-nocookie.com/embed/")
+    assert body["queries"][0] == "partie italienne échecs ouverture explication"
+    assert "message" not in body
+
+
+def test_videos_route_explains_an_empty_result(client, respx_mock):
+    respx_mock.get(f"{YOUTUBE_URL}/search").respond(json={"items": []})
+
+    response = client.get("/api/v1/videos/Bird Opening")
+
+    assert response.status_code == 200
+    assert response.json()["videos"] == []
+    assert "Aucune vidéo" in response.json()["message"]
+
+
+def test_videos_route_without_key_is_503(make_registry):
+    app.dependency_overrides[get_registry] = lambda: make_registry(youtube_api_key=None)
+
+    response = TestClient(app).get("/api/v1/videos/Italian Game")
+
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "not_configured"

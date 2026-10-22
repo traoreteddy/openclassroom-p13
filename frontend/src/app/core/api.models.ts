@@ -83,13 +83,23 @@ export interface Video {
   title: string;
   channel: string;
   url: string;
+  embed_url: string;
   thumbnail_url: string | null;
   published_at: string | null;
+  duration_s: number | null;
+  views: number | null;
+  likes: number | null;
+  language: string | null;
 }
 
-/** Sortie de `find_opening_videos` (YouTube). */
+/** Sortie de `find_opening_videos` (YouTube) et de `GET /videos/{opening}`. */
 export interface Videos {
   videos: Video[];
+  queries: string[];
+  from_cache: boolean;
+  quota_used_today: number;
+  /** Présent quand la liste est vide : explication pour l'utilisateur. */
+  message?: string;
 }
 
 export type JobStatus = 'pending' | 'running' | 'done' | 'failed';

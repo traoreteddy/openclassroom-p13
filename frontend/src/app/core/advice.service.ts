@@ -3,7 +3,7 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { Subject, debounceTime, distinctUntilChanged, of, switchMap, timer } from 'rxjs';
 import { catchError, expand, filter, map, takeWhile } from 'rxjs/operators';
 
-import { AgentResponse, Evaluation, JobState, OpeningTheory } from './api.models';
+import { AgentResponse, Evaluation, JobState, OpeningTheory, Videos } from './api.models';
 import { ApiService, describeError } from './api.service';
 import { GameStateService } from './game-state.service';
 
@@ -53,6 +53,8 @@ type Outcome<T> = { ok: true; fen: string; value: T } | { ok: false; fen: string
  *   analysée et se signale « dépassé » si la position a bougé depuis.
  * - **Analyse profonde** (Stockfish, une à plusieurs minutes) : lancée en tâche de fond par
  *   l'API, interrogée toutes les 2 s jusqu'à `done` ; abandonnée si la position change.
+ * - **Vidéos** : dès que la théorie nomme une ouverture, sa famille (avant le « : ») est
+ *   cherchée une seule fois par session (cache local, et cache de 7 jours côté serveur).
  * - **Questions libres** : conversation dans la même session (regroupement des traces).
  */
 @Injectable({ providedIn: 'root' })
@@ -87,6 +89,16 @@ export class AdviceService {
     const analysis = this._analysis();
     return analysis !== null && analysis.fen !== this.game.fen();
   });
+
+  private readonly videoCache = new Map<string, Videos>();
+  private readonly _videos = signal<Videos | null>(null);
+  private readonly _videosLoading = signal(false);
+  private readonly _videosError = signal<string | null>(null);
+  readonly videos = this._videos.asReadonly();
+  readonly videosLoading = this._videosLoading.asReadonly();
+  readonly videosError = this._videosError.asReadonly();
+  /** Famille d'ouverture de la position courante, d'après la théorie. */
+  readonly openingFamily = computed(() => familyOf(this._theory()?.opening?.name));
 
   private readonly deepRequests = new Subject<{ fen: string; depth: number } | null>();
   private readonly _deep = signal<DeepAnalysis | null>(null);
@@ -143,6 +155,27 @@ export class AdviceService {
       )
       .subscribe((state) => this._deep.set(state));
 
+    toObservable(this.openingFamily)
+      .pipe(
+        distinctUntilChanged(),
+        switchMap((family) => (family ? this.loadVideos(family) : of(null))),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((outcome) => {
+        this._videosLoading.set(false);
+        if (outcome === null) {
+          this._videos.set(null);
+          this._videosError.set(null);
+        } else if (outcome.ok) {
+          this.videoCache.set(outcome.fen, outcome.value);
+          this._videos.set(outcome.value);
+          this._videosError.set(null);
+        } else {
+          this._videos.set(null);
+          this._videosError.set(outcome.error);
+        }
+      });
+
     // Une position qui change rend l'analyse profonde en cours sans objet.
     toObservable(this.game.fen)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -150,6 +183,20 @@ export class AdviceService {
         const deep = this._deep();
         if (deep && deep.fen !== fen && this.deepRunning()) this.cancelDeepAnalysis();
       });
+  }
+
+  /** Vidéos d'une famille d'ouverture (la clé `fen` du résultat porte ici la famille). */
+  private loadVideos(family: string) {
+    const cached = this.videoCache.get(family);
+    if (cached) return of<Outcome<Videos>>({ ok: true, fen: family, value: cached });
+    this._videosLoading.set(true);
+    this._videosError.set(null);
+    return this.api.videos(family).pipe(
+      map((value): Outcome<Videos> => ({ ok: true, fen: family, value })),
+      catchError((error) =>
+        of<Outcome<Videos>>({ ok: false, fen: family, error: describeError(error) }),
+      ),
+    );
   }
 
   /** Démarre la tâche puis l'interroge jusqu'à son terme ; chaque état est émis. */
@@ -281,6 +328,12 @@ export class AdviceService {
       return [...list.slice(0, -1), { ...last, ...result }];
     });
   }
+}
+
+/** « Italian Game: Two Knights Defense » → « Italian Game ». */
+export function familyOf(name: string | null | undefined): string | null {
+  const family = name?.split(':')[0].trim();
+  return family ? family : null;
 }
 
 function newSessionId(): string {

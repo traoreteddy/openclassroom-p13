@@ -84,13 +84,19 @@ export class AdvicePanel {
   protected readonly context = computed(() =>
     this.ok<KnowledgeContext>(this.response()?.data.context),
   );
-  protected readonly videos = computed(
-    () => this.ok<Videos>(this.response()?.data.videos)?.videos ?? [],
-  );
+  /** Vidéos : celles de la carte dédiée (par ouverture), sinon celles ramenées par l'agent. */
+  protected readonly videos = computed(() => {
+    const fromCard = this.advice.videos()?.videos ?? [];
+    if (fromCard.length) return fromCard;
+    return this.ok<Videos>(this.response()?.data.videos)?.videos ?? [];
+  });
   protected readonly videosFailure = computed(() => {
     const data = this.response()?.data.videos;
     return isToolFailure(data) ? data.error : null;
   });
+  protected readonly videosMessage = computed(
+    () => this.advice.videosError() ?? this.advice.videos()?.message ?? this.videosFailure(),
+  );
   protected readonly theoryFromAgent = computed(() =>
     this.ok<OpeningTheory>(this.response()?.data.theory),
   );
@@ -149,6 +155,15 @@ export class AdvicePanel {
     return this.sanitizer.bypassSecurityTrustResourceUrl(
       `https://www.youtube-nocookie.com/embed/${id}`,
     );
+  }
+
+  protected minutes(video: Video): string {
+    return video.duration_s ? `${Math.round(video.duration_s / 60)} min` : '';
+  }
+
+  protected compact(views: number | null): string {
+    if (views === null) return '';
+    return `${new Intl.NumberFormat('fr-FR', { notation: 'compact' }).format(views)} vues`;
   }
 
   protected percent(value: number): string {

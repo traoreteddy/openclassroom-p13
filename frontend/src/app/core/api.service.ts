@@ -9,6 +9,7 @@ import {
   JobState,
   JobTicket,
   OpeningTheory,
+  Videos,
 } from './api.models';
 
 /**
@@ -37,6 +38,14 @@ export class ApiService {
   evaluate(fen: string, depth = 14): Observable<Evaluation> {
     const params = new HttpParams().set('depth', depth);
     return this.http.get<Evaluation>(`${this.baseUrl}/evaluate/${encodeFen(fen)}`, { params });
+  }
+
+  /** Vidéos explicatives YouTube sur une ouverture (nom Lichess), filtrées et mises en cache. */
+  videos(opening: string, maxResults = 3): Observable<Videos> {
+    const params = new HttpParams().set('max_results', maxResults);
+    return this.http.get<Videos>(`${this.baseUrl}/videos/${encodeURIComponent(opening)}`, {
+      params,
+    });
   }
 
   /** Lance une analyse Stockfish profonde en tâche de fond (202 + ticket). */

@@ -17,6 +17,7 @@ from app.core.config import Settings
 from app.tools.base import ToolRegistry
 from app.tools.catalog import ToolDependencies, build_registry
 from app.tools.knowledge import KnowledgeSearch, Passage
+from app.tools.video_store import MemoryVideoStore
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -194,6 +195,7 @@ def make_registry(
             http=http_client,
             analyzer=analyzer or StubAnalyzer(),
             knowledge=KnowledgeSearch(StubEmbedder(), store or StubVectorStore()),
+            video_store=MemoryVideoStore(clock=clock),
         )
         return build_registry(settings.model_copy(update=overrides), deps, sleep=sleep, clock=clock)
 

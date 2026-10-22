@@ -29,7 +29,8 @@ ChessBoard (ngx-chess-board) ──► GameStateService (chess.js : FEN, légali
 | Carte | Outil / route | Déclenchement |
 |---|---|---|
 | Coups théoriques (nom ECO, coups des maîtres avec effectifs et résultats, badge en / hors théorie) | `get_opening_theory` · `GET /moves/{fen}` | **automatique** à chaque position, 400 ms après le dernier coup |
-| Conseil de l'agent : réponse rédigée, évaluation et lignes Stockfish, passages de la base de connaissances avec leur source, vidéos (lien et lecteur intégré) | parcours « position » du graphe : `inspect_position` → `get_opening_theory` → `evaluate_position` → `search_opening_knowledge` → `find_opening_videos` · `POST /agent/analyze` | **sur demande** (bouton), avec une question facultative sur la position |
+| Conseil de l'agent : réponse rédigée, évaluation et lignes Stockfish, passages de la base de connaissances avec leur source | parcours « position » du graphe : `inspect_position` → `get_opening_theory` → `evaluate_position` → `search_opening_knowledge` → `find_opening_videos` · `POST /agent/analyze` | **sur demande** (bouton), avec une question facultative sur la position |
+| Vidéos pour réviser (lien et lecteur intégré) | `find_opening_videos` · `GET /videos/{opening}` | **automatique** dès que la théorie nomme une ouverture, une fois par famille |
 | Analyse profonde (profondeur 28, une à plusieurs minutes) | `start_deep_analysis` + `get_deep_analysis` · `POST /analysis/{fen}` puis `GET /analysis/{job_id}` | sur demande ; état interrogé toutes les 2 s jusqu'à `done` |
 | Poser une question | graphe « question » (le modèle choisit ses outils) · `POST /agent/ask` | sur demande, conversation dans la même session |
 
@@ -69,11 +70,14 @@ texte dédié quand le serveur est injoignable (statut 0). La théorie a un bout
 
 ## 4. Vidéos
 
-Le backend renvoie pour chaque vidéo `video_id`, titre, chaîne, `url` et miniature. Le
-panneau affiche le lien (ouvre YouTube) et un lecteur intégré sans cookies
-(`youtube-nocookie.com/embed/<id>`, URL construite côté front et jamais reprise de
-l'API). Sans clé YouTube, l'outil répond `not_configured` et la carte indique « Vidéos
-indisponibles » sans bloquer le reste du conseil.
+La carte « Vidéos pour réviser » appelle `GET /videos/{famille}` dès que la théorie nomme
+une ouverture (famille = nom Lichess avant le « : »), une fois par famille et par session ;
+le backend garde ses résultats 7 jours (voir `docs/outil-videos.md`). Chaque vidéo montre
+miniature, titre, chaîne, durée, vues, le **lien** YouTube et un **lecteur intégré** sans
+cookies (`youtube-nocookie.com/embed/<id>`, URL construite côté front, jamais reprise de
+l'API) ouvert à la demande. Les vidéos ramenées par l'agent servent de repli si la carte
+est vide. Sans clé YouTube ou quota épuisé, la carte affiche le message de l'API sans
+bloquer le reste.
 
 ## 5. Tests (Vitest, `npm test`)
 

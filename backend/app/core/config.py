@@ -27,6 +27,11 @@ class Settings(BaseSettings):
 
     youtube_api_url: str = "https://www.googleapis.com/youtube/v3"
     youtube_api_key: str | None = None
+    # Quota YouTube : 10 000 unités par jour (recherche 100, détails 1) ; la réserve est
+    # gardée pour les appels de l'agent en fin de journée. Résultats gardés 7 jours.
+    youtube_quota_daily: int = 10_000
+    youtube_quota_reserve: int = 500
+    youtube_cache_ttl_s: int = 7 * 24 * 3600
 
     http_timeout_s: float = 5.0
 

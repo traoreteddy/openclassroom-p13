@@ -1,0 +1,881 @@
+{
+  "kind": "youtube#videoListResponse",
+  "etag": "vlremhJXjuCmvPq12lNDVAmn4fo",
+  "items": [
+    {
+      "kind": "youtube#video",
+      "etag": "nN3rDp8Ve7sFxw1xFUl1jyJL3Zc",
+      "id": "gfxAZIX8hC4",
+      "snippet": {
+        "publishedAt": "2023-02-15T08:50:05Z",
+        "channelId": "UCho9uPByw7z1mOhTqEnfWUA",
+        "title": "Devenez un PRO de l'ouverture ITALIENNE",
+        "description": "Dans cette vidéo nous vous proposons un concentré des plans à connaître dans l'ouverture Italienne. Les connaissances ici partagées doivent suffire pour surpasser la plupart des joueurs en dessous de 1500 Elo !\n\nRetrouvez les plans à connaître d'autres ouvertures: https://youtube.com/playlist?list=PLDzslQtErjzjJs4Y5Te7kVoA3OwXGT2Td\n\nChapitrage:\n00:00 Introduction\n02:10 Jouer avec Cc3\n14:18 Jouer avec la poussée c3-d4\n\n🎥 Ma Chaîne Principale\n- Blitzstream avec principalement des analyses de parties récentes du haut-niveau et historiques: https://www.youtube.com/@VideosEchecs\n\n- Blitz rediff le meilleur (et le pire) de Twitch https://www.youtube.com/channel/UCjylyKydCPV2pK6j5aB92wg\n\n📢 Restez en contact avec moi\nMe suivre sur Twitter► https://twitter.com/Blitz_Stream\nRejoignez nous sur Discord► https://discord.gg/NkdJnHy\nRejoignez nous pour Jouer ►  bit.ly/3IbbFag",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/gfxAZIX8hC4/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/gfxAZIX8hC4/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/gfxAZIX8hC4/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/gfxAZIX8hC4/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/gfxAZIX8hC4/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "Blitzstream Facile",
+        "tags": [
+          "échecs",
+          "apprendre",
+          "débutant"
+        ],
+        "categoryId": "20",
+        "liveBroadcastContent": "none",
+        "defaultLanguage": "fr",
+        "localized": {
+          "title": "Devenez un PRO de l'ouverture ITALIENNE",
+          "description": "Dans cette vidéo nous vous proposons un concentré des plans à connaître dans l'ouverture Italienne. Les connaissances ici partagées doivent suffire pour surpasser la plupart des joueurs en dessous de 1500 Elo !\n\nRetrouvez les plans à connaître d'autres ouvertures: https://youtube.com/playlist?list=PLDzslQtErjzjJs4Y5Te7kVoA3OwXGT2Td\n\nChapitrage:\n00:00 Introduction\n02:10 Jouer avec Cc3\n14:18 Jouer avec la poussée c3-d4\n\n🎥 Ma Chaîne Principale\n- Blitzstream avec principalement des analyses de parties récentes du haut-niveau et historiques: https://www.youtube.com/@VideosEchecs\n\n- Blitz rediff le meilleur (et le pire) de Twitch https://www.youtube.com/channel/UCjylyKydCPV2pK6j5aB92wg\n\n📢 Restez en contact avec moi\nMe suivre sur Twitter► https://twitter.com/Blitz_Stream\nRejoignez nous sur Discord► https://discord.gg/NkdJnHy\nRejoignez nous pour Jouer ►  bit.ly/3IbbFag"
+        },
+        "defaultAudioLanguage": "fr"
+      },
+      "contentDetails": {
+        "duration": "PT30M27S",
+        "dimension": "2d",
+        "definition": "hd",
+        "caption": "false",
+        "licensedContent": true,
+        "contentRating": {},
+        "projection": "rectangular"
+      },
+      "status": {
+        "uploadStatus": "processed",
+        "privacyStatus": "public",
+        "license": "youtube",
+        "embeddable": true,
+        "publicStatsViewable": true,
+        "madeForKids": false
+      },
+      "statistics": {
+        "viewCount": "242321",
+        "likeCount": "5130",
+        "favoriteCount": "0",
+        "commentCount": "159"
+      }
+    },
+    {
+      "kind": "youtube#video",
+      "etag": "tH7jAXuAUfZyaDUBxopJzGn-Hc0",
+      "id": "P1Pb7HTKjSY",
+      "snippet": {
+        "publishedAt": "2021-11-12T18:26:41Z",
+        "channelId": "UC3FXGTXQqx9cc2T7EDhslIQ",
+        "title": "LE PLAN à connaitre dans l'ITALIENNE",
+        "description": "👉 Rejoins la communauté et obtiens des conseils pour progresser aux échecs sur https://liens.juliensong.com !\n\n👉 Pour jouer aux échecs gratuitement sur Chesscom : https://bit.ly/4oXnci3\n👉 Pour prendre un abonnement Premium sur Chesscom : https://bit.ly/45DmPBM\n\n📩 Contact pro : contact@juliensong.com",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/P1Pb7HTKjSY/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/P1Pb7HTKjSY/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/P1Pb7HTKjSY/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/P1Pb7HTKjSY/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/P1Pb7HTKjSY/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "Julien Song",
+        "tags": [
+          "juliensong",
+          "chess",
+          "échecs",
+          "italienne échecs",
+          "partie italienne échecs",
+          "ouverture italienne échecs",
+          "e4 e5 Cf3 Cc6 Fc4",
+          "comment bien jouer l'italienne aux échecs",
+          "giuoco piano",
+          "giucco piano échecs",
+          "giuoco pianissimo",
+          "giuco pianissimo échecs"
+        ],
+        "categoryId": "24",
+        "liveBroadcastContent": "none",
+        "defaultLanguage": "fr",
+        "localized": {
+          "title": "LE PLAN à connaitre dans l'ITALIENNE",
+          "description": "👉 Rejoins la communauté et obtiens des conseils pour progresser aux échecs sur https://liens.juliensong.com !\n\n👉 Pour jouer aux échecs gratuitement sur Chesscom : https://bit.ly/4oXnci3\n👉 Pour prendre un abonnement Premium sur Chesscom : https://bit.ly/45DmPBM\n\n📩 Contact pro : contact@juliensong.com"
+        },
+        "defaultAudioLanguage": "fr"
+      },
+      "contentDetails": {
+        "duration": "PT21M9S",
+        "dimension": "2d",
+        "definition": "hd",
+        "caption": "false",
+        "licensedContent": true,
+        "contentRating": {},
+        "projection": "rectangular"
+      },
+      "status": {
+        "uploadStatus": "processed",
+        "privacyStatus": "public",
+        "license": "youtube",
+        "embeddable": true,
+        "publicStatsViewable": true,
+        "madeForKids": false
+      },
+      "statistics": {
+        "viewCount": "433024",
+        "likeCount": "8763",
+        "favoriteCount": "0",
+        "commentCount": "275"
+      }
+    },
+    {
+      "kind": "youtube#video",
+      "etag": "dmsAJwlIuWPzjY_EKVC7UN4x_Nk",
+      "id": "_tltitUIyX8",
+      "snippet": {
+        "publishedAt": "2026-03-20T18:45:47Z",
+        "channelId": "UCwBtfnsZ-z5d0kCY1_szv-Q",
+        "title": "L’ÉCHANGE à connaître dans l’ouverture italienne",
+        "description": "Partie d'échecs pédagogique, commentée au coup par coup avec analyses tactiques et stratégiques.\nL'ouverture est une partie italienne jouée sur Lichess contre un 1700 Elo\n\n⭐️ Progressez avec mon club d’échecs en ligne :\n➡️ https://marcquenehen.com\n\n⭐️ Ma chaîne pédagogique Échecs Faciles :\n➡️ https://www.youtube.com/@Echecs-et-Marc\n\n⭐️ Restons connectés :\n➡️ Facebook https://www.facebook.com/MarcQuenehenChess\n➡️ Instagram https://www.instagram.com/marcquenehen\n➡️ LinkedIn https://www.linkedin.com/in/marc-quenehen\n➡️ X https://x.com/MarcQuenehen\n\n⭐️⭐️⭐️ Marc Quenehen — entraîneur d’échecs passionné",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/_tltitUIyX8/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/_tltitUIyX8/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/_tltitUIyX8/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/_tltitUIyX8/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/_tltitUIyX8/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          },
+          "qhd": {
+            "url": "https://i.ytimg.com/vi/_tltitUIyX8/qhddefault.jpg",
+            "width": 2560,
+            "height": 1440
+          }
+        },
+        "channelTitle": "Progresser aux échecs avec Marc Quenehen",
+        "tags": [
+          "echecs",
+          "chess",
+          "partie echecs",
+          "partie pedagogique",
+          "echecs pedagogie",
+          "cours echecs",
+          "apprendre les echecs",
+          "strategie echecs",
+          "tactique echecs",
+          "analyse echecs",
+          "lecon echecs",
+          "progresser aux echecs",
+          "entrainement echecs",
+          "video echecs",
+          "vidéos d'échecs",
+          "partie d'échecs pédagogique",
+          "ouverture italienne",
+          "partie italienne",
+          "techniques échecs"
+        ],
+        "categoryId": "20",
+        "liveBroadcastContent": "none",
+        "defaultLanguage": "fr-FR",
+        "localized": {
+          "title": "L’ÉCHANGE à connaître dans l’ouverture italienne",
+          "description": "Partie d'échecs pédagogique, commentée au coup par coup avec analyses tactiques et stratégiques.\nL'ouverture est une partie italienne jouée sur Lichess contre un 1700 Elo\n\n⭐️ Progressez avec mon club d’échecs en ligne :\n➡️ https://marcquenehen.com\n\n⭐️ Ma chaîne pédagogique Échecs Faciles :\n➡️ https://www.youtube.com/@Echecs-et-Marc\n\n⭐️ Restons connectés :\n➡️ Facebook https://www.facebook.com/MarcQuenehenChess\n➡️ Instagram https://www.instagram.com/marcquenehen\n➡️ LinkedIn https://www.linkedin.com/in/marc-quenehen\n➡️ X https://x.com/MarcQuenehen\n\n⭐️⭐️⭐️ Marc Quenehen — entraîneur d’échecs passionné"
+        },
+        "defaultAudioLanguage": "fr"
+      },
+      "contentDetails": {
+        "duration": "PT22M28S",
+        "dimension": "2d",
+        "definition": "hd",
+        "caption": "false",
+        "licensedContent": true,
+        "contentRating": {},
+        "projection": "rectangular"
+      },
+      "status": {
+        "uploadStatus": "processed",
+        "privacyStatus": "public",
+        "license": "youtube",
+        "embeddable": true,
+        "publicStatsViewable": true,
+        "madeForKids": false
+      },
+      "statistics": {
+        "viewCount": "26267",
+        "likeCount": "1409",
+        "favoriteCount": "0",
+        "commentCount": "49"
+      }
+    },
+    {
+      "kind": "youtube#video",
+      "etag": "fJpRPMx9DuhiW85alr2SR7BvX0k",
+      "id": "5Ny8I1Bj-ek",
+      "snippet": {
+        "publishedAt": "2025-01-10T17:18:37Z",
+        "channelId": "UCAVjSfCSqTQaK8kO_j2EHcw",
+        "title": "L'OUVERTURE ITALIENNE aux Échecs : Dominez Rapidement avec les Blancs ! ♟️",
+        "description": "Découvrez comment jouer l'Ouverture Italienne, une ouverture classique et efficace pour prendre l’avantage dès les premiers coups. \n🏆 Tu veux atteindre 1000 ELO en Blitz ? Mon programme complet : https://whop.com/dingochess/atteindre-1000-elo-en-blitz/\n📚 Tous Mes Programmes : https://whop.com/dingochess\n\nAvec cette stratégie, vous apprendrez à dominer rapidement vos adversaires avec les Blancs en combinant développement rapide et pression sur les cases clés.\n\n🌟 Ce que vous allez apprendre :\n\nLes coups précis pour jouer l’Ouverture Italienne.\nLes plans stratégiques pour exploiter les erreurs de vos adversaires.\nComment utiliser cette ouverture pour gagner rapidement vos parties.\n🎯 Pourquoi choisir l'Ouverture Italienne ?\n\nFacile à apprendre et idéale pour les débutants et intermédiaires.\nOffre un contrôle solide du centre et des opportunités tactiques.\nUne ouverture classique utilisée par les grands maîtres !\n\nouverture italienne\nstratégie échecs débutants\ndominer avec les blancs\néchecs ouverture classique\napprendre l’ouverture italienne\néchecs en ligne\npartie rapide échecs\nouverture italienne échecs tutoriel\nstratégies échecs pour gagner\nbases des échecs\ntactiques avec les blancs\nouverture italienne plans stratégiques 🔔 Abonnez-vous pour progresser aux échecs et découvrir des pièges d’ouverture et des mats rapides ! 📧 Contact : dingochess@proton.me",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/5Ny8I1Bj-ek/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/5Ny8I1Bj-ek/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/5Ny8I1Bj-ek/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/5Ny8I1Bj-ek/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/5Ny8I1Bj-ek/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "Dingo Chess",
+        "tags": [
+          "echecs",
+          "chess com",
+          "blitz",
+          "ouverture italienne",
+          "stratégie échecs débutants",
+          "dominer avec les blancs",
+          "échecs ouverture classique",
+          "apprendre l’ouverture italienne",
+          "échecs en ligne",
+          "partie rapide échecs",
+          "ouverture italienne échecs tutoriel",
+          "stratégies échecs pour gagner",
+          "bases des échecs",
+          "tactiques avec les blancs",
+          "ouverture italienne plans stratégiques"
+        ],
+        "categoryId": "27",
+        "liveBroadcastContent": "none",
+        "defaultLanguage": "fr",
+        "localized": {
+          "title": "L'OUVERTURE ITALIENNE aux Échecs : Dominez Rapidement avec les Blancs ! ♟️",
+          "description": "Découvrez comment jouer l'Ouverture Italienne, une ouverture classique et efficace pour prendre l’avantage dès les premiers coups. \n🏆 Tu veux atteindre 1000 ELO en Blitz ? Mon programme complet : https://whop.com/dingochess/atteindre-1000-elo-en-blitz/\n📚 Tous Mes Programmes : https://whop.com/dingochess\n\nAvec cette stratégie, vous apprendrez à dominer rapidement vos adversaires avec les Blancs en combinant développement rapide et pression sur les cases clés.\n\n🌟 Ce que vous allez apprendre :\n\nLes coups précis pour jouer l’Ouverture Italienne.\nLes plans stratégiques pour exploiter les erreurs de vos adversaires.\nComment utiliser cette ouverture pour gagner rapidement vos parties.\n🎯 Pourquoi choisir l'Ouverture Italienne ?\n\nFacile à apprendre et idéale pour les débutants et intermédiaires.\nOffre un contrôle solide du centre et des opportunités tactiques.\nUne ouverture classique utilisée par les grands maîtres !\n\nouverture italienne\nstratégie échecs débutants\ndominer avec les blancs\néchecs ouverture classique\napprendre l’ouverture italienne\néchecs en ligne\npartie rapide échecs\nouverture italienne échecs tutoriel\nstratégies échecs pour gagner\nbases des échecs\ntactiques avec les blancs\nouverture italienne plans stratégiques 🔔 Abonnez-vous pour progresser aux échecs et découvrir des pièges d’ouverture et des mats rapides ! 📧 Contact : dingochess@proton.me"
+        },
+        "defaultAudioLanguage": "fr"
+      },
+      "contentDetails": {
+        "duration": "PT3M46S",
+        "dimension": "2d",
+        "definition": "hd",
+        "caption": "false",
+        "licensedContent": false,
+        "contentRating": {},
+        "projection": "rectangular"
+      },
+      "status": {
+        "uploadStatus": "processed",
+        "privacyStatus": "public",
+        "license": "youtube",
+        "embeddable": true,
+        "publicStatsViewable": true,
+        "madeForKids": false
+      },
+      "statistics": {
+        "viewCount": "4305",
+        "likeCount": "101",
+        "favoriteCount": "0",
+        "commentCount": "3"
+      }
+    },
+    {
+      "kind": "youtube#video",
+      "etag": "iRhBNHnqNKnm6PubYrojyPhroDA",
+      "id": "wpIcyDhdGKs",
+      "snippet": {
+        "publishedAt": "2021-03-25T23:31:35Z",
+        "channelId": "UCwBtfnsZ-z5d0kCY1_szv-Q",
+        "title": "Ouverture italienne (1) : Partie d'échecs pédagogique",
+        "description": "► 𝐌𝐞 𝐬𝐨𝐮𝐭𝐞𝐧𝐢𝐫 𝐬𝐮𝐫 𝐓𝐢𝐩𝐞𝐞𝐞 ❤️: https://fr.tipeee.com/marc-quenehen-le-divin-chauve\n► 𝐌𝐞𝐬 𝐥𝐢𝐯𝐫𝐞𝐬 𝐝'𝐞́𝐜𝐡𝐞𝐜𝐬 📚 : https://marcquenehen.com\n► 𝐌𝐨𝐧 𝐁𝐥𝐨𝐠 ✍ : https://marcquenehen.com/blogs/infos\n► 𝐋𝐨𝐠𝐢𝐜𝐢𝐞𝐥 𝐝'𝐞́𝐜𝐡𝐞𝐜𝐬 𝐪𝐮𝐞 𝐣'𝐮𝐭𝐢𝐥𝐢𝐬𝐞 👨\u200d💻 : https://shop.chessbase.com/fr/products/chessbase_17_mega_package?ref=%20RF337-H3HRW5JZN8\n► 𝐌𝐞𝐬 𝐞𝐧𝐭𝐫𝐞𝐩𝐫𝐢𝐬𝐞𝐬 𝐩𝐚𝐫𝐭𝐞𝐧𝐚𝐢𝐫𝐞𝐬 💞: https://marcquenehen.com/pages/%F0%9F%92%9E-entreprises-partenaires\n► 𝐓𝐰𝐢𝐭𝐭𝐞𝐫 : https://twitter.com/MarcQuenehen\n► 𝐅𝐚𝐜𝐞𝐛𝐨𝐨𝐤 : https://www.facebook.com/marc.quenehen\n► 𝐈𝐧𝐬𝐭𝐚𝐠𝐫𝐚𝐦 : https://www.instagram.com/marcquenehen\n► 𝐋𝐢𝐧𝐤𝐞𝐝𝐈𝐧 : https://www.linkedin.com/in/marc-quenehen-1bba976a\n\n𝐐𝐔𝐈 𝐒𝐔𝐈𝐒-𝐉𝐄 ?\n\nEntraineur, auteur de livres et créateurs de divers contenus échiquéens !\n\nAprès avoir travaillé avec le Grand Maître International Iossif Dorfman, entraîneur de l'ancien champion du monde Garry Kasparov, je me suis passionné pour l'enseignement des principes stratégiques que je m'applique à rendre accessibles, pour tous les niveaux, via des vidéos pédagogiques classées par ouvertures.\n\n𝐑𝐄𝐉𝐎𝐈𝐆𝐍𝐄𝐙-𝐌𝐎𝐈 !\n\n► 𝐒'𝐚𝐛𝐨𝐧𝐧𝐞𝐫 𝐚̀ 𝐥𝐚 𝐜𝐡𝐚𝐢̂𝐧𝐞 : https://www.youtube.com/c/MarcQuenehen/?sub_confirmation=1\n► 𝐓𝐰𝐢𝐭𝐭𝐞𝐫 : https://twitter.com/MarcQuenehen\n► 𝐅𝐚𝐜𝐞𝐛𝐨𝐨𝐤 : https://www.facebook.com/marc.quenehen\n\n𝐏𝐑𝐄𝐒𝐄𝐍𝐓𝐀𝐓𝐈𝐎𝐍 𝐃𝐄 𝐋𝐀 𝐕𝐈𝐃𝐄𝐎\n\nLa Partie italienne est une ouverture d'échecs qui apparaît après les coups : 1.e4 e5 2.Cf3 Cc6 3.Fc4 Fc5 C'est une ouverture d'échecs classique, très populaire.\n\nJ'explique chaque coup de cette partie d'échecs pédagogique en insistant sur la tactique et la stratégie aux echecs. Que vous soyez débutant ou joueur d'échecs un peu plus expérimenté, vous progresserez dans votre compréhension de jeu.\n\nLa cadence de jeu est de 10 minutes + un bonus de 5 secondes par coup.\n\nPartie italienne | Partie pédagogique | Echecs\nPartie italienne n°1 : Contre attaque centrale\n#échecs #echecs #marcquenehen",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/wpIcyDhdGKs/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/wpIcyDhdGKs/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/wpIcyDhdGKs/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/wpIcyDhdGKs/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/wpIcyDhdGKs/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "Progresser aux échecs avec Marc Quenehen",
+        "tags": [
+          "Marc Quenehen",
+          "échecs",
+          "s'améliorer aux échecs",
+          "comment progresser aux échecs",
+          "bases échecs",
+          "echecs",
+          "partie pédagogique",
+          "partie pédagogique echecs",
+          "partie italienne",
+          "partie italienne échecs",
+          "ouverture échecs",
+          "apprendre les échecs",
+          "stratégie échecs débutant",
+          "échecs techniques et stratégies",
+          "ouverture italienne",
+          "ouvertures échecs",
+          "échecs ouverture",
+          "échecs ouvertures",
+          "échecs stratégie",
+          "partie pédagogiqu",
+          "Progresser aux échecs avec Marc Quenehen",
+          "echecs stratégie",
+          "échecs chaine"
+        ],
+        "categoryId": "20",
+        "liveBroadcastContent": "none",
+        "defaultLanguage": "fr",
+        "localized": {
+          "title": "Ouverture italienne (1) : Partie d'échecs pédagogique",
+          "description": "► 𝐌𝐞 𝐬𝐨𝐮𝐭𝐞𝐧𝐢𝐫 𝐬𝐮𝐫 𝐓𝐢𝐩𝐞𝐞𝐞 ❤️: https://fr.tipeee.com/marc-quenehen-le-divin-chauve\n► 𝐌𝐞𝐬 𝐥𝐢𝐯𝐫𝐞𝐬 𝐝'𝐞́𝐜𝐡𝐞𝐜𝐬 📚 : https://marcquenehen.com\n► 𝐌𝐨𝐧 𝐁𝐥𝐨𝐠 ✍ : https://marcquenehen.com/blogs/infos\n► 𝐋𝐨𝐠𝐢𝐜𝐢𝐞𝐥 𝐝'𝐞́𝐜𝐡𝐞𝐜𝐬 𝐪𝐮𝐞 𝐣'𝐮𝐭𝐢𝐥𝐢𝐬𝐞 👨\u200d💻 : https://shop.chessbase.com/fr/products/chessbase_17_mega_package?ref=%20RF337-H3HRW5JZN8\n► 𝐌𝐞𝐬 𝐞𝐧𝐭𝐫𝐞𝐩𝐫𝐢𝐬𝐞𝐬 𝐩𝐚𝐫𝐭𝐞𝐧𝐚𝐢𝐫𝐞𝐬 💞: https://marcquenehen.com/pages/%F0%9F%92%9E-entreprises-partenaires\n► 𝐓𝐰𝐢𝐭𝐭𝐞𝐫 : https://twitter.com/MarcQuenehen\n► 𝐅𝐚𝐜𝐞𝐛𝐨𝐨𝐤 : https://www.facebook.com/marc.quenehen\n► 𝐈𝐧𝐬𝐭𝐚𝐠𝐫𝐚𝐦 : https://www.instagram.com/marcquenehen\n► 𝐋𝐢𝐧𝐤𝐞𝐝𝐈𝐧 : https://www.linkedin.com/in/marc-quenehen-1bba976a\n\n𝐐𝐔𝐈 𝐒𝐔𝐈𝐒-𝐉𝐄 ?\n\nEntraineur, auteur de livres et créateurs de divers contenus échiquéens !\n\nAprès avoir travaillé avec le Grand Maître International Iossif Dorfman, entraîneur de l'ancien champion du monde Garry Kasparov, je me suis passionné pour l'enseignement des principes stratégiques que je m'applique à rendre accessibles, pour tous les niveaux, via des vidéos pédagogiques classées par ouvertures.\n\n𝐑𝐄𝐉𝐎𝐈𝐆𝐍𝐄𝐙-𝐌𝐎𝐈 !\n\n► 𝐒'𝐚𝐛𝐨𝐧𝐧𝐞𝐫 𝐚̀ 𝐥𝐚 𝐜𝐡𝐚𝐢̂𝐧𝐞 : https://www.youtube.com/c/MarcQuenehen/?sub_confirmation=1\n► 𝐓𝐰𝐢𝐭𝐭𝐞𝐫 : https://twitter.com/MarcQuenehen\n► 𝐅𝐚𝐜𝐞𝐛𝐨𝐨𝐤 : https://www.facebook.com/marc.quenehen\n\n𝐏𝐑𝐄𝐒𝐄𝐍𝐓𝐀𝐓𝐈𝐎𝐍 𝐃𝐄 𝐋𝐀 𝐕𝐈𝐃𝐄𝐎\n\nLa Partie italienne est une ouverture d'échecs qui apparaît après les coups : 1.e4 e5 2.Cf3 Cc6 3.Fc4 Fc5 C'est une ouverture d'échecs classique, très populaire.\n\nJ'explique chaque coup de cette partie d'échecs pédagogique en insistant sur la tactique et la stratégie aux echecs. Que vous soyez débutant ou joueur d'échecs un peu plus expérimenté, vous progresserez dans votre compréhension de jeu.\n\nLa cadence de jeu est de 10 minutes + un bonus de 5 secondes par coup.\n\nPartie italienne | Partie pédagogique | Echecs\nPartie italienne n°1 : Contre attaque centrale\n#échecs #echecs #marcquenehen"
+        },
+        "defaultAudioLanguage": "fr"
+      },
+      "contentDetails": {
+        "duration": "PT24M21S",
+        "dimension": "2d",
+        "definition": "hd",
+        "caption": "false",
+        "licensedContent": true,
+        "contentRating": {},
+        "projection": "rectangular"
+      },
+      "status": {
+        "uploadStatus": "processed",
+        "privacyStatus": "public",
+        "license": "youtube",
+        "embeddable": true,
+        "publicStatsViewable": true,
+        "madeForKids": false
+      },
+      "statistics": {
+        "viewCount": "105975",
+        "likeCount": "2727",
+        "favoriteCount": "0",
+        "commentCount": "189"
+      }
+    },
+    {
+      "kind": "youtube#video",
+      "etag": "hNUqNJqi9wNvcm8U4G0q8aXesP8",
+      "id": "qUews8fEGkc",
+      "snippet": {
+        "publishedAt": "2024-12-13T14:00:52Z",
+        "channelId": "UCsKZ2yOsgfNxln8xH5WkGvg",
+        "title": "Italian Game Chess Opening Explained in 20 Minutes [Crash Course]",
+        "description": "✅ Just released: My BRAND-NEW FREE Masterclass, created after coaching thousands of students ► https://chess-teacher.net/masterclassyt/\n\nTake Your Chess Skills To The Next Level With High-Quality Courses\nLearn here ► https://online.chess-teacher.com/shopyd\n\n💰💲 Join the RCA Affiliate Program, promote our courses, and get 50% commission - https://chess-teacher.com/partnership/\n\n🔹 3 Rules That Will Change YOUR Chess Forever! [Expert SECRETS & TIPS] - https://youtu.be/mFlYDz3IKJw\n\n♛ Find the Italian Game chess opening variations shown in the video in this blog-post - https://chess-teacher.com/italian-game-opening/\n\nThis is a quick chess opening crash course on the Italian Game — one of the oldest recorded and most popular chess openings. By the end of this crash course, you’ll know how to play the Italian Game better than 95% of chess players!\n\nThe Italian Game arises after the following moves: 1.e4 e5 2.Nf3 Nc6 3.Bc4. White develops their bishop to the active diagonal, targeting Black’s weak f7-pawn. \n\nMost amateur players respond with 3...Bc5, mirroring White’s plan. This leads to the well-known Giuoco Piano variation. White then continues with 4.c3, transitioning into the Classical Variation, which often sets the stage for Greco’s Attack (also known as the Center Attack).\n\nIn this lesson, you’ll learn:\n\n► The opening theory and key concepts behind the Italian Game.\n► Common attacking ideas for White.\n► How to counter Black’s various defenses.\n► Deadly traps that give White a winning advantage in as few as 9 moves.\n► Most importantly, this crash course focuses on teaching you the logic and principles behind these moves so you can truly understand the opening instead of just memorizing lines.\n\n▬▬▬▬▬▬\n► Chapters\n\n00:00 Learn the Italian Game: Theory, Plans, Traps\n00:12 Giuoco Piano, 3...Bc5\n00:38 Why 4.c3\n03:16 Classical Variation, Center Attack, Greco Gambit\n05:12 Trap to win in 9 moves\n07:14 Why 10.Qb3 is a bad move\n08:56 If Black gives up Queen for 2 Rooks\n10:09 If Black does NOT play Bxa1\n12:15 Italian Game for advanced players (8...Bxc3)\n13:17 KEY MOVE d5 for both White and Black\n14:48 Do NOT make this opening mistake\n16:16 Do THIS if Black castles early\n18:02 Puzzle of the Day\n18:43 If Black plays d6 before castling\n20:01 Brutal attack (sacrificing like Tal)\n22:09 If Black plays Bd7 to cover the check\n\n► Follow RCA on social media \nFacebook: https://www.facebook.com/RemoteChessAcademy\nInstagram: https://www.instagram.com/gm.igorsmirnov/\nTikTok: https://www.tiktok.com/@gmigorsmirnov\nX (Twitter): https://x.com/GMIgorSmirnov/\n\n#IgorNation #ChessOpenings #ItalianGame #ChessTraps #OpeningTraps",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/qUews8fEGkc/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/qUews8fEGkc/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/qUews8fEGkc/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/qUews8fEGkc/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/qUews8fEGkc/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "Remote Chess Academy",
+        "tags": [
+          "italian game chess",
+          "italian game chess theory",
+          "italian game chess traps",
+          "italian game chess main line",
+          "italian game chess opening",
+          "italian game opening",
+          "italian game opening theory",
+          "italian game opening traps",
+          "italian game for white",
+          "italian game full theory",
+          "italian game explained",
+          "learn the italian opening",
+          "learn the italian game",
+          "how to play the italian game chess",
+          "italian game giuoco piano main line",
+          "italian game classical variation center attack",
+          "italian game greco attack"
+        ],
+        "categoryId": "27",
+        "liveBroadcastContent": "none",
+        "defaultLanguage": "en",
+        "localized": {
+          "title": "Italian Game Chess Opening Explained in 20 Minutes [Crash Course]",
+          "description": "✅ Just released: My BRAND-NEW FREE Masterclass, created after coaching thousands of students ► https://chess-teacher.net/masterclassyt/\n\nTake Your Chess Skills To The Next Level With High-Quality Courses\nLearn here ► https://online.chess-teacher.com/shopyd\n\n💰💲 Join the RCA Affiliate Program, promote our courses, and get 50% commission - https://chess-teacher.com/partnership/\n\n🔹 3 Rules That Will Change YOUR Chess Forever! [Expert SECRETS & TIPS] - https://youtu.be/mFlYDz3IKJw\n\n♛ Find the Italian Game chess opening variations shown in the video in this blog-post - https://chess-teacher.com/italian-game-opening/\n\nThis is a quick chess opening crash course on the Italian Game — one of the oldest recorded and most popular chess openings. By the end of this crash course, you’ll know how to play the Italian Game better than 95% of chess players!\n\nThe Italian Game arises after the following moves: 1.e4 e5 2.Nf3 Nc6 3.Bc4. White develops their bishop to the active diagonal, targeting Black’s weak f7-pawn. \n\nMost amateur players respond with 3...Bc5, mirroring White’s plan. This leads to the well-known Giuoco Piano variation. White then continues with 4.c3, transitioning into the Classical Variation, which often sets the stage for Greco’s Attack (also known as the Center Attack).\n\nIn this lesson, you’ll learn:\n\n► The opening theory and key concepts behind the Italian Game.\n► Common attacking ideas for White.\n► How to counter Black’s various defenses.\n► Deadly traps that give White a winning advantage in as few as 9 moves.\n► Most importantly, this crash course focuses on teaching you the logic and principles behind these moves so you can truly understand the opening instead of just memorizing lines.\n\n▬▬▬▬▬▬\n► Chapters\n\n00:00 Learn the Italian Game: Theory, Plans, Traps\n00:12 Giuoco Piano, 3...Bc5\n00:38 Why 4.c3\n03:16 Classical Variation, Center Attack, Greco Gambit\n05:12 Trap to win in 9 moves\n07:14 Why 10.Qb3 is a bad move\n08:56 If Black gives up Queen for 2 Rooks\n10:09 If Black does NOT play Bxa1\n12:15 Italian Game for advanced players (8...Bxc3)\n13:17 KEY MOVE d5 for both White and Black\n14:48 Do NOT make this opening mistake\n16:16 Do THIS if Black castles early\n18:02 Puzzle of the Day\n18:43 If Black plays d6 before castling\n20:01 Brutal attack (sacrificing like Tal)\n22:09 If Black plays Bd7 to cover the check\n\n► Follow RCA on social media \nFacebook: https://www.facebook.com/RemoteChessAcademy\nInstagram: https://www.instagram.com/gm.igorsmirnov/\nTikTok: https://www.tiktok.com/@gmigorsmirnov\nX (Twitter): https://x.com/GMIgorSmirnov/\n\n#IgorNation #ChessOpenings #ItalianGame #ChessTraps #OpeningTraps"
+        },
+        "defaultAudioLanguage": "en"
+      },
+      "contentDetails": {
+        "duration": "PT23M39S",
+        "dimension": "2d",
+        "definition": "hd",
+        "caption": "false",
+        "licensedContent": true,
+        "contentRating": {},
+        "projection": "rectangular"
+      },
+      "status": {
+        "uploadStatus": "processed",
+        "privacyStatus": "public",
+        "license": "youtube",
+        "embeddable": true,
+        "publicStatsViewable": true,
+        "madeForKids": false
+      },
+      "statistics": {
+        "viewCount": "1108983",
+        "likeCount": "20350",
+        "favoriteCount": "0",
+        "commentCount": "564"
+      }
+    },
+    {
+      "kind": "youtube#video",
+      "etag": "h9qHT7wb3bXZ-FzaO47UHM9PdOA",
+      "id": "MhNs8GLo894",
+      "snippet": {
+        "publishedAt": "2023-01-27T16:43:14Z",
+        "channelId": "UCsKZ2yOsgfNxln8xH5WkGvg",
+        "title": "Learn the Italian Game in 20 Minutes [Chess Opening Crash Course]",
+        "description": "🇮🇹 The Italian Game is great for learning development, center control, and attacks—but you’ll also learn how to handle other openings with ideas: https://chess-teacher.net/masterclasscta\n\nTake Your Chess Skills To The Next Level With High-Quality Courses\nLearn here ►https://online.chess-teacher.com/shopyd\n\n💰💲 Join the RCA Affiliate Program, promote our courses, and get 50% commission - https://chess-teacher.com/partnership/\n\n📥 Download the PGN of these Italian Game opening variations from this blog-post - https://chess-teacher.com/italian-game-chess-opening/ \n\n🔹 Hidden line in the Italian Game | Crushing Chess Opening for White - https://youtu.be/2DwFB4NzekU\n🔹 4 Ways to PUNISH Bg5 Pin on Your Knight (Tactically & Strategically) - https://youtu.be/RIFihcygk94\n\nIn this video lesson, GM Igor Smirnov gives you a quick crash course on one of the most popular chess openings, the Italian Game, which happens after the following moves: 1.e4 e5 2.Nf3 Nc6 3.Bc4.\n\nYou will learn the general opening theory, guidelines, key ideas, attacking plans, common errors, and some cool traps. Instead of just memorizing the opening moves, you will learn and understand the key ideas and purpose of each move.\n\n▬▬▬▬▬▬\n► Chapters\n\n00:00 Italian Game Chess Opening [Ideas & Plans]\n00:24 Why 3.Bc4? Don't memorize moves, understand the opening\n01:18 Giuoco Piano, 4.c3\n03:34 Pawn sacrifice for a winning attack\n04:32 Can you find the winning move for White?\n05:00 If White plays 5.d4\n06:55 If White plays 5.d3\n09:07 Black plays 5...d6, Classical Variation, Giuoco Pianissimo\n10:10 If Black delays castling 6...0-0 and plays 6...a6\n11:43 Creating an escape square for the c4-bishop\n12:33 Most common error by White (DON'T make this mistake)\n14:34 If Black plays Bg4, pinning your knight\n17:01 Building up the kingside attack\n18:46 Summary & Conclusion\n\n📗 Free chess courses - https://chess-teacher.com/rca-freebies/\n\n#IgorNation #ItalianGame #ChessOpenings #ChessOpening",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/MhNs8GLo894/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/MhNs8GLo894/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/MhNs8GLo894/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/MhNs8GLo894/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/MhNs8GLo894/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "Remote Chess Academy",
+        "tags": [
+          "italian game chess",
+          "italian game",
+          "italian game chess theory",
+          "italian game opening",
+          "italian game variations",
+          "italian game all variations",
+          "learn italian game chess",
+          "italian game chess opening",
+          "learn chess openings",
+          "giuoco piano chess opening",
+          "giuoco piano",
+          "giuoco piano opening"
+        ],
+        "categoryId": "27",
+        "liveBroadcastContent": "none",
+        "defaultLanguage": "en",
+        "localized": {
+          "title": "Learn the Italian Game in 20 Minutes [Chess Opening Crash Course]",
+          "description": "🇮🇹 The Italian Game is great for learning development, center control, and attacks—but you’ll also learn how to handle other openings with ideas: https://chess-teacher.net/masterclasscta\n\nTake Your Chess Skills To The Next Level With High-Quality Courses\nLearn here ►https://online.chess-teacher.com/shopyd\n\n💰💲 Join the RCA Affiliate Program, promote our courses, and get 50% commission - https://chess-teacher.com/partnership/\n\n📥 Download the PGN of these Italian Game opening variations from this blog-post - https://chess-teacher.com/italian-game-chess-opening/ \n\n🔹 Hidden line in the Italian Game | Crushing Chess Opening for White - https://youtu.be/2DwFB4NzekU\n🔹 4 Ways to PUNISH Bg5 Pin on Your Knight (Tactically & Strategically) - https://youtu.be/RIFihcygk94\n\nIn this video lesson, GM Igor Smirnov gives you a quick crash course on one of the most popular chess openings, the Italian Game, which happens after the following moves: 1.e4 e5 2.Nf3 Nc6 3.Bc4.\n\nYou will learn the general opening theory, guidelines, key ideas, attacking plans, common errors, and some cool traps. Instead of just memorizing the opening moves, you will learn and understand the key ideas and purpose of each move.\n\n▬▬▬▬▬▬\n► Chapters\n\n00:00 Italian Game Chess Opening [Ideas & Plans]\n00:24 Why 3.Bc4? Don't memorize moves, understand the opening\n01:18 Giuoco Piano, 4.c3\n03:34 Pawn sacrifice for a winning attack\n04:32 Can you find the winning move for White?\n05:00 If White plays 5.d4\n06:55 If White plays 5.d3\n09:07 Black plays 5...d6, Classical Variation, Giuoco Pianissimo\n10:10 If Black delays castling 6...0-0 and plays 6...a6\n11:43 Creating an escape square for the c4-bishop\n12:33 Most common error by White (DON'T make this mistake)\n14:34 If Black plays Bg4, pinning your knight\n17:01 Building up the kingside attack\n18:46 Summary & Conclusion\n\n📗 Free chess courses - https://chess-teacher.com/rca-freebies/\n\n#IgorNation #ItalianGame #ChessOpenings #ChessOpening"
+        },
+        "defaultAudioLanguage": "en"
+      },
+      "contentDetails": {
+        "duration": "PT19M31S",
+        "dimension": "2d",
+        "definition": "hd",
+        "caption": "false",
+        "licensedContent": true,
+        "contentRating": {},
+        "projection": "rectangular"
+      },
+      "status": {
+        "uploadStatus": "processed",
+        "privacyStatus": "public",
+        "license": "youtube",
+        "embeddable": true,
+        "publicStatsViewable": true,
+        "madeForKids": false
+      },
+      "statistics": {
+        "viewCount": "1195680",
+        "likeCount": "21581",
+        "favoriteCount": "0",
+        "commentCount": "701"
+      }
+    },
+    {
+      "kind": "youtube#video",
+      "etag": "XW39zqSWIjoc8HhQAWXPeVUSiMg",
+      "id": "QBXk_AUmL2s",
+      "snippet": {
+        "publishedAt": "2025-09-25T17:25:38Z",
+        "channelId": "UCRxtTeoTNe_gHxks1G5Jnjw",
+        "title": "How I Master the ITALIAN GAME  to reach 2000 in Chess",
+        "description": "1 on 1 lessons with me https://www.chesswithakeem.com/ (limited slots)\nWant my exclusive videos only available for my private students ? Support me on Patreon by clicking this link\n  / chesslife  \n\nIm Akeem a Chess Master from Jamaica, ive been playing chess since i was 11 (im now 24) my major accomplishments are: \n-youngest ever chess master in jamaica (age 15) \n-first player in Jamaican history to win 7 titles consecutively in all 7 years of high school (2013-2019) \n\nIf you have ANY chess related questions ask below ill asnwer them all\n\nStart with \n( 0:00 )\nGame vs 500 ( 0:25 )\nGame vs 600 ( 5:17 )\nGame vs 700 ( 8:26 )\nGame vs 800 ( 12:34 )\nGame vs 900 ( 17:10)\nGame vs 1000 ( 25:16 )\nGame vs 1100 ( 29:48 )\nGame vs 1200 ( 37:26 )\nGame vs 1300 ( 44:11 )\nGame vs 1400 ( 51:49 )\nGame vs 1500 ( 58:33 )\nGame vs 1600( 01:12:18 )\nGame vs 1700 ( 01:16:08 )  \nGame vs 1800 ( 01:22:28 ) \n Game vs 1900 ( 01:34:55 ) \nGame vs 2000 ( 01:42:28",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/QBXk_AUmL2s/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/QBXk_AUmL2s/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/QBXk_AUmL2s/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/QBXk_AUmL2s/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/QBXk_AUmL2s/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "ChesswithAkeem",
+        "categoryId": "27",
+        "liveBroadcastContent": "none",
+        "defaultLanguage": "en",
+        "localized": {
+          "title": "How I Master the ITALIAN GAME  to reach 2000 in Chess",
+          "description": "1 on 1 lessons with me https://www.chesswithakeem.com/ (limited slots)\nWant my exclusive videos only available for my private students ? Support me on Patreon by clicking this link\n  / chesslife  \n\nIm Akeem a Chess Master from Jamaica, ive been playing chess since i was 11 (im now 24) my major accomplishments are: \n-youngest ever chess master in jamaica (age 15) \n-first player in Jamaican history to win 7 titles consecutively in all 7 years of high school (2013-2019) \n\nIf you have ANY chess related questions ask below ill asnwer them all\n\nStart with \n( 0:00 )\nGame vs 500 ( 0:25 )\nGame vs 600 ( 5:17 )\nGame vs 700 ( 8:26 )\nGame vs 800 ( 12:34 )\nGame vs 900 ( 17:10)\nGame vs 1000 ( 25:16 )\nGame vs 1100 ( 29:48 )\nGame vs 1200 ( 37:26 )\nGame vs 1300 ( 44:11 )\nGame vs 1400 ( 51:49 )\nGame vs 1500 ( 58:33 )\nGame vs 1600( 01:12:18 )\nGame vs 1700 ( 01:16:08 )  \nGame vs 1800 ( 01:22:28 ) \n Game vs 1900 ( 01:34:55 ) \nGame vs 2000 ( 01:42:28"
+        }
+      },
+      "contentDetails": {
+        "duration": "PT1H46M41S",
+        "dimension": "2d",
+        "definition": "hd",
+        "caption": "false",
+        "licensedContent": true,
+        "contentRating": {},
+        "projection": "rectangular"
+      },
+      "status": {
+        "uploadStatus": "processed",
+        "privacyStatus": "public",
+        "license": "youtube",
+        "embeddable": true,
+        "publicStatsViewable": true,
+        "madeForKids": false
+      },
+      "statistics": {
+        "viewCount": "455271",
+        "likeCount": "8864",
+        "favoriteCount": "0",
+        "commentCount": "826"
+      }
+    },
+    {
+      "kind": "youtube#video",
+      "etag": "eUlt1J7JM8cNmD5v4Q6ae9pOLUI",
+      "id": "6ACqk117Q7U",
+      "snippet": {
+        "publishedAt": "2024-11-22T13:21:02Z",
+        "channelId": "UCsKZ2yOsgfNxln8xH5WkGvg",
+        "title": "Learn The Italian Game, ALL Variations Explained [Traps, Ideas, And Plans]",
+        "description": "⚔️ The Italian Game is great for traps and attacking ideas—but you’ll also learn how to handle openings through plans, not endless memorization: https://chess-teacher.net/masterclasscta\n\nTake Your Chess Skills To The Next Level With High-Quality Courses\nLearn here ► https://online.chess-teacher.com/shopyd\n\n💰💲 Join the RCA Affiliate Program, promote our courses, and get 50% commission - https://chess-teacher.com/partnership/\n\n🔹 How I Went From 1600 to 2260 Chess Rating in 1 Year - https://youtu.be/ue6r5dhlVkw\n\n♛ Find the Italian Game chess opening variations shown in the video in this blog-post - https://chess-teacher.com/italian-game-variations/\n\nThis is a quick chess opening crash course on the Italian Game—a popular and one of the oldest recorded chess openings. It arises after the following moves: 1.e4 e5 2.Nf3 Nc6 3.Bc4, where White develops their light-squared bishop to c4, aiming to target Black's vulnerable f7-pawn.\n\nWatch the full video lesson to learn all the variations, opening theory, key ideas, typical attacking plans for White, and of course, some deadly traps. By understanding the fundamental ideas and logic behind each move, you will find it much easier to master this opening without relying solely on memorizing the moves.\n\nYou'll learn how to counter the most common responses from Black, such as the Two Knights Defense and the Giuoco Piano, as well as the most popular and tricky lines including the Fried Liver Attack, the Rousseau Gambit, and the Blackburne Shilling Gambit.\n\n▬▬▬▬▬▬\n► Chapters\n\n00:00 Learn the Italian Game in 20 Minutes [Chess Opening Crash Course]\n00:12 Basic ideas & plans in the Italian Game (for White and Black)\n01:13 1) Paris Defense, 3...d6 - aggressive sideline\n02:38 Legal Mate (Trap) named after Sire de Légall\n03:47 2) Blackburne Shilling Gambit, 3...Nd4\n06:25 Puzzle of the day\n06:35 3) Rousseau Gambit: 3...f5\n08:57 4) Giuoco Piano, 3...Bc5\n11:27 If Black plays h6 to attack Bg5\n15:10 If Black plays h6 before Bg5\n19:30 5) Two Knights Defense, 3...Nf6\n20:03 Fried Liver Attack For White\n21:50 Fried Liver Attack Counter For Black\n\n► Follow RCA on social media \nFacebook: https://www.facebook.com/RemoteChessAcademy\nInstagram: https://www.instagram.com/gm.igorsmirnov/\nTikTok: https://www.tiktok.com/@gmigorsmirnov\nX (Twitter): https://x.com/GMIgorSmirnov/\n\n#IgorNation #ChessOpenings #ItalianGame #ChessGambit #ChessOpeningsForBeginners",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/6ACqk117Q7U/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/6ACqk117Q7U/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/6ACqk117Q7U/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/6ACqk117Q7U/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/6ACqk117Q7U/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "Remote Chess Academy",
+        "tags": [
+          "italian game variations",
+          "italian game",
+          "italian game chess",
+          "italian game chess theory",
+          "italian game traps for white",
+          "italian game theory",
+          "italian game giuoco piano",
+          "italian game knight attack",
+          "italian game opening theory",
+          "italian game blackburne shilling gambit",
+          "italian game explained",
+          "learn the italian game",
+          "how to play the italian game chess",
+          "how to play the italian opening chess",
+          "italian game for beginners",
+          "italian game all variations",
+          "italian game all lines",
+          "e4 opening"
+        ],
+        "categoryId": "27",
+        "liveBroadcastContent": "none",
+        "defaultLanguage": "en",
+        "localized": {
+          "title": "Learn The Italian Game, ALL Variations Explained [Traps, Ideas, And Plans]",
+          "description": "⚔️ The Italian Game is great for traps and attacking ideas—but you’ll also learn how to handle openings through plans, not endless memorization: https://chess-teacher.net/masterclasscta\n\nTake Your Chess Skills To The Next Level With High-Quality Courses\nLearn here ► https://online.chess-teacher.com/shopyd\n\n💰💲 Join the RCA Affiliate Program, promote our courses, and get 50% commission - https://chess-teacher.com/partnership/\n\n🔹 How I Went From 1600 to 2260 Chess Rating in 1 Year - https://youtu.be/ue6r5dhlVkw\n\n♛ Find the Italian Game chess opening variations shown in the video in this blog-post - https://chess-teacher.com/italian-game-variations/\n\nThis is a quick chess opening crash course on the Italian Game—a popular and one of the oldest recorded chess openings. It arises after the following moves: 1.e4 e5 2.Nf3 Nc6 3.Bc4, where White develops their light-squared bishop to c4, aiming to target Black's vulnerable f7-pawn.\n\nWatch the full video lesson to learn all the variations, opening theory, key ideas, typical attacking plans for White, and of course, some deadly traps. By understanding the fundamental ideas and logic behind each move, you will find it much easier to master this opening without relying solely on memorizing the moves.\n\nYou'll learn how to counter the most common responses from Black, such as the Two Knights Defense and the Giuoco Piano, as well as the most popular and tricky lines including the Fried Liver Attack, the Rousseau Gambit, and the Blackburne Shilling Gambit.\n\n▬▬▬▬▬▬\n► Chapters\n\n00:00 Learn the Italian Game in 20 Minutes [Chess Opening Crash Course]\n00:12 Basic ideas & plans in the Italian Game (for White and Black)\n01:13 1) Paris Defense, 3...d6 - aggressive sideline\n02:38 Legal Mate (Trap) named after Sire de Légall\n03:47 2) Blackburne Shilling Gambit, 3...Nd4\n06:25 Puzzle of the day\n06:35 3) Rousseau Gambit: 3...f5\n08:57 4) Giuoco Piano, 3...Bc5\n11:27 If Black plays h6 to attack Bg5\n15:10 If Black plays h6 before Bg5\n19:30 5) Two Knights Defense, 3...Nf6\n20:03 Fried Liver Attack For White\n21:50 Fried Liver Attack Counter For Black\n\n► Follow RCA on social media \nFacebook: https://www.facebook.com/RemoteChessAcademy\nInstagram: https://www.instagram.com/gm.igorsmirnov/\nTikTok: https://www.tiktok.com/@gmigorsmirnov\nX (Twitter): https://x.com/GMIgorSmirnov/\n\n#IgorNation #ChessOpenings #ItalianGame #ChessGambit #ChessOpeningsForBeginners"
+        },
+        "defaultAudioLanguage": "en"
+      },
+      "contentDetails": {
+        "duration": "PT22M52S",
+        "dimension": "2d",
+        "definition": "hd",
+        "caption": "false",
+        "licensedContent": true,
+        "contentRating": {},
+        "projection": "rectangular"
+      },
+      "status": {
+        "uploadStatus": "processed",
+        "privacyStatus": "public",
+        "license": "youtube",
+        "embeddable": true,
+        "publicStatsViewable": true,
+        "madeForKids": false
+      },
+      "statistics": {
+        "viewCount": "314362",
+        "likeCount": "6287",
+        "favoriteCount": "0",
+        "commentCount": "225"
+      }
+    },
+    {
+      "kind": "youtube#video",
+      "etag": "5kGHAMYbCLWw50QLn4lcm8DRYPw",
+      "id": "2-iD3_M7104",
+      "snippet": {
+        "publishedAt": "2026-04-18T14:30:02Z",
+        "channelId": "UClE7RCE1XdClecOQPDOniOQ",
+        "title": "I Wish Someone Would've Teach Me This Chess Opening Sooner",
+        "description": "How to Play the Italian Game The Best Chess Opening for Beginners in Hindi, The Italian Game Makes You Better at Chess Immediately Cause This 26-minute Italian Guide Will Change your Rating Forever. In this video, I’ll teach you how to master the Italian chess opening from white's side — including all major variations, key traps, and powerful strategies. Including  Giuoco Piano Opening, Fried Liver Attack, Bishop's Opening, Ruy Lopez And Ideas from Top Players like Magnus Carlsen and Hikaru, along with practical concepts used in modern chess.\n\nI've already taught you How To Play Chess For Beginners in Hindi and How To Calculate in Chess? And Chess Endgame, Chess Middlegame, Other Chess Openings ( London System, Caro Kann Defense, Vienna Gambit, etc) but it's Time for... The Italian Game.\nWatch the full video to avoid (Blunders) the Common Chess Mistakes Beginners Make, and take your game to the next level. This is The Only Italian Guide You'll Ever Need!\n\n👉 Subscribe for the Most Amazing and High-quality Chess content in India, especially if you love creators like GothamChess, Hikaru Nakamura, or Anna Cramling\n-------------------------------------------\n----- [ Support ProfessorChess] -----\nBUY Chess.com Premium💎 Membership With My CODE: https://www.chess.com/membership?ref_id=387897617\nAnd GET Benefits LIKE:\nGet a 20% discount on ALL Courses\nUnlimited Game Review\nNo Ads\nOpening & Endgame Trainers\nLessons & Insights\nBots, Custom Flairs, Explorer, and more\n-------------------------------------------\n⏳Time stamps🕢\n00:00 INTRO\n01:02 Logic Behind Italian's Every Move?\n02:34 D6 (Basic Plans, Legal's Trap, etc)\n05:44 Bc5 (Basic Plans, Giuoco Piano, Mainline :D3,D4)\n22:17 Nf6 (Basic Plans, Fried Liver Attack, Bishop's Opening)\n------------------------------------------------\n- - [ Professor's Universe ] - -\ninstagram -   https://www.instagram.com/professorchess/\nYoutube -  https://www.youtube.com/@ProfessorChessYT\nDiscord -  https://discord.com/invite/SS3jSrUnAZ\nChess.com - https://www.chess.com/member/professorislive\n-------------------------------------------\nCHESS OPENING MIND MAP by ProfessorChess FREE PDF 👇🏻🩷\nhttps://drive.google.com/file/d/1gICLhu-DQVsWkTzWkIrly7rqdfclknZe/view?usp=drive_link\n-------------------------------------------\nLearn CHESS CALCULATION HERE:\nhttps://www.youtube.com/watch?v=abq7UnmK-PE&t=34s&list=PLHa_pb4Ua2uTDBQUm8Qssm67bIQfCxExP\n-------------------------------------------\nLearn CHESS MIDDLEGAME HERE:\nhttps://www.youtube.com/watch?v=iRxZ70yK3P0&t=22s&list=PLHa_pb4Ua2uTDBQUm8Qssm67bIQfCxExP\n-------------------------------------------\nLearn CHESS ENDGAME HERE:\nhttps://www.youtube.com/watch?v=bkec9moMm4k&list=PLHa_pb4Ua2uTDBQUm8Qssm67bIQfCxExP\n-------------------------------------------\nLearn LONDON SYSTEM HERE: \nhttps://www.youtube.com/watch?v=ozE-NNLnVCQ&t=1306s&list=PLHa_pb4Ua2uTDBQUm8Qssm67bIQfCxExP\n-------------------------------------------\nLearn CARO-KANN DEFENSE HERE: \nhttps://www.youtube.com/watch?v=6IclOjGaJ9c&t=975s&list=PLHa_pb4Ua2uTDBQUm8Qssm67bIQfCxExP\n-------------------------------------------\nLearn Cool & EASY Chess Traps (CLICK HERE)\nCursed Chess Opening - https://www.youtube.com/shorts/nPNtVqUhU-Q\nRoman Reigns Favourite Chess Trap - https://www.youtube.com/shorts/BPDCS76q96k\nInsane Chess Trap - https://www.youtube.com/shorts/ud_5ZaTOLmo\n-----------------------------------------------\n\n-----------------------------------------------\n#italiangame #italian #italianchessopening #chessopenings #chessgame #chesscalculation #HowToPlayChess #LearnChess #ChessInHindi #ChessForBeginners #OpeningStrategy #GothamChess #Hikaru  #magnus #londonsystem  #MarvelFans #chesstraps  #professorchess #chesstactics #chesscom  #avengersdoomsday #spiderman #professor #bestchessopening #chesstricks \n-----------------------------------------------\nCopyright Disclaimer under Section 107 of the Copyright Act 1976, allowance is made for 'fair use' for purposes such as criticism, comment, news reporting, teaching, scholarship, and research. Fair use is a use permitted by copyright statute that might otherwise be infringing. Non-profit, educational, or personal use tips the balance in favor of fair use.\n------------------------------------------------\nMake Sure To Comment, Thank you❤",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/2-iD3_M7104/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/2-iD3_M7104/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/2-iD3_M7104/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/2-iD3_M7104/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/2-iD3_M7104/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          },
+          "fhd": {
+            "url": "https://i.ytimg.com/vi/2-iD3_M7104/fhddefault.jpg",
+            "width": 1920,
+            "height": 1080
+          }
+        },
+        "channelTitle": "ProfessorChess",
+        "tags": [
+          "how to",
+          "how to play chess",
+          "italian game",
+          "italian game chess",
+          "italian chess opening",
+          "best chess opening",
+          "chess gambits",
+          "chess opening",
+          "chess for beginners",
+          "chess tutorial",
+          "chess openings for beginners",
+          "gothamchess vienna",
+          "learning chess",
+          "gothamchess",
+          "professor",
+          "professor chess",
+          "professorchess",
+          "london system chess",
+          "chess kaise khelte hain",
+          "chess tricks",
+          "chess traps",
+          "chess game",
+          "fide",
+          "avengers doomsday trailer",
+          "spider man brand new day"
+        ],
+        "categoryId": "24",
+        "liveBroadcastContent": "none",
+        "defaultLanguage": "en",
+        "localized": {
+          "title": "I Wish Someone Would've Teach Me This Chess Opening Sooner",
+          "description": "How to Play the Italian Game The Best Chess Opening for Beginners in Hindi, The Italian Game Makes You Better at Chess Immediately Cause This 26-minute Italian Guide Will Change your Rating Forever. In this video, I’ll teach you how to master the Italian chess opening from white's side — including all major variations, key traps, and powerful strategies. Including  Giuoco Piano Opening, Fried Liver Attack, Bishop's Opening, Ruy Lopez And Ideas from Top Players like Magnus Carlsen and Hikaru, along with practical concepts used in modern chess.\n\nI've already taught you How To Play Chess For Beginners in Hindi and How To Calculate in Chess? And Chess Endgame, Chess Middlegame, Other Chess Openings ( London System, Caro Kann Defense, Vienna Gambit, etc) but it's Time for... The Italian Game.\nWatch the full video to avoid (Blunders) the Common Chess Mistakes Beginners Make, and take your game to the next level. This is The Only Italian Guide You'll Ever Need!\n\n👉 Subscribe for the Most Amazing and High-quality Chess content in India, especially if you love creators like GothamChess, Hikaru Nakamura, or Anna Cramling\n-------------------------------------------\n----- [ Support ProfessorChess] -----\nBUY Chess.com Premium💎 Membership With My CODE: https://www.chess.com/membership?ref_id=387897617\nAnd GET Benefits LIKE:\nGet a 20% discount on ALL Courses\nUnlimited Game Review\nNo Ads\nOpening & Endgame Trainers\nLessons & Insights\nBots, Custom Flairs, Explorer, and more\n-------------------------------------------\n⏳Time stamps🕢\n00:00 INTRO\n01:02 Logic Behind Italian's Every Move?\n02:34 D6 (Basic Plans, Legal's Trap, etc)\n05:44 Bc5 (Basic Plans, Giuoco Piano, Mainline :D3,D4)\n22:17 Nf6 (Basic Plans, Fried Liver Attack, Bishop's Opening)\n------------------------------------------------\n- - [ Professor's Universe ] - -\ninstagram -   https://www.instagram.com/professorchess/\nYoutube -  https://www.youtube.com/@ProfessorChessYT\nDiscord -  https://discord.com/invite/SS3jSrUnAZ\nChess.com - https://www.chess.com/member/professorislive\n-------------------------------------------\nCHESS OPENING MIND MAP by ProfessorChess FREE PDF 👇🏻🩷\nhttps://drive.google.com/file/d/1gICLhu-DQVsWkTzWkIrly7rqdfclknZe/view?usp=drive_link\n-------------------------------------------\nLearn CHESS CALCULATION HERE:\nhttps://www.youtube.com/watch?v=abq7UnmK-PE&t=34s&list=PLHa_pb4Ua2uTDBQUm8Qssm67bIQfCxExP\n-------------------------------------------\nLearn CHESS MIDDLEGAME HERE:\nhttps://www.youtube.com/watch?v=iRxZ70yK3P0&t=22s&list=PLHa_pb4Ua2uTDBQUm8Qssm67bIQfCxExP\n-------------------------------------------\nLearn CHESS ENDGAME HERE:\nhttps://www.youtube.com/watch?v=bkec9moMm4k&list=PLHa_pb4Ua2uTDBQUm8Qssm67bIQfCxExP\n-------------------------------------------\nLearn LONDON SYSTEM HERE: \nhttps://www.youtube.com/watch?v=ozE-NNLnVCQ&t=1306s&list=PLHa_pb4Ua2uTDBQUm8Qssm67bIQfCxExP\n-------------------------------------------\nLearn CARO-KANN DEFENSE HERE: \nhttps://www.youtube.com/watch?v=6IclOjGaJ9c&t=975s&list=PLHa_pb4Ua2uTDBQUm8Qssm67bIQfCxExP\n-------------------------------------------\nLearn Cool & EASY Chess Traps (CLICK HERE)\nCursed Chess Opening - https://www.youtube.com/shorts/nPNtVqUhU-Q\nRoman Reigns Favourite Chess Trap - https://www.youtube.com/shorts/BPDCS76q96k\nInsane Chess Trap - https://www.youtube.com/shorts/ud_5ZaTOLmo\n-----------------------------------------------\n\n-----------------------------------------------\n#italiangame #italian #italianchessopening #chessopenings #chessgame #chesscalculation #HowToPlayChess #LearnChess #ChessInHindi #ChessForBeginners #OpeningStrategy #GothamChess #Hikaru  #magnus #londonsystem  #MarvelFans #chesstraps  #professorchess #chesstactics #chesscom  #avengersdoomsday #spiderman #professor #bestchessopening #chesstricks \n-----------------------------------------------\nCopyright Disclaimer under Section 107 of the Copyright Act 1976, allowance is made for 'fair use' for purposes such as criticism, comment, news reporting, teaching, scholarship, and research. Fair use is a use permitted by copyright statute that might otherwise be infringing. Non-profit, educational, or personal use tips the balance in favor of fair use.\n------------------------------------------------\nMake Sure To Comment, Thank you❤"
+        },
+        "defaultAudioLanguage": "hi"
+      },
+      "contentDetails": {
+        "duration": "PT26M37S",
+        "dimension": "2d",
+        "definition": "hd",
+        "caption": "false",
+        "licensedContent": true,
+        "contentRating": {},
+        "projection": "rectangular"
+      },
+      "status": {
+        "uploadStatus": "processed",
+        "privacyStatus": "public",
+        "license": "youtube",
+        "embeddable": true,
+        "publicStatsViewable": true,
+        "madeForKids": false
+      },
+      "statistics": {
+        "viewCount": "318019",
+        "likeCount": "7543",
+        "favoriteCount": "0",
+        "commentCount": "640"
+      }
+    }
+  ],
+  "pageInfo": {
+    "totalResults": 10,
+    "resultsPerPage": 10
+  }
+}

@@ -215,44 +215,6 @@
         </details>
       }
     }
-
-    @if (videos().length) {
-      <div class="videos" data-testid="videos">
-        <h3>Vidéos pour réviser</h3>
-        @for (video of videos(); track video.video_id) {
-          <article class="video">
-            @if (playingVideo() === video.video_id) {
-              <iframe
-                class="video__player"
-                [src]="embedUrl(video)"
-                [title]="video.title"
-                allow="accelerometer; encrypted-media; picture-in-picture"
-                allowfullscreen
-              ></iframe>
-            } @else if (video.thumbnail_url) {
-              <button
-                type="button"
-                class="video__thumb"
-                (click)="toggleVideo(video)"
-                [attr.aria-label]="'Lire : ' + video.title"
-              >
-                <img [src]="video.thumbnail_url" [alt]="''" loading="lazy" />
-                <span class="video__play" aria-hidden="true">▶</span>
-              </button>
-            }
-            <div class="video__meta">
-              <a [href]="video.url" target="_blank" rel="noopener">{{ video.title }}</a>
-              <span class="muted">{{ video.channel }}</span>
-              <button type="button" class="btn btn--ghost btn--small" (click)="toggleVideo(video)">
-                {{ playingVideo() === video.video_id ? 'Fermer le lecteur' : 'Lire ici' }}
-              </button>
-            </div>
-          </article>
-        }
-      </div>
-    } @else if (videosFailure(); as failure) {
-      <p class="muted">Vidéos indisponibles : {{ failure }}</p>
-    }
   } @else if (!advice.analysisLoading() && !advice.analysisError()) {
     <p class="muted">
       L’agent consulte les parties de maîtres, Stockfish si la position sort de la théorie, sa base
@@ -319,6 +281,61 @@
       </button>
     }
   </div>
+</section>
+
+<!-- Vidéos : par famille d'ouverture, dès que la théorie en nomme une -->
+<section class="card" data-testid="videos-card">
+  <header class="card__header">
+    <h2>Vidéos pour réviser</h2>
+    @if (advice.videosLoading()) {
+      <span class="spinner" role="status" aria-label="Chargement"></span>
+    } @else if (advice.openingFamily(); as family) {
+      <span class="muted">{{ family }}</span>
+    }
+  </header>
+
+  @if (videos().length) {
+    <div class="videos" data-testid="videos">
+      @for (video of videos(); track video.video_id) {
+        <article class="video">
+          @if (playingVideo() === video.video_id) {
+            <iframe
+              class="video__player"
+              [src]="embedUrl(video)"
+              [title]="video.title"
+              allow="accelerometer; encrypted-media; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          } @else if (video.thumbnail_url) {
+            <button
+              type="button"
+              class="video__thumb"
+              (click)="toggleVideo(video)"
+              [attr.aria-label]="'Lire : ' + video.title"
+            >
+              <img [src]="video.thumbnail_url" [alt]="''" loading="lazy" />
+              <span class="video__play" aria-hidden="true">▶</span>
+            </button>
+          }
+          <div class="video__meta">
+            <a [href]="video.url" target="_blank" rel="noopener">{{ video.title }}</a>
+            <span class="muted"
+              >{{ video.channel }} · {{ minutes(video) }} · {{ compact(video.views) }}</span
+            >
+            <button type="button" class="btn btn--ghost btn--small" (click)="toggleVideo(video)">
+              {{ playingVideo() === video.video_id ? 'Fermer le lecteur' : 'Lire ici' }}
+            </button>
+          </div>
+        </article>
+      }
+    </div>
+  } @else if (videosMessage(); as message) {
+    <p class="muted">{{ message }}</p>
+  } @else if (!advice.videosLoading()) {
+    <p class="muted">
+      Des vidéos s’affichent ici dès que la position correspond à une ouverture connue.
+    </p>
+  }
 </section>
 
 <!-- Questions libres -->

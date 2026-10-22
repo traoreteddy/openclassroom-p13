@@ -56,7 +56,18 @@ describe('AdviceService', () => {
     http = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => http.verify());
+  const emptyVideos = { videos: [], queries: [], from_cache: false, quota_used_today: 0 };
+  const videosUrl = (family: string) => (r: { url: string }) =>
+    r.url === `/api/v1/videos/${encodeURIComponent(family)}`;
+
+  afterEach(() => {
+    // La théorie nomme une ouverture : la carte Vidéos interroge l'API une fois par famille.
+    http
+      .match((r) => r.url.startsWith('/api/v1/videos/'))
+      .filter((r) => !r.cancelled)
+      .forEach((r) => r.flush(emptyVideos));
+    http.verify();
+  });
 
   const theoryUrl = (fen: string) => (r: { url: string }) =>
     r.url === `/api/v1/moves/${encodeFen(fen)}`;
@@ -208,5 +219,56 @@ describe('AdviceService', () => {
 
     expect(advice.asking()).toBe(false);
     expect(advice.exchanges()[0].response?.answer).toBe('Bonjour !');
+  });
+
+  it('charge les vidéos de la famille d’ouverture une seule fois', async () => {
+    await settle();
+    http
+      .expectOne(theoryUrl(DEFAULT_POSITION))
+      .flush(theoryOf('Italian Game: Two Knights Defense'));
+    await settle();
+
+    expect(advice.openingFamily()).toBe('Italian Game');
+    expect(advice.videosLoading()).toBe(true);
+    const request = http.expectOne(videosUrl('Italian Game'));
+    expect(request.request.params.get('max_results')).toBe('3');
+    request.flush({
+      ...emptyVideos,
+      videos: [{ video_id: 'v1', title: 'Italienne', channel: 'c', url: 'u', embed_url: 'e' }],
+    });
+
+    expect(advice.videosLoading()).toBe(false);
+    expect(advice.videos()?.videos[0].video_id).toBe('v1');
+
+    game.play('e4');
+    await settle();
+    http.expectOne(theoryUrl(game.fen())).flush(theoryOf('Italian Game: Evans Gambit'));
+    await settle();
+
+    http.expectNone(videosUrl('Italian Game')); // même famille : pas de nouvel appel
+    expect(advice.videos()?.videos[0].video_id).toBe('v1');
+  });
+
+  it('explique l’absence de vidéos et les erreurs de la carte Vidéos', async () => {
+    await settle();
+    http.expectOne(theoryUrl(DEFAULT_POSITION)).flush(theoryOf('Bird Opening'));
+    await settle();
+    http.expectOne(videosUrl('Bird Opening')).flush({ ...emptyVideos, message: 'Aucune vidéo.' });
+
+    expect(advice.videos()?.message).toBe('Aucune vidéo.');
+
+    game.play('e4');
+    await settle();
+    http.expectOne(theoryUrl(game.fen())).flush(theoryOf('Sicilian Defense'));
+    await settle();
+    http
+      .expectOne(videosUrl('Sicilian Defense'))
+      .flush(
+        { error: { kind: 'unavailable', code: 'quota_exceeded', message: 'Quota épuisé.' } },
+        { status: 503, statusText: 'Service Unavailable' },
+      );
+
+    expect(advice.videos()).toBeNull();
+    expect(advice.videosError()).toBe('Quota épuisé.');
   });
 });
