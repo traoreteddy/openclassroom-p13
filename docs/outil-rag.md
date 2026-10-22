@@ -134,7 +134,7 @@ Choix et constats :
 **Tests** : 17 tests du module de corpus (API Wikipédia simulée avec respx) ; 219 tests
 au total, couverture de branches 99 %.
 
-### Phase 1 : jeux de référence ⏳
+### Phase 1 : jeux de référence ✅
 
 | Jeu | Contenu | Sert à |
 |---|---|---|
@@ -142,6 +142,115 @@ au total, couverture de branches 99 %.
 | **Décision-50** | 50 questions, dont **20 hors corpus** | Taux d'appels inutiles |
 | **Tâches-30** | 30 tâches avec l'outil attendu | Taux d'appels d'outil corrects |
 | **Multi-10** | 10 questions multi-sauts avec leurs sous-questions attendues | Multi-sauts vs RAG en un seul passage |
+
+#### Résultats de la phase 1
+
+Les 4 jeux sont dans `backend/data/eval/` (JSON Lines). Le format est défini dans
+`app/rag/eval/datasets.py`, et chaque jeu est construit par un script reproductible.
+
+**Étape 1.1 : format et normalisation commune.** `app/rag/text.py` normalise le texte
+pour l'ingestion **et** l'évaluation : figurines Unicode → lettres françaises
+(« 4...♝c5 5.♘c3 » → « 4...Fc5 5.Cc3 »), espaces simples (y compris insécables).
+Un chunk est jugé pertinent s'il **contient** l'extrait attendu, comparaison faite sur
+une seule ligne, sans tenir compte de la casse (`contains_excerpt`) : le jugement ne
+dépend donc pas du découpage.
+
+**Étape 1.2 : passages candidats** (`app/rag/eval/passages.py`). Chaque article est
+découpé en paragraphes avec leur chemin de section ; les sections « Notes et
+références », « Bibliographie », « Liens externes »… sont écartées, ainsi que les
+paragraphes de moins de 200 caractères. Résultat : 134 passages.
+Un filtre « texte rédigé » écarte ensuite les listes de coups et les parties complètes :
+si plus de 25 % des mots sont des coups (« 4.Cf3 », « exd4 », « O-O »), le passage est
+écarté. Exemple : « 1.e4 c5 2.Cf3 e6 3.d4… » a un ratio de 1,00 ; une phrase rédigée,
+environ 0,15. Il reste **78 passages rédigés**.
+
+**Étape 1.3 : génération avec phi4-mini** (`app/rag/eval/generate.py`,
+`scripts/generate_ref_candidates.py`). 3 passages par article, répartis sur tout
+l'article (1 seul pour « Partie italienne »), soit 34 passages. Pour chacun, phi4-mini
+produit en **sortie structurée** une question, l'extrait qui contient la réponse et la
+réponse. Contrôle automatique immédiat : l'extrait doit exister **mot pour mot** dans le
+passage ; sinon, seconde tentative avec le motif du refus.
+Résultat : **34 candidats en 63 s** ; 29 validés par le contrôle, 5 rejetés (extrait
+trop court ou paraphrasé).
+
+**Étape 1.4 : relecture** (`scripts/build_ref30.py`, décisions tracées dans
+`data/eval/ref30_review.jsonl`). Le contrôle automatique garantit que l'extrait existe,
+pas que la question est bonne. Chaque candidat a été relu :
+
+| Verdict | Nombre | Exemples de défauts corrigés |
+|---|---|---|
+| Validée (au plus une retouche de forme) | 6 | — |
+| Corrigée | 22 | Question sans rapport avec l'extrait (6) ; question qui donne la réponse (5) ; détail inventé (2) ; réponse fausse (« Fa5 » au lieu de « Ca5 ») ; joueurs intervertis (Karpov / Kasparov) |
+| Récupérée après rejet automatique | 2 | Extrait paraphrasé ; espace supprimée avant « ; » |
+| Rejetée | 4 | 3 listes de coups ; 1 hors périmètre (série Netflix) |
+
+**Leçon** : phi4-mini accélère le premier jet (choix du passage, ébauche), mais
+**22 candidats sur 34 avaient un défaut** : une relecture humaine est indispensable.
+Chaque extrait final est revérifié dans l'article complet.
+
+**Réf-30** : 30 questions, les 12 articles couverts (1 à 3 questions chacun).
+
+**Étape 1.5 : Décision-50** (`scripts/build_decision50.py`).
+
+| Catégorie | Nombre | Recherche | Exemple |
+|---|---|---|---|
+| `dans_corpus` | 30 | Utile | Les 30 questions de Réf-30 |
+| `echecs_hors_corpus` | 8 | Inutile, **pas toujours évitable** | « Quelles sont les idées du gambit letton ? » |
+| `autre_outil` | 6 | Inutile, **évitable** | « Qui est mieux dans cette position : <FEN> ? » (→ `evaluate_position`) |
+| `hors_sujet` | 6 | Inutile, **évitable** | « Quelle est la capitale de l'Australie ? » |
+
+L'absence des 8 sujets hors corpus est **vérifiée par mot-clé** au moment de la
+construction. Cette vérification a écarté plusieurs premières idées (Alekhine, Fischer,
+nimzo-indienne, Grünfeld), qui apparaissent en passant dans le corpus.
+
+**Étape 1.6 : Tâches-30** (`scripts/build_tasks30.py`). 30 demandes couvrant les
+7 outils et le cas « aucun outil » : `inspect_position` 4, `get_opening_theory` 5,
+`evaluate_position` 5, `search_opening_knowledge` 6, `find_opening_videos` 4,
+`start_deep_analysis` 2, `get_deep_analysis` 1, aucun outil 3. Les arguments imposés
+par la demande sont attendus (`lines=3` pour « les 3 meilleurs coups »,
+`database=lichess` pour « les joueurs en ligne », `include_games=true`, `depth=35`).
+Les 18 FEN sont **calculées** par python-chess à partir de suites de coups.
+
+**Étape 1.7 : Multi-10** (`scripts/build_multi10.py`). 10 questions à 2 sauts ; la
+sous-question du saut 2 utilise la réponse du saut 1. Exemple :
+« Quel métier exerçait l'homme qui a donné son nom au gambit de la partie italienne joué
+par 4.b4 ? » → saut 1 : 4.b4 = gambit Evans → saut 2 : William Davies Evans, capitaine
+de navire gallois. **3 chaînes traversent deux articles** (française → sicilienne,
+Caro-Kann → anglaise, slave → gambit dame) ; 7 relient deux sections d'un même article.
+
+**Étape 1.8 : validation** (`app/rag/eval/validate.py`, `scripts/validate_eval.py`).
+Contrôles : effectifs, identifiants uniques, présence de chaque extrait dans son article,
+répartition de Décision-50, outils existants, FEN valides, dépendances entre sauts.
+Le validateur tourne aussi dans pytest : un jeu incohérent fait échouer la suite.
+
+**Tests** : 29 tests pour la phase 1 (normalisation, passages, génération avec Ollama
+simulé par respx, validation et détection des incohérences). 248 tests au total,
+couverture de branches 99 %.
+
+**Reconstruire les jeux :**
+
+```bash
+cd backend
+uv run python -m scripts.generate_ref_candidates   # phi4-mini, ~1 min
+uv run python -m scripts.build_ref30
+uv run python -m scripts.build_decision50
+uv run python -m scripts.build_tasks30
+uv run python -m scripts.build_multi10
+uv run python -m scripts.validate_eval
+```
+
+**Limites :**
+- **Un seul relecteur** pour Réf-30 : une relecture croisée par une seconde personne
+  renforcerait le jeu.
+- **Un seul extrait attendu par question** : si la même information figure à deux
+  endroits du corpus, une recherche qui trouve l'autre passage sera comptée comme un échec.
+- **Décision-50 réutilise les questions de Réf-30** pour sa partie « dans le corpus » :
+  les deux mesures ne sont pas indépendantes.
+- **Multi-10 a surtout des chaînes à l'intérieur d'un même article** (7 sur 10) : ces
+  questions peuvent parfois être résolues en une seule recherche si les deux faits sont
+  dans le même chunk. C'est justement ce que la phase 6 permettra de mesurer.
+- **« Partie italienne » n'a qu'une question** (article de 1 537 caractères) ; la famille
+  italienne est couverte par la Défense des deux cavaliers et le Gambit Evans.
 
 ### Phase 2 : RAG simple, la référence (livrables de l'énoncé) ⏳
 
