@@ -52,6 +52,7 @@ dependencies = [
     { name = "fastapi" },
     { name = "httpx" },
     { name = "langchain-core" },
+    { name = "langchain-text-splitters" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pymilvus" },
@@ -79,6 +80,7 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.141.1" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "langchain-core", specifier = ">=1.0" },
+    { name = "langchain-text-splitters", specifier = ">=1.0" },
     { name = "pydantic", specifier = ">=2.12" },
     { name = "pydantic-settings", specifier = ">=2.15.0" },
     { name = "pymilvus", specifier = ">=2.6.17,<2.7" },
@@ -494,8 +496,8 @@ name = "httpcore2"
 version = "2.13.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "h11" },
-    { name = "truststore" },
+    { name = "h11", marker = "sys_platform != 'emscripten'" },
+    { name = "truststore", marker = "sys_platform != 'emscripten'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/cb/f3/1db7aa2bc2524062192bb0e0323969492d1883152a232fe36eea65f4e35c/httpcore2-2.13.1.tar.gz", hash = "sha256:e0aa977abe17e69a3b820a24542a6fa88702676d83880b8d194dcd18408e5103", size = 68071, upload-time = "2026-09-23T07:47:22.372Z" }
 wheels = [
@@ -685,6 +687,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/cb/8b/d908d082c3cf5368ddd1816ed114de79c873f979ba7f98b95fab0e841643/langchain_protocol-0.0.20.tar.gz", hash = "sha256:0f5bd002474265648e91161771a9e0438fe9480bd55a416e51af0f60070637ec", size = 6280, upload-time = "2026-10-20T11:13:50.84Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/02/4b/f1c99a0b27c5ff8b4b131c0d6e62012c17cc424089efe213767db927afd2/langchain_protocol-0.0.20-py3-none-any.whl", hash = "sha256:3c935e5e46b0f6f9cb52f45ba7cfa53d1b9fa80c82c4a277d47f03e07f7385b1", size = 7347, upload-time = "2026-10-20T11:13:49.566Z" },
+]
+
+[[package]]
+name = "langchain-text-splitters"
+version = "1.1.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "langchain-core" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/85/22/d401fffe8d3f1339f6ac880e5d637db73933efa95635304849b2d44ab0fe/langchain_text_splitters-1.1.3.tar.gz", hash = "sha256:929b6c76f99d611a5b1d8f5591ef302909b86a436ceb3217034d24e4757868d8", size = 308295, upload-time = "2026-10-02T15:46:33.173Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c7/51/2880d2e88cce13c1180178f7e8dc796c2f45b2dc09cc09ed407d116c08cc/langchain_text_splitters-1.1.3-py3-none-any.whl", hash = "sha256:50edeb318b3be6a6308dddd7d616ab82823a9ccbea59a9c14c58a7b91df60295", size = 38217, upload-time = "2026-10-02T15:46:32.271Z" },
 ]
 
 [[package]]

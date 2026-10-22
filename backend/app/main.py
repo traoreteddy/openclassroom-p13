@@ -14,6 +14,7 @@ from app.tools.catalog import build_registry, default_dependencies
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     deps = default_dependencies(settings)
     app.state.tool_registry = build_registry(settings, deps)
+    deps.start_warm_up()  # chargement du modèle d'embedding sans retarder le démarrage
     yield
     await deps.aclose()
     await close_db()

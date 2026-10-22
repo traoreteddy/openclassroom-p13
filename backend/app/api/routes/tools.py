@@ -63,6 +63,21 @@ async def evaluate(
     return to_response(result)
 
 
+@router.get("/vector-search", summary="Recherche vectorielle dans la base de connaissances")
+async def vector_search(
+    registry: Registry,
+    query: Annotated[str, Query(min_length=3, max_length=300, description="Question.")],
+    opening: Annotated[
+        str | None, Query(max_length=100, description="Nom d'ouverture Lichess (filtre).")
+    ] = None,
+    limit: Annotated[int, Query(ge=1, le=8)] = 4,
+) -> Any:
+    arguments: dict[str, Any] = {"query": query, "limit": limit}
+    if opening:
+        arguments["opening"] = opening
+    return to_response(await registry.execute("search_opening_knowledge", arguments))
+
+
 @router.get("/tools", summary="Catalogue des outils exposés à l'agent")
 async def list_tools(registry: Registry) -> list[dict[str, Any]]:
     return registry.definitions()

@@ -252,7 +252,7 @@ uv run python -m scripts.validate_eval
 - **« Partie italienne » n'a qu'une question** (article de 1 537 caractères) ; la famille
   italienne est couverte par la Défense des deux cavaliers et le Gambit Evans.
 
-### Phase 2 : RAG simple, la référence (livrables de l'énoncé) ⏳
+### Phase 2 : RAG simple, la référence (livrables de l'énoncé) ✅
 
 | Tâche | Détail |
 |---|---|
@@ -261,6 +261,113 @@ uv run python -m scripts.validate_eval
 | Endpoint | `GET /api/v1/vector-search?query=…&opening=…&limit=…` |
 | Tests | Sans réseau (découpage, adaptateur Milvus, endpoint, ingestion) + test d'intégration avec le vrai Milvus |
 | Mesure de référence | recall@5 sur Réf-30 |
+
+#### Résultats de la phase 2
+
+**Étape 2.1 : découpage de référence** (`app/rag/chunking.py`).
+- **Récursif, 512 tokens, recouvrement 51 tokens (10 %)**, tokens comptés avec le
+  tokenizer du modèle d'embedding : la limite porte sur ce que le modèle lit vraiment.
+- **Séparateurs adaptés au français**, du plus fort au plus faible : titre Markdown →
+  paragraphe → ligne → fin de phrase (`. ? ! …`) → `; :` → `,` → espace. Ce sont des
+  expressions régulières qui ne coupent que l'espace (`(?<=[.!?…])\s+`) : avec un
+  séparateur simple comme `". "`, le point se retrouverait au début du chunk suivant.
+  Un titre ouvre toujours le chunk qui le suit.
+- **Sections exclues** : « Notes et références », « Bibliographie », « Liens externes »…
+- **Fusion des petits chunks** (moins de 50 tokens) avec leur voisin : le premier
+  découpage produisait 10 chunks de moins de 60 tokens, dont un titre seul
+  (« # Défense française », 5 tokens) et des phrases d'introduction orphelines
+  (« Au choix des Blancs, on peut trouver : »). Après fusion : **148 chunks**, de 57 à
+  552 tokens (moyenne 341, médiane 387). 3 chunks dépassent légèrement 512 tokens à
+  cause des fusions, sans conséquence (le modèle accepte 32 768 tokens).
+- Chaque chunk garde son **fil d'Ariane** (`section`) et les métadonnées de l'article.
+
+**Étape 2.2 : embedder** (`app/rag/embedding.py`). `Qwen3-Embedding-0.6B`,
+1 024 dimensions, vecteurs normalisés. Modèle **asymétrique** : consigne de recherche
+pour les questions (`prompt_name="query"`), aucune pour les documents.
+
+**Étape 2.3 : adaptateur Milvus** (`app/rag/milvus_store.py`). Collection `openings`,
+index **HNSW** (M = 16, efConstruction = 200), distance **cosinus**. Les métadonnées
+filtrables sont des champs scalaires : `date`, `version`, `service_emetteur`,
+`confidentialite`, `type_document`, `opening`, `opening_family`, `strategy`. Identifiants
+stables (`recursive:defense-slave:007`). Erreurs traduites dans la taxonomie : Milvus
+injoignable → `vector_store_error` / `network_error` (réessayées) ; collection absente →
+`not_indexed`, avec le conseil de lancer l'ingestion.
+
+**Étape 2.4 : ingestion** (`app/rag/ingest.py`, `scripts/ingest_corpus.py`).
+**148 chunks, 50 490 tokens, en ≈ 30 s** (Mac, GPU). Textes bruts dans MongoDB
+(collection `corpus_articles`).
+Un piège rencontré : après une 2ᵉ ingestion, Milvus annonçait **296** chunks. La
+statistique `row_count` compte aussi les lignes supprimées pas encore compactées (un
+`upsert` = suppression + insertion). Le comptage utilise donc une requête `count(*)`.
+Vérifié : après deux ingestions, **148 chunks et 148 identifiants uniques**.
+
+**Étapes 2.5 et 2.6 : outil et endpoint.** `search_opening_knowledge` est branché sur
+Milvus et le vrai modèle ; `GET /api/v1/vector-search?query=…&opening=…&limit=…` passe
+par le registre (validation, timeout, tentatives, disjoncteur).
+
+**Le démarrage à froid**, découvert au premier essai réel : les 4 premières recherches
+ont échoué en `timeout`. Le chargement du modèle (**8,4 s**) dépassait le timeout de
+5 s de l'outil, et les appels suivants attendaient le verrou. Une fois le modèle chargé,
+une recherche prend **50 à 100 ms** (embedding + Milvus). Corrections :
+1. **Préchauffage** : l'API lance le chargement en arrière-plan dès son démarrage, sans
+   retarder sa disponibilité.
+2. **Réponse immédiate** pendant le chargement : `model_loading`, avec un délai de nouvel
+   essai, au lieu d'attendre puis d'échouer. L'agent peut continuer avec les autres outils.
+
+**Étape 2.7 : tests.** 42 tests ajoutés : découpage, embedder (faux modèle, y compris
+`model_loading`), adaptateur Milvus (faux client : filtres, schéma, suppression avant
+réinsertion, erreurs), ingestion, endpoint, métriques d'évaluation (recall@k, MRR,
+precision@k, calibration). **290 tests, couverture de branches 99 %.**
+Test d'intégration sur le vrai Milvus et le vrai modèle (ingestion, relance sans doublon,
+bon article en tête, filtre) : **réussi** (`uv run pytest -m integration`).
+
+**Étape 2.8 : mesure de référence** (`app/rag/eval/retrieval.py`,
+`scripts/eval_retrieval.py`, résultats dans `data/eval/results/phase2-reference.json`).
+
+| Variante | recall@1 | recall@3 | **recall@5** | MRR | precision@5 |
+|---|---|---|---|---|---|
+| Sans filtre | 0,50 | 0,70 | **0,77** | 0,60 | 0,15 |
+| Avec filtre d'ouverture | 0,50 | 0,70 | **0,80** | 0,62 | 0,16 |
+
+- **Contrôle de la mesure** : les 30 extraits attendus sont tous présents dans au moins
+  un chunk de l'index. Une question manquée est donc un défaut de classement, pas un
+  biais de l'évaluation.
+- **7 questions manquées**, au même profil : leur réponse est dans une **liste de coups
+  ou de variantes** (« 3...dxe4 (variante Rubinstein) », « Elle s'obtient après les coups
+  5. a4 Ff5 »). Ces chunks contiennent peu de texte rédigé, et le modèle les rapproche mal
+  d'une question en français. C'est la cible des phases 3 et 4 (fil d'Ariane en tête de
+  chunk, questions hypothétiques).
+- La precision@5 est plafonnée à 0,20 (un seul extrait attendu par question).
+
+**Calibration du seuil de pertinence** (meilleur score de chaque question) :
+
+| Population | Meilleurs scores |
+|---|---|
+| Questions du corpus (30) | 0,51 à 0,84 (médiane 0,74) |
+| Hors sujet (6) | 0,21 à 0,37 |
+| Échecs hors corpus (8) | 0,49 à 0,64 |
+| Relevant d'un autre outil (6) | 0,64 à 0,73 |
+
+| Seuil | Questions du corpus gardées | Questions hors corpus écartées |
+|---|---|---|
+| 0,40 | 100 % | 30 % |
+| **0,50 (retenu)** | **100 %** | **35 %** (dont tous les hors-sujet) |
+| 0,55 | 97 % | 50 % |
+| 0,60 | 93 % | 65 % |
+| 0,70 | 67 % | 85 % |
+
+**Étape 2.9 : exécution dans Docker** 🚧. Image reconstruite (2,67 Go ; un premier échec
+de `uv sync` était passager, dû à un téléchargement interrompu). Ingestion lancée **dans le
+conteneur** : modèle téléchargé une fois dans le volume `hf_models` (1,1 Go), embeddings
+calculés **sur CPU** (7 cœurs à 100 %), car Docker n'a pas accès au GPU du Mac. Durée :
+plus de 15 minutes, contre 30 s sur l'hôte avec le GPU. Résultat final et appel de
+`/vector-search` depuis l'hôte : à compléter.
+
+**Décision : seuil 0,50.** Il garde toutes les bonnes réponses et écarte toutes les
+questions hors sujet. Les questions d'échecs hors corpus ou relevant d'un autre outil ont
+des scores aussi élevés que les vraies réponses (même vocabulaire) : **aucun seuil ne les
+sépare** sans perdre de bonnes réponses. Les éviter relève de la **décision de l'agent**
+(phase 5), pas du seuil.
 
 ### Phase 3 : comparer les découpages ⏳
 

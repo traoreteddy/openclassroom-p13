@@ -11,14 +11,11 @@ from dataclasses import dataclass
 import httpx
 
 from app.core.config import Settings
+from app.rag.embedding import SentenceTransformerEmbedder
+from app.rag.milvus_store import MilvusVectorStore
 from app.tools.base import ToolRegistry
 from app.tools.deep_analysis import DeepAnalysisJobs, build_deep_analysis_tools
-from app.tools.errors import ToolUnavailableError
-from app.tools.knowledge import (
-    KnowledgeSearch,
-    Passage,
-    build_search_knowledge_tool,
-)
+from app.tools.knowledge import KnowledgeSearch, build_search_knowledge_tool
 from app.tools.lichess import LichessExplorer, build_opening_theory_tool
 from app.tools.position import build_inspect_position_tool
 from app.tools.resilience import Clock, Sleep
@@ -32,6 +29,13 @@ class ToolDependencies:
     analyzer: Analyzer
     knowledge: KnowledgeSearch
 
+    def start_warm_up(self) -> None:
+        """Préchauffe en arrière-plan ce qui est lent à charger (modèle d'embedding)."""
+        embedder = getattr(self.knowledge, "_embedder", None)
+        warm_up = getattr(embedder, "start_warm_up", None)
+        if warm_up is not None:
+            warm_up()
+
     async def aclose(self) -> None:
         """Libère les ressources : connexions HTTP et processus Stockfish."""
         await self.http.aclose()
@@ -40,24 +44,10 @@ class ToolDependencies:
             await close()
 
 
-class _KnowledgeNotConfigured:
-    """Base vectorielle pas encore branchée (étape 2) : l'outil répond « indisponible »."""
-
-    async def embed(self, text: str) -> list[float]:
-        raise ToolUnavailableError(
-            code="not_configured",
-            message="La base de connaissances n'est pas encore disponible.",
-            hint="Répondre avec get_opening_theory et evaluate_position uniquement.",
-        )
-
-    async def search(
-        self, vector: list[float], *, limit: int, opening: str | None
-    ) -> list[Passage]:  # pragma: no cover - jamais atteint, embed échoue avant
-        return []
-
-
 def default_dependencies(settings: Settings) -> ToolDependencies:
-    placeholder = _KnowledgeNotConfigured()
+    """Dépendances réelles. Rien n'est contacté ni chargé avant le premier appel d'outil."""
+    embedder = SentenceTransformerEmbedder(settings.embedding_model)
+    store = MilvusVectorStore(settings.milvus_uri, settings.milvus_collection)
     return ToolDependencies(
         http=httpx.AsyncClient(timeout=settings.http_timeout_s),
         analyzer=StockfishAnalyzer(
@@ -65,7 +55,7 @@ def default_dependencies(settings: Settings) -> ToolDependencies:
             threads=settings.stockfish_threads,
             hash_mb=settings.stockfish_hash_mb,
         ),
-        knowledge=KnowledgeSearch(placeholder, placeholder),
+        knowledge=KnowledgeSearch(embedder, store, min_score=settings.rag_min_score),
     )
 
 

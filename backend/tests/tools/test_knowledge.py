@@ -97,14 +97,13 @@ async def test_store_outage_is_retried_then_reported(make_registry):
     assert len(store.calls) == 2
 
 
-async def test_unconfigured_knowledge_base(settings):
-    deps = default_dependencies(settings)
-    try:
-        from app.tools.catalog import build_registry
+def test_default_dependencies_use_milvus_and_the_embedding_model(settings):
+    from app.rag.embedding import SentenceTransformerEmbedder
+    from app.rag.milvus_store import MilvusVectorStore
 
-        result = await build_registry(settings, deps).execute("search_opening_knowledge", QUESTION)
-    finally:
-        await deps.aclose()
+    knowledge = default_dependencies(settings).knowledge
 
-    assert result.error["code"] == "not_configured"
-    assert "get_opening_theory" in result.error["hint"]
+    assert isinstance(knowledge._embedder, SentenceTransformerEmbedder)
+    assert isinstance(knowledge._store, MilvusVectorStore)
+    assert knowledge._store.collection == settings.milvus_collection
+    assert knowledge._min_score == settings.rag_min_score

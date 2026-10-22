@@ -32,6 +32,8 @@ class Settings(BaseSettings):
     milvus_uri: str = "http://localhost:19530"
     milvus_collection: str = "openings"
     embedding_model: str = "Qwen/Qwen3-Embedding-0.6B"
+    # Similarité cosinus minimale pour qu'un passage soit jugé pertinent (calibrée en phase 2)
+    rag_min_score: float = 0.5
 
     # LLM local (Ollama sur la machine hôte, hors Docker)
     ollama_base_url: str = "http://localhost:11434"

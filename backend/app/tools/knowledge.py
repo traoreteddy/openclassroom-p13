@@ -1,4 +1,4 @@
-"""Outil `search_opening_knowledge` : recherche vectorielle dans la base Wikichess (Milvus).
+"""Outil `search_opening_knowledge` : recherche vectorielle dans le corpus Wikipédia FR (Milvus).
 
 L'outil dépend de deux interfaces :
 - `Embedder` : transforme la question en vecteur (sentence-transformers, étape 2) ;
@@ -21,7 +21,7 @@ DEFAULT_MIN_SCORE = 0.5
 _FEN_LIKE = re.compile(r"^([1-8pnbrqkPNBRQK]+/){7}[1-8pnbrqkPNBRQK]+(\s|$)")
 
 DESCRIPTION = """\
-Recherche dans la base de connaissances sur les ouvertures (articles Wikichess indexés
+Recherche dans la base de connaissances sur les ouvertures (articles Wikipédia indexés
 dans Milvus) les passages les plus proches d'une question : idées, plans typiques,
 pièges, histoire. Renvoie des extraits avec leur source.
 
@@ -64,9 +64,13 @@ class SearchKnowledgeInput(ToolInput):
 
 
 class Passage(ToolOutput):
-    text: str
+    chunk_id: str
+    article_id: str
+    title: str
     opening: str
+    opening_family: str
     section: str
+    text: str
     source_url: str
     score: float
 
