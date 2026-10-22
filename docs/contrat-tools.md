@@ -457,7 +457,7 @@ en parallèle, puis les deux suivants en parallèle.
 
 | Objectif | Résultat |
 |---|---|
-| Les 5 outils couverts par pytest **sans appel réseau facturé** | ✅ 183 tests. Un garde-fou (`_no_network` dans `tests/conftest.py`) fait échouer tout test qui tenterait une vraie requête HTTP |
+| Les 5 outils couverts par pytest **sans appel réseau facturé** | ✅ 202 tests (dont 19 pour l'adaptateur LangChain). Un garde-fou (`_no_network` dans `tests/conftest.py`) fait échouer tout test qui tenterait une vraie requête HTTP |
 | Cas limites en tests **paramétrés** | ✅ 14 FEN invalides (vide, mal formée, sans roi, 9 pions, triple échec…), bornes de chaque paramètre, champ inconnu, FEN passée comme question, positions terminées |
 | API externes simulées avec **respx** et **fixtures versionnées** | ✅ `tests/fixtures/lichess/*.json`, `tests/fixtures/youtube/*.json` |
 | Couverture de **branches ≥ 80 %** | ✅ **99 %** (`uv run pytest --cov`, seuil bloquant `fail_under = 80`) |
@@ -557,6 +557,8 @@ répondent tous deux à « que jouer ? »).
 ```
 backend/
 ├── app/
+│   ├── agent/
+│   │   └── langchain_tools.py    # adaptateur ToolSpec → StructuredTool (LangGraph)
 │   ├── api/
 │   │   ├── deps/__init__.py      # get_registry : accès au catalogue depuis une route
 │   │   └── routes/tools.py       # /moves/{fen}, /evaluate/{fen}, /tools (routes fines)
@@ -577,6 +579,7 @@ backend/
 ├── tests/
 │   ├── conftest.py               # doubles de test, garde-fou réseau, fabrique de catalogue
 │   ├── fixtures/                 # réponses d'API figées (versionnées) + README de provenance
+│   ├── agent/test_langchain_tools.py  # adaptateur LangChain
 │   ├── test_tools_routes.py      # routes HTTP
 │   └── tools/test_*.py           # un fichier de tests par module d'outil
 └── scripts/
@@ -690,7 +693,7 @@ backend/
 | **Stubs** pour Stockfish, l'embedder et Milvus | Mocks génériques (`MagicMock`) | Un stub implémente la vraie interface : les tests restent lisibles et cassent si l'interface change |
 | **Fixtures JSON versionnées**, construites d'après le format documenté | Enregistrement automatique (VCR) | L'Explorer exige un jeton et YouTube une clé, absents pour l'instant. `record_fixtures.py` permettra de les remplacer par des réponses réelles |
 | **Garde-fou réseau global** (`_no_network`) | Faire confiance aux tests | Garantit qu'aucun test n'appelle une API réelle ou facturée, même par erreur |
-| **Horloge et `sleep` injectés** | Vraies attentes | Les tests de disjoncteur et de backoff s'exécutent instantanément : 183 tests en ≈ 1 s |
+| **Horloge et `sleep` injectés** | Vraies attentes | Les tests de disjoncteur et de backoff s'exécutent instantanément : 202 tests en ≈ 1,5 s |
 | **Couverture de branches** (et pas seulement de lignes) | Couverture de lignes | Les politiques de résilience sont faites de conditions : il faut vérifier chaque chemin (retry ou non, disjoncteur fermé, ouvert ou semi-ouvert) |
 
 ### 10.5 `@tool` (LangChain) ou `ToolSpec` : comparaison et choix
@@ -743,37 +746,70 @@ LangGraph.
  LangGraph  ── décide QUAND appeler un outil (nœuds, état, routage, boucle LLM)
      │  bind_tools / ToolNode
      ▼
- Adaptateur ToolSpec → StructuredTool   (app/agent/langchain_tools.py, étape 3)
+ Adaptateur ToolSpec → StructuredTool   (app/agent/langchain_tools.py) ✅
      ▼
  ToolRegistry ── garantit que l'appel est FIABLE (validation, timeout, retry, disjoncteur)
      ▼
  Outils (Lichess, Stockfish, Milvus, YouTube…)
 ```
 
-**Esquisse de l'adaptateur** (étape 3) :
+**Implémentation** ✅ : `app/agent/langchain_tools.py`, testée dans
+`tests/agent/test_langchain_tools.py` (19 tests).
 
 ```python
-from langchain_core.tools import StructuredTool
-
 def to_langchain_tool(registry: ToolRegistry, spec: ToolSpec) -> StructuredTool:
     async def run(**arguments):
-        result = await registry.execute(spec.name, arguments)  # validation + résilience
-        return result.to_model_content(), result.data           # texte LLM, données app
+        result = await registry.execute(spec.name, arguments)   # validation + résilience
+        if not result.ok:
+            raise ToolException(result.to_model_content())       # → ToolMessage status="error"
+        return result.to_model_content(), result.model_dump(mode="json")  # texte LLM, artefact app
+
+    def on_validation_error(exc):                               # notre message, pas celui de LangChain
+        return invalid_arguments_error(spec, exc).to_model_message()
 
     return StructuredTool.from_function(
         coroutine=run,
         name=spec.name,
         description=spec.description,
-        args_schema=spec.input_model,           # le même modèle Pydantic
+        args_schema=spec.input_model,            # le même modèle Pydantic
         response_format="content_and_artifact",
-        handle_validation_error=...,            # notre message [invalid_arguments] + exemple
+        handle_validation_error=on_validation_error,
+        handle_tool_error=True,
     )
+
+tools = build_langchain_tools(registry)          # → llm.bind_tools(tools), ToolNode(tools)
 ```
 
-**Tests prévus pour l'adaptateur :** un outil généré a le même nom, la même
-description et le même schéma que sa `ToolSpec` ; un appel invalide renvoie notre
-message `[invalid_arguments] … Exemple valide : {…}` ; une panne renvoie le message de
-la taxonomie au lieu d'interrompre le graphe.
+**Ce que reçoit le modèle** (contenu du `ToolMessage`) :
+
+| Situation | Contenu | `status` |
+|---|---|---|
+| Succès | Données JSON de l'outil | `success` |
+| Arguments invalides | `[invalid_arguments] … Exemple valide : {…}` | `error` |
+| Panne ou erreur de l'outil | `[code] message Conseil : …` | `error` |
+
+L'application reçoit en plus, dans `ToolMessage.artifact`, le `ToolResult` complet
+(données structurées pour le panneau Angular, durée, erreur détaillée).
+
+**Pourquoi brancher `handle_validation_error`** : vérifié dans le code de
+`langchain-core` 1.6, LangChain valide les arguments **avant** d'appeler l'outil. Par
+défaut, il **lève** l'erreur, ce qui interrompt le graphe. Avec `True`, il renvoie
+seulement « Tool input validation error », sans dire quoi corriger. Notre fonction
+renvoie le même message que le registre, avec la raison et un exemple valide.
+
+**Ce que vérifient les tests :**
+
+| Test | Vérification |
+|---|---|
+| Une seule source de vérité | Pour les 7 outils : même nom, même description, même modèle Pydantic, mêmes paramètres dans le schéma envoyé au LLM |
+| Succès | `ToolMessage` en `success`, contenu JSON pour le LLM, artefact `ToolResult` pour l'application ; valeurs par défaut du schéma appliquées |
+| Arguments invalides | FEN illégale, champ inventé, valeur hors bornes, FEN passée comme question : `status="error"`, **message identique à celui du registre**, et le service n'est jamais appelé |
+| Pannes | 503 persistant (3 tentatives puis `retries_exhausted`), moteur absent : message de la taxonomie, **aucune exception** ne remonte dans le graphe |
+| Disjoncteur | État partagé avec le registre : un circuit ouvert par des appels directs l'est aussi pour LangChain |
+
+**Ajustement induit** : `ToolSpec` retire les espaces en début et fin de description,
+car LangChain le fait de son côté. Le modèle reçoit ainsi exactement le même texte
+par les deux chemins.
 
 **Variante écartée :** écrire 7 fonctions décorées `@tool` qui délèguent chacune au
 registre. Les `@tool` seraient visibles dans le code, mais signature et docstring
@@ -792,5 +828,5 @@ seraient dupliquées pour chaque outil. Cette variante ne serait retenue que si 
 | Stockfish absent de l'image Docker | `evaluate_position` répond `engine_not_found` dans le conteneur | Étape 6 : installer Stockfish dans le `Dockerfile` |
 | Tâches différées en mémoire | Perdues au redémarrage ; un seul processus | Si besoin : stockage MongoDB ou file de tâches |
 | Disjoncteur par processus | Plusieurs instances de l'API ne partagent pas l'état du circuit | Acceptable pour le POC (une instance) |
-| Outils pas encore exposés à LangGraph | L'agent ne peut pas encore les appeler | Étape 3 : adaptateur `ToolSpec` → `StructuredTool` et ses tests (§ 10.5) |
+| Graphe LangGraph pas encore écrit | Les outils sont prêts pour `bind_tools` / `ToolNode` (§ 10.5), mais aucun agent ne les appelle encore | Étape 3 : graphe d'analyse et graphe de partie, une fois le LLM choisi |
 | Taux de sélection non mesuré | Pas encore de preuve chiffrée de la qualité des descriptions | Écrire le jeu de 30 requêtes et l'évaluation v0 / v1 une fois le LLM choisi |

@@ -66,6 +66,11 @@ class ToolSpec:
     idempotent: bool
     policy: ResiliencePolicy = field(default_factory=ResiliencePolicy)
 
+    def __post_init__(self) -> None:
+        # Même texte pour le modèle, que l'outil passe par le registre ou par LangChain
+        # (qui retire les espaces de début et de fin).
+        object.__setattr__(self, "description", self.description.strip())
+
     def definition(self) -> dict[str, Any]:
         """Définition neutre (nom, description, JSON Schema d'entrée) pour un LLM."""
         return {
@@ -178,17 +183,26 @@ def _validate(spec: ToolSpec, arguments: dict[str, Any]) -> ToolInput:
     try:
         return spec.input_model.model_validate(arguments)
     except ValidationError as exc:
-        problems = "; ".join(_format_error(err) for err in exc.errors())
-        example = (spec.input_model.model_config.get("json_schema_extra") or {}).get("examples")
-        hint = "Corriger les paramètres puis rappeler l'outil."
-        if example:
-            hint += f" Exemple valide : {json.dumps(example[0], ensure_ascii=False)}"
-        raise ToolInputError(
-            code="invalid_arguments",
-            message=f"Paramètres invalides pour {spec.name} : {problems}.",
-            hint=hint,
-            details={"errors": [_format_error(err) for err in exc.errors()]},
-        ) from None
+        raise invalid_arguments_error(spec, exc) from None
+
+
+def invalid_arguments_error(spec: ToolSpec, exc: ValidationError) -> ToolInputError:
+    """Traduit une erreur de validation Pydantic en erreur exploitable par le modèle.
+
+    Partagé par le registre et par l'adaptateur LangChain : le modèle reçoit le même
+    message, quel que soit le chemin d'appel.
+    """
+    problems = "; ".join(_format_error(err) for err in exc.errors())
+    example = (spec.input_model.model_config.get("json_schema_extra") or {}).get("examples")
+    hint = "Corriger les paramètres puis rappeler l'outil."
+    if example:
+        hint += f" Exemple valide : {json.dumps(example[0], ensure_ascii=False)}"
+    return ToolInputError(
+        code="invalid_arguments",
+        message=f"Paramètres invalides pour {spec.name} : {problems}.",
+        hint=hint,
+        details={"errors": [_format_error(err) for err in exc.errors()]},
+    )
 
 
 def _format_error(err: Any) -> str:
