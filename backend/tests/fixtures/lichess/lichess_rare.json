@@ -1,0 +1,11 @@
+{
+  "white": 6,
+  "draws": 1,
+  "black": 5,
+  "moves": [
+    {"uci": "h6g6", "san": "Rg6", "averageRating": 1712, "white": 2, "draws": 0, "black": 3, "game": null}
+  ],
+  "recentGames": [],
+  "topGames": [],
+  "opening": null
+}

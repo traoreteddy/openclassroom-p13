@@ -1,12 +1,17 @@
 [project]
 name = "backend"
 version = "0.1.0"
-description = "Add your description here"
+description = "API de l’agent IA d’apprentissage des ouvertures (FFE)"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "chess>=1.11.2",
     "fastapi>=0.141.1",
+    "httpx>=0.28.1",
+    "pydantic>=2.12",
     "pydantic-settings>=2.15.0",
+    "pymongo>=4.18.2",
+    "tenacity>=9.2.1",
     "uvicorn[standard]>=0.54.0",
 ]
 
@@ -14,4 +19,38 @@ dependencies = [
 dev = [
     "httpx2>=2.13.1",
     "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "pytest-cov>=7.1.0",
+    "respx>=0.23.1",
+    "ruff>=0.14",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "integration: tests qui exigent un service réel (Stockfish, réseau…) ; exclus par défaut",
+]
+addopts = "-m 'not integration'"
+
+[tool.coverage.run]
+branch = true
+source = ["app"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+fail_under = 80
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "\\.\\.\\.$",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC", "RUF"]

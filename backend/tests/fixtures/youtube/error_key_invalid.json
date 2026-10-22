@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": 403,
+    "message": "API key not valid. Please pass a valid API key.",
+    "errors": [{"message": "API key not valid. Please pass a valid API key.", "domain": "global", "reason": "forbidden"}],
+    "status": "PERMISSION_DENIED"
+  }
+}

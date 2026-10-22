@@ -1,0 +1,17 @@
+{
+  "white": 4385,
+  "draws": 4891,
+  "black": 3110,
+  "moves": [
+    {"uci": "f8c5", "san": "Bc5", "averageRating": 2451, "white": 2342, "draws": 2851, "black": 1677, "game": null},
+    {"uci": "g8f6", "san": "Nf6", "averageRating": 2464, "white": 1460, "draws": 1517, "black": 1026, "game": null},
+    {"uci": "f8e7", "san": "Be7", "averageRating": 2380, "white": 296, "draws": 297, "black": 214, "game": null},
+    {"uci": "d7d6", "san": "d6", "averageRating": 2385, "white": 213, "draws": 166, "black": 136, "game": null},
+    {"uci": "g7g6", "san": "g6", "averageRating": 2408, "white": 21, "draws": 25, "black": 23, "game": null}
+  ],
+  "topGames": [
+    {"uci": "f8c5", "id": "Ys5vKQWj", "winner": "white", "white": {"name": "Carlsen, Magnus", "rating": 2863}, "black": {"name": "Aronian, Levon", "rating": 2785}, "year": 2019, "month": "2019-06"},
+    {"uci": "g8f6", "id": "kL3pRt9a", "winner": null, "white": {"name": "Caruana, Fabiano", "rating": 2820}, "black": {"name": "Giri, Anish", "rating": 2780}, "year": 2021, "month": "2021-01"}
+  ],
+  "opening": {"eco": "C50", "name": "Italian Game"}
+}

@@ -1,0 +1,39 @@
+{
+  "kind": "youtube#searchListResponse",
+  "etag": "fixture-etag",
+  "regionCode": "FR",
+  "pageInfo": {"totalResults": 1000000, "resultsPerPage": 3},
+  "items": [
+    {
+      "kind": "youtube#searchResult",
+      "id": {"kind": "youtube#video", "videoId": "dQw4w9WgXc1"},
+      "snippet": {
+        "publishedAt": "2024-03-12T17:00:01Z",
+        "channelId": "UCfixture1",
+        "title": "La partie italienne : les idées à connaître (débutant)",
+        "description": "Comprendre l&#39;Italienne en 12 minutes.",
+        "thumbnails": {"default": {"url": "https://i.ytimg.com/vi/dQw4w9WgXc1/default.jpg"}, "medium": {"url": "https://i.ytimg.com/vi/dQw4w9WgXc1/mqdefault.jpg"}},
+        "channelTitle": "Échecs &amp; Stratégie",
+        "liveBroadcastContent": "none"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "id": {"kind": "youtube#video", "videoId": "aBcDeFgHiJ2"},
+      "snippet": {
+        "publishedAt": "2023-11-02T09:30:00Z",
+        "channelId": "UCfixture2",
+        "title": "Giuoco Piano : le plan c3-d4 expliqué",
+        "description": "",
+        "thumbnails": {"default": {"url": "https://i.ytimg.com/vi/aBcDeFgHiJ2/default.jpg"}},
+        "channelTitle": "Club FFE",
+        "liveBroadcastContent": "none"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "id": {"kind": "youtube#channel", "channelId": "UCnotAVideo"},
+      "snippet": {"title": "Une chaîne, pas une vidéo", "channelTitle": "X", "thumbnails": {}}
+    }
+  ]
+}

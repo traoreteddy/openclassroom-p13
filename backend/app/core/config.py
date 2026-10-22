@@ -1,0 +1,37 @@
+from functools import lru_cache
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    # ../.env : fichier de la racine du projet quand l'API est lancée depuis backend/
+    model_config = SettingsConfigDict(env_file=("../.env", ".env"), extra="ignore")
+
+    app_name: str = "P13 Chess Openings API"
+    app_env: str = "development"
+    api_v1_prefix: str = "/api/v1"
+
+    mongodb_url: str = "mongodb://localhost:27017"
+    mongodb_db_name: str = "p13"
+
+    # Outils de l'agent
+    lichess_explorer_url: str = "https://explorer.lichess.ovh"
+    lichess_token: str | None = None
+    theory_min_games: int = 20
+
+    stockfish_path: str = "stockfish"
+    stockfish_threads: int = 1
+    stockfish_hash_mb: int = 64
+
+    youtube_api_url: str = "https://www.googleapis.com/youtube/v3"
+    youtube_api_key: str | None = None
+
+    http_timeout_s: float = 5.0
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
+
+
+settings = get_settings()
