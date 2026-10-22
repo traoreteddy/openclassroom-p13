@@ -104,3 +104,37 @@ def test_lifespan_builds_the_real_registry_and_warms_up(monkeypatch):
         assert len(client.app.state.tool_registry.names) == 7
 
     assert len(warm_ups) == 1
+
+
+async def _wait_jobs(client):
+    jobs = app.dependency_overrides[get_registry]().get("start_deep_analysis").handler.__self__
+    for job_id in list(jobs._jobs):
+        await jobs.wait(job_id)
+
+
+def test_deep_analysis_is_started_then_polled(client):
+    started = client.post(url("analysis", START_FEN), params={"depth": 25})
+
+    assert started.status_code == 202
+    ticket = started.json()
+    assert ticket["status"] == "pending" and ticket["poll_after_s"] >= 1
+
+    import asyncio
+
+    asyncio.get_event_loop().run_until_complete(_wait_jobs(client))
+    state = client.get(f"/api/v1/analysis/{ticket['job_id']}")
+
+    assert state.status_code == 200
+    assert state.json()["status"] == "done"
+    assert state.json()["result"]["score_cp"] == 20  # évaluation du moteur simulé
+
+
+def test_deep_analysis_rejects_a_shallow_depth(client):
+    assert client.post(url("analysis", START_FEN), params={"depth": 10}).status_code == 422
+
+
+def test_unknown_job_is_404(client):
+    response = client.get("/api/v1/analysis/nope")
+
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "unknown_job"

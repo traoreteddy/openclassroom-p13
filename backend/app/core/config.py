@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     app_name: str = "P13 Chess Openings API"
     app_env: str = "development"
     api_v1_prefix: str = "/api/v1"
+    # Origines autorisées (CORS) pour le front Angular, séparées par des virgules
+    cors_origins: str = "http://localhost:4200"
 
     mongodb_url: str = "mongodb://localhost:27017"
     mongodb_db_name: str = "p13"

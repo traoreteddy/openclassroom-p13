@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import APIRouter, FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 from pymongo.errors import PyMongoError
 
 from app.agent.graph import AgentConfig, ChessAgent
@@ -46,6 +47,13 @@ app = FastAPI(
     title=settings.app_name,
     docs_url="/docs" if settings.app_env != "prod" else None,
     lifespan=lifespan,
+)
+# Le front Angular (autre origine en développement) appelle l'API depuis le navigateur.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[o.strip() for o in settings.cors_origins.split(",") if o.strip()],
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
 )
 router = APIRouter(prefix=settings.api_v1_prefix)
 

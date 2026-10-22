@@ -279,7 +279,7 @@ backend/app/
   de 10 000 par jour, soit environ 100 recherches par jour.
 - Tests de bout en bout sur 3 positions : en théorie, sortie de théorie, position invalide.
 
-### Étape 4 : Front Angular
+### Étape 4 : Front Angular ✅ (réalisation détaillée dans `docs/frontend.md`)
 
 **À livrer :** échiquier `ngx-chess-board`, panneau de recommandations (coups suggérés,
 contexte, vidéos), communication avec l'API par des services Angular.

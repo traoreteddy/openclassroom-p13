@@ -8,6 +8,8 @@ son `ToolResult` en réponse HTTP.
 | ok                       | 200 + données                       |
 | erreur `input`           | 422 + erreur                        |
 | erreur `unavailable`     | 503 + erreur (+ en-tête Retry-After)|
+| analyse lancée           | 202 + ticket (job_id)               |
+| job inconnu              | 404 + erreur                        |
 """
 
 from typing import Annotated, Any, Literal
@@ -76,6 +78,31 @@ async def vector_search(
     if opening:
         arguments["opening"] = opening
     return to_response(await registry.execute("search_opening_knowledge", arguments))
+
+
+@router.post(
+    "/analysis/{fen:path}",
+    status_code=202,
+    summary="Lance une analyse Stockfish profonde en tâche de fond",
+)
+async def start_analysis(
+    fen: FenPath,
+    registry: Registry,
+    depth: Annotated[int, Query(ge=23, le=40)] = 28,
+) -> Any:
+    """Renvoie un `job_id` à interroger avec `GET /analysis/{job_id}` (202 Accepted)."""
+    result = await registry.execute("start_deep_analysis", {"fen": fen, "depth": depth})
+    return to_response(result)
+
+
+@router.get("/analysis/{job_id}", summary="État et résultat d'une analyse profonde")
+async def get_analysis(
+    job_id: Annotated[str, Path(min_length=1, max_length=64)], registry: Registry
+) -> Any:
+    result = await registry.execute("get_deep_analysis", {"job_id": job_id})
+    if not result.ok and result.error and result.error["code"] == "unknown_job":
+        return JSONResponse(status_code=404, content={"error": result.error})
+    return to_response(result)
 
 
 @router.get("/tools", summary="Catalogue des outils exposés à l'agent")

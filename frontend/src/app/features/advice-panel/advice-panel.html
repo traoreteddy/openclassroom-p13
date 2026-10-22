@@ -54,12 +54,305 @@
   }
 </section>
 
-<section class="card card--placeholder">
+<!-- Théorie : automatique à chaque position -->
+<section class="card" data-testid="theory-card">
   <header class="card__header">
-    <h2>Conseils de l’agent</h2>
+    <h2>Coups théoriques</h2>
+    @if (advice.theoryLoading()) {
+      <span class="spinner" role="status" aria-label="Chargement"></span>
+    } @else if (theory(); as theory) {
+      <span class="badge" [class.badge--off]="!theory.in_theory">
+        {{ theory.in_theory ? 'En théorie' : 'Hors théorie' }}
+      </span>
+    }
   </header>
-  <p class="muted">
-    Coups théoriques, évaluation Stockfish, contexte de l’ouverture et vidéos
-    s’afficheront ici une fois l’API branchée.
-  </p>
+
+  @if (advice.theoryError(); as error) {
+    <p class="error" role="alert">
+      {{ error }}
+      <button type="button" class="btn btn--ghost btn--small" (click)="advice.retryTheory()">
+        Réessayer
+      </button>
+    </p>
+  } @else if (theory(); as theory) {
+    @if (theory.opening) {
+      <p class="opening">
+        <strong>{{ theory.opening.name }}</strong>
+        <span class="muted">· {{ theory.opening.eco }}</span>
+      </p>
+    }
+    @if (theory.moves.length) {
+      <table class="theory">
+        <thead>
+          <tr>
+            <th scope="col">Coup</th>
+            <th scope="col">Parties</th>
+            <th scope="col" title="Blancs / nulles / Noirs">B / N / N</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (move of theory.moves; track move.uci) {
+            <tr>
+              <td>
+                <button
+                  type="button"
+                  class="move"
+                  (click)="playSuggested(move.san)"
+                  title="Jouer ce coup"
+                >
+                  {{ move.san }}
+                </button>
+              </td>
+              <td>{{ move.games.toLocaleString('fr-FR') }}</td>
+              <td class="muted">
+                {{ percent(move.white_pct) }} / {{ percent(move.draw_pct) }} /
+                {{ percent(move.black_pct) }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <p class="muted">
+        Aucune partie de maître connue dans cette position : demandez l’avis du moteur.
+      </p>
+    }
+  } @else if (!advice.theoryLoading()) {
+    <p class="muted">Les coups des parties de maîtres (Lichess) s’affichent ici.</p>
+  }
+</section>
+
+<!-- Conseil complet : à la demande (le modèle local met plusieurs secondes) -->
+<section class="card" data-testid="advice-card">
+  <header class="card__header">
+    <h2>Conseil de l’agent</h2>
+    <button
+      type="button"
+      class="btn"
+      data-testid="analyze"
+      (click)="requestAdvice()"
+      [disabled]="advice.analysisLoading()"
+    >
+      @if (advice.analysisLoading()) {
+        <span class="spinner spinner--light" aria-hidden="true"></span> L’agent réfléchit…
+      } @else if (response()) {
+        Analyser à nouveau
+      } @else {
+        Demander conseil
+      }
+    </button>
+  </header>
+
+  <div class="question-row">
+    <label for="focus-input" class="sr-only">Question sur la position (facultatif)</label>
+    <input
+      id="focus-input"
+      type="text"
+      autocomplete="off"
+      maxlength="500"
+      placeholder="Question sur cette position (facultatif) : pourquoi pas Cg5 ?"
+      [value]="focus()"
+      (input)="focus.set($any($event.target).value)"
+      (keydown.enter)="requestAdvice()"
+    />
+  </div>
+
+  @if (advice.analysisError(); as error) {
+    <p class="error" role="alert">{{ error }}</p>
+  }
+
+  @if (response(); as response) {
+    @if (advice.analysisStale()) {
+      <p class="stale" role="status">
+        Ce conseil porte sur une position précédente : relancez l’analyse.
+      </p>
+    }
+
+    <p class="answer" [innerHTML]="response.answer | richText"></p>
+
+    @if (evaluation(); as evaluation) {
+      <div class="evaluation">
+        <span class="evaluation__score">{{ scoreLabel() }}</span>
+        <span class="muted">{{ evaluation.assessment }} · profondeur {{ evaluation.depth }}</span>
+        @if (evaluation.lines.length) {
+          <ul class="lines">
+            @for (line of evaluation.lines; track line.rank) {
+              <li>
+                <button
+                  type="button"
+                  class="move"
+                  (click)="playSuggested(line.move_san)"
+                  [disabled]="advice.analysisStale()"
+                  title="Jouer ce coup"
+                >
+                  {{ line.move_san }}
+                </button>
+                <span class="muted">{{ line.pv_san.slice(1, 6).join(' ') }}</span>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    }
+
+    @if (context(); as context) {
+      @if (context.passages.length) {
+        <details class="context" open>
+          <summary>Contexte de l’ouverture ({{ context.passages.length }})</summary>
+          @for (passage of context.passages; track passage.chunk_id) {
+            <blockquote class="passage">
+              <p class="passage__text">{{ passage.text }}</p>
+              <footer class="muted">
+                <a [href]="passage.source_url" target="_blank" rel="noopener">{{
+                  passage.title
+                }}</a>
+                @if (passage.section) {
+                  · {{ passage.section }}
+                }
+              </footer>
+            </blockquote>
+          }
+        </details>
+      }
+    }
+
+    @if (videos().length) {
+      <div class="videos" data-testid="videos">
+        <h3>Vidéos pour réviser</h3>
+        @for (video of videos(); track video.video_id) {
+          <article class="video">
+            @if (playingVideo() === video.video_id) {
+              <iframe
+                class="video__player"
+                [src]="embedUrl(video)"
+                [title]="video.title"
+                allow="accelerometer; encrypted-media; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            } @else if (video.thumbnail_url) {
+              <button
+                type="button"
+                class="video__thumb"
+                (click)="toggleVideo(video)"
+                [attr.aria-label]="'Lire : ' + video.title"
+              >
+                <img [src]="video.thumbnail_url" [alt]="''" loading="lazy" />
+                <span class="video__play" aria-hidden="true">▶</span>
+              </button>
+            }
+            <div class="video__meta">
+              <a [href]="video.url" target="_blank" rel="noopener">{{ video.title }}</a>
+              <span class="muted">{{ video.channel }}</span>
+              <button type="button" class="btn btn--ghost btn--small" (click)="toggleVideo(video)">
+                {{ playingVideo() === video.video_id ? 'Fermer le lecteur' : 'Lire ici' }}
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    } @else if (videosFailure(); as failure) {
+      <p class="muted">Vidéos indisponibles : {{ failure }}</p>
+    }
+  } @else if (!advice.analysisLoading() && !advice.analysisError()) {
+    <p class="muted">
+      L’agent consulte les parties de maîtres, Stockfish si la position sort de la théorie, sa base
+      de connaissances et YouTube, puis rédige un conseil.
+    </p>
+  }
+
+  <!-- Analyse profonde : tâche de fond côté serveur, suivie jusqu'à son terme -->
+  <div class="deep" data-testid="deep">
+    @if (advice.deep(); as deep) {
+      @if (advice.deepRunning()) {
+        <span class="spinner" role="status" aria-label="Analyse en cours"></span>
+        <span>Stockfish analyse à la profondeur {{ deep.depth }}…</span>
+        <button
+          type="button"
+          class="btn btn--ghost btn--small"
+          (click)="advice.cancelDeepAnalysis()"
+        >
+          Abandonner
+        </button>
+      } @else if (deep.status === 'done' && deep.result; as result) {
+        <p class="evaluation__title">Analyse profonde (Stockfish)</p>
+        <span class="evaluation__score">{{ deepScoreLabel() }}</span>
+        <span class="muted">
+          {{ result.assessment }} · profondeur {{ result.depth }} · {{ deep.elapsedS.toFixed(0) }} s
+        </span>
+        @if (result.lines.length) {
+          <ul class="lines">
+            @for (line of result.lines; track line.rank) {
+              <li>
+                <button
+                  type="button"
+                  class="move"
+                  (click)="playSuggested(line.move_san)"
+                  [disabled]="deepStale()"
+                  title="Jouer ce coup"
+                >
+                  {{ line.move_san }}
+                </button>
+                <span class="muted">{{ line.pv_san.slice(1, 8).join(' ') }}</span>
+              </li>
+            }
+          </ul>
+        }
+        @if (deepStale()) {
+          <p class="stale">Analyse d’une position précédente.</p>
+        }
+      } @else {
+        <p class="error" role="alert">Analyse profonde échouée : {{ deep.error }}</p>
+      }
+    }
+    @if (!advice.deepRunning()) {
+      <button
+        type="button"
+        class="btn btn--ghost btn--small"
+        data-testid="deep-analyze"
+        (click)="advice.deepAnalyze()"
+      >
+        {{
+          advice.deep()
+            ? 'Relancer l’analyse profonde'
+            : 'Analyse profonde (Stockfish, profondeur 28)'
+        }}
+      </button>
+    }
+  </div>
+</section>
+
+<!-- Questions libres -->
+<section class="card" data-testid="ask-card">
+  <header class="card__header">
+    <h2>Poser une question</h2>
+  </header>
+
+  @for (exchange of advice.exchanges(); track $index) {
+    <div class="exchange">
+      <p class="exchange__question">{{ exchange.question }}</p>
+      @if (exchange.response; as response) {
+        <p class="exchange__answer" [innerHTML]="response.answer | richText"></p>
+      } @else if (exchange.error; as error) {
+        <p class="error" role="alert">{{ error }}</p>
+      } @else {
+        <p class="muted"><span class="spinner" aria-hidden="true"></span> L’agent réfléchit…</p>
+      }
+    </div>
+  }
+
+  <form class="ask-form" (submit)="$event.preventDefault(); askAgent()">
+    <label for="question-input" class="sr-only">Question</label>
+    <input
+      id="question-input"
+      type="text"
+      autocomplete="off"
+      maxlength="1000"
+      placeholder="Quelles sont les idées de la défense sicilienne ?"
+      [value]="question()"
+      (input)="question.set($any($event.target).value)"
+    />
+    <button type="submit" class="btn" [disabled]="!question().trim() || advice.asking()">
+      Envoyer
+    </button>
+  </form>
 </section>

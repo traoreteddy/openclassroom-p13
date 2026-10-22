@@ -34,3 +34,22 @@ def test_healthcheck_database_ok(monkeypatch):
 
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
+
+
+def test_cors_allows_the_angular_dev_origin():
+    response = client.options(
+        "/api/v1/healthcheck",
+        headers={
+            "Origin": "http://localhost:4200",
+            "Access-Control-Request-Method": "POST",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "http://localhost:4200"
+
+
+def test_cors_rejects_an_unknown_origin():
+    response = client.get("/api/v1/healthcheck", headers={"Origin": "http://evil.example"})
+
+    assert "access-control-allow-origin" not in response.headers
