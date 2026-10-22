@@ -1,4 +1,5 @@
-<section class="card">
+<!-- Position : trait, statut, coups joués ; la FEN est repliée pour ne pas encombrer -->
+<section class="card" data-testid="position-card">
   <header class="card__header">
     <h2>Position</h2>
     <span class="turn" [class.turn--black]="game.turn() === 'black'">{{ turnLabel() }}</span>
@@ -8,56 +9,55 @@
     <p class="status" role="status">{{ statusLabel() }}</p>
   }
 
-  <div class="fen">
-    <code class="fen__value" data-testid="current-fen">{{ game.fen() }}</code>
-    <button type="button" class="btn btn--ghost" (click)="copyFen()">
-      {{ copied() ? 'Copiée ✓' : 'Copier' }}
-    </button>
-  </div>
-
-  <form class="fen-form" (submit)="$event.preventDefault(); loadFen()">
-    <label for="fen-input">Charger une position (FEN)</label>
-    <div class="fen-form__row">
-      <input
-        id="fen-input"
-        type="text"
-        spellcheck="false"
-        autocomplete="off"
-        placeholder="rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"
-        [value]="fenInput()"
-        (input)="fenInput.set($any($event.target).value)"
-      />
-      <button type="submit" class="btn" [disabled]="!fenInput().trim()">Charger</button>
-    </div>
-    @if (fenError(); as error) {
-      <p class="error" role="alert">FEN invalide : {{ error }}</p>
-    }
-  </form>
-</section>
-
-<section class="card">
-  <header class="card__header">
-    <h2>Coups joués</h2>
-  </header>
   @if (movePairs().length) {
-    <ol class="moves">
+    <ol class="moves" aria-label="Coups joués">
       @for (pair of movePairs(); track pair.number) {
         <li>
           <span class="moves__number">{{ pair.number }}.</span>
-          <span>{{ pair.white }}</span>
-          <span>{{ pair.black ?? '' }}</span>
+          <span class="moves__san">{{ pair.white }}</span>
+          <span class="moves__san">{{ pair.black ?? '' }}</span>
         </li>
       }
     </ol>
   } @else {
-    <p class="muted">Jouez un coup sur l’échiquier pour commencer.</p>
+    <p class="muted">Jouez un coup sur l’échiquier, ou chargez une position.</p>
   }
+
+  <details class="fen-details">
+    <summary>Position en notation FEN</summary>
+    <div class="fen">
+      <code class="fen__value" data-testid="current-fen">{{ game.fen() }}</code>
+      <button type="button" class="btn btn--ghost btn--small" (click)="copyFen()">
+        {{ copied() ? 'Copiée ✓' : 'Copier' }}
+      </button>
+    </div>
+    <form class="fen-form" (submit)="$event.preventDefault(); loadFen()">
+      <label for="fen-input">Charger une position</label>
+      <div class="fen-form__row">
+        <input
+          id="fen-input"
+          type="text"
+          spellcheck="false"
+          autocomplete="off"
+          placeholder="Collez une FEN…"
+          [value]="fenInput()"
+          (input)="fenInput.set($any($event.target).value)"
+        />
+        <button type="submit" class="btn btn--small" [disabled]="!fenInput().trim()">
+          Charger
+        </button>
+      </div>
+      @if (fenError(); as error) {
+        <p class="error" role="alert">FEN invalide : {{ error }}</p>
+      }
+    </form>
+  </details>
 </section>
 
 <!-- Théorie : automatique à chaque position -->
 <section class="card" data-testid="theory-card">
   <header class="card__header">
-    <h2>Coups théoriques</h2>
+    <h2>Coups des maîtres</h2>
     @if (advice.theoryLoading()) {
       <span class="spinner" role="status" aria-label="Chargement"></span>
     } @else if (theory(); as theory) {
@@ -78,47 +78,62 @@
     @if (theory.opening) {
       <p class="opening">
         <strong>{{ theory.opening.name }}</strong>
-        <span class="muted">· {{ theory.opening.eco }}</span>
+        <span class="opening__eco">{{ theory.opening.eco }}</span>
       </p>
     }
     @if (theory.moves.length) {
-      <table class="theory">
-        <thead>
-          <tr>
-            <th scope="col">Coup</th>
-            <th scope="col">Parties</th>
-            <th scope="col" title="Blancs / nulles / Noirs">B / N / N</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (move of theory.moves; track move.uci) {
-            <tr>
-              <td>
-                <button
-                  type="button"
-                  class="move"
-                  (click)="playSuggested(move.san)"
-                  title="Jouer ce coup"
-                >
-                  {{ move.san }}
-                </button>
-              </td>
-              <td>{{ move.games.toLocaleString('fr-FR') }}</td>
-              <td class="muted">
-                {{ percent(move.white_pct) }} / {{ percent(move.draw_pct) }} /
-                {{ percent(move.black_pct) }}
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    } @else {
-      <p class="muted">
-        Aucune partie de maître connue dans cette position : demandez l’avis du moteur.
+      <p class="hint">
+        Cliquez un coup pour le jouer. Barre : victoires des Blancs, nulles, victoires des Noirs.
       </p>
+      <ul class="theory">
+        @for (move of theory.moves; track move.uci) {
+          <li class="theory__row">
+            <button
+              type="button"
+              class="move"
+              (click)="playSuggested(move.san)"
+              title="Jouer ce coup"
+            >
+              {{ move.san }}
+            </button>
+            <span class="theory__games">{{ compactNumber(move.games) }} parties</span>
+            <span
+              class="results"
+              role="img"
+              [attr.aria-label]="
+                'Blancs ' +
+                percent(move.white_pct) +
+                ', nulles ' +
+                percent(move.draw_pct) +
+                ', Noirs ' +
+                percent(move.black_pct)
+              "
+              [title]="
+                percent(move.white_pct) +
+                ' · ' +
+                percent(move.draw_pct) +
+                ' · ' +
+                percent(move.black_pct)
+              "
+            >
+              <span class="results__white" [style.width.%]="move.white_pct">{{
+                percent(move.white_pct)
+              }}</span>
+              <span class="results__draw" [style.width.%]="move.draw_pct">{{
+                percent(move.draw_pct)
+              }}</span>
+              <span class="results__black" [style.width.%]="move.black_pct">{{
+                percent(move.black_pct)
+              }}</span>
+            </span>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="muted">Aucune partie de maître connue ici : demandez l’avis du moteur.</p>
     }
   } @else if (!advice.theoryLoading()) {
-    <p class="muted">Les coups des parties de maîtres (Lichess) s’affichent ici.</p>
+    <p class="muted">Les coups joués par les maîtres (Lichess) s’affichent ici.</p>
   }
 </section>
 
@@ -126,36 +141,32 @@
 <section class="card" data-testid="advice-card">
   <header class="card__header">
     <h2>Conseil de l’agent</h2>
-    <button
-      type="button"
-      class="btn"
-      data-testid="analyze"
-      (click)="requestAdvice()"
-      [disabled]="advice.analysisLoading()"
-    >
-      @if (advice.analysisLoading()) {
-        <span class="spinner spinner--light" aria-hidden="true"></span> L’agent réfléchit…
-      } @else if (response()) {
-        Analyser à nouveau
-      } @else {
-        Demander conseil
-      }
-    </button>
+    @if (advice.analysisLoading()) {
+      <span class="spinner" role="status" aria-label="L’agent réfléchit"></span>
+    }
   </header>
 
-  <div class="question-row">
+  <form class="ask" (submit)="$event.preventDefault(); requestAdvice()">
     <label for="focus-input" class="sr-only">Question sur la position (facultatif)</label>
     <input
       id="focus-input"
       type="text"
       autocomplete="off"
       maxlength="500"
-      placeholder="Question sur cette position (facultatif) : pourquoi pas Cg5 ?"
+      placeholder="Une question sur la position ? (facultatif)"
       [value]="focus()"
       (input)="focus.set($any($event.target).value)"
-      (keydown.enter)="requestAdvice()"
     />
-  </div>
+    <button type="submit" class="btn" data-testid="analyze" [disabled]="advice.analysisLoading()">
+      @if (advice.analysisLoading()) {
+        L’agent réfléchit…
+      } @else if (response()) {
+        Analyser à nouveau
+      } @else {
+        Demander conseil
+      }
+    </button>
+  </form>
 
   @if (advice.analysisError(); as error) {
     <p class="error" role="alert">{{ error }}</p>
@@ -168,12 +179,15 @@
       </p>
     }
 
-    <p class="answer" [innerHTML]="response.answer | richText"></p>
+    <div class="answer" [innerHTML]="response.answer | richText"></div>
 
     @if (evaluation(); as evaluation) {
       <div class="evaluation">
         <span class="evaluation__score">{{ scoreLabel() }}</span>
-        <span class="muted">{{ evaluation.assessment }} · profondeur {{ evaluation.depth }}</span>
+        <span class="evaluation__label">
+          {{ evaluation.assessment }}
+          <span class="muted">· Stockfish, profondeur {{ evaluation.depth }}</span>
+        </span>
         @if (evaluation.lines.length) {
           <ul class="lines">
             @for (line of evaluation.lines; track line.rank) {
@@ -197,8 +211,8 @@
 
     @if (context(); as context) {
       @if (context.passages.length) {
-        <details class="context" open>
-          <summary>Contexte de l’ouverture ({{ context.passages.length }})</summary>
+        <details class="context">
+          <summary>Ce que dit l’encyclopédie ({{ context.passages.length }})</summary>
           @for (passage of context.passages; track passage.chunk_id) {
             <blockquote class="passage">
               <p class="passage__text">{{ passage.text }}</p>
@@ -217,8 +231,8 @@
     }
   } @else if (!advice.analysisLoading() && !advice.analysisError()) {
     <p class="muted">
-      L’agent consulte les parties de maîtres, Stockfish si la position sort de la théorie, sa base
-      de connaissances et YouTube, puis rédige un conseil.
+      L’agent consulte les parties de maîtres, Stockfish si la position sort de la théorie, son
+      encyclopédie et YouTube, puis rédige un conseil.
     </p>
   }
 
@@ -236,10 +250,13 @@
           Abandonner
         </button>
       } @else if (deep.status === 'done' && deep.result; as result) {
-        <p class="evaluation__title">Analyse profonde (Stockfish)</p>
+        <p class="deep__title">Analyse profonde</p>
         <span class="evaluation__score">{{ deepScoreLabel() }}</span>
-        <span class="muted">
-          {{ result.assessment }} · profondeur {{ result.depth }} · {{ deep.elapsedS.toFixed(0) }} s
+        <span class="evaluation__label">
+          {{ result.assessment }}
+          <span class="muted"
+            >· profondeur {{ result.depth }} · {{ deep.elapsedS.toFixed(0) }} s</span
+          >
         </span>
         @if (result.lines.length) {
           <ul class="lines">
@@ -290,7 +307,7 @@
     @if (advice.videosLoading()) {
       <span class="spinner" role="status" aria-label="Chargement"></span>
     } @else if (advice.openingFamily(); as family) {
-      <span class="muted">{{ family }}</span>
+      <span class="badge badge--off">{{ family }}</span>
     }
   </header>
 
@@ -315,13 +332,16 @@
             >
               <img [src]="video.thumbnail_url" [alt]="''" loading="lazy" />
               <span class="video__play" aria-hidden="true">▶</span>
+              @if (minutes(video)) {
+                <span class="video__duration">{{ minutes(video) }}</span>
+              }
             </button>
           }
           <div class="video__meta">
-            <a [href]="video.url" target="_blank" rel="noopener">{{ video.title }}</a>
-            <span class="muted"
-              >{{ video.channel }} · {{ minutes(video) }} · {{ compact(video.views) }}</span
-            >
+            <a class="video__title" [href]="video.url" target="_blank" rel="noopener">{{
+              video.title
+            }}</a>
+            <span class="muted">{{ video.channel }} · {{ compact(video.views) }}</span>
             <button type="button" class="btn btn--ghost btn--small" (click)="toggleVideo(video)">
               {{ playingVideo() === video.video_id ? 'Fermer le lecteur' : 'Lire ici' }}
             </button>
@@ -348,7 +368,7 @@
     <div class="exchange">
       <p class="exchange__question">{{ exchange.question }}</p>
       @if (exchange.response; as response) {
-        <p class="exchange__answer" [innerHTML]="response.answer | richText"></p>
+        <div class="exchange__answer" [innerHTML]="response.answer | richText"></div>
       } @else if (exchange.error; as error) {
         <p class="error" role="alert">{{ error }}</p>
       } @else {
@@ -357,14 +377,14 @@
     </div>
   }
 
-  <form class="ask-form" (submit)="$event.preventDefault(); askAgent()">
+  <form class="ask" (submit)="$event.preventDefault(); askAgent()">
     <label for="question-input" class="sr-only">Question</label>
     <input
       id="question-input"
       type="text"
       autocomplete="off"
       maxlength="1000"
-      placeholder="Quelles sont les idées de la défense sicilienne ?"
+      placeholder="Ex. : quelles sont les idées de la Sicilienne ?"
       [value]="question()"
       (input)="question.set($any($event.target).value)"
     />

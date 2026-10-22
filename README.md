@@ -30,9 +30,15 @@ P13/
 ## Démarrage
 
 ```bash
-cp .env.example .env
-docker compose up -d --build
+cp .env.example .env            # LICHESS_TOKEN et YOUTUBE_API_KEY facultatifs mais recommandés
+ollama pull qwen3:14b           # modèle de l'agent, sur la machine hôte (hors Docker)
+docker compose up -d --build    # frontend (nginx), backend (Stockfish), MongoDB, Milvus
+docker compose exec backend uv run python -m scripts.ingest_corpus   # corpus → Milvus, une fois
 ```
+
+L'application est sur <http://localhost:8080> (échiquier, coups des maîtres, conseil de
+l'agent, analyse profonde, vidéos, questions). Détails et positions de démo dans
+[docs/deploiement.md](docs/deploiement.md).
 
 Vérifier que l'API répond :
 
@@ -62,6 +68,8 @@ La configuration passe par des variables d'environnement définies dans `.env`.
 | `APP_ENV`       | `development`            | Environnement d'exécution                |
 | `API_V1_PREFIX` | `/api/v1`                | Préfixe des routes de l'API              |
 | `BACKEND_PORT`  | `8001`                   | Port de l'API exposé sur la machine hôte |
+| `FRONTEND_PORT` | `8080`                   | Port du front (nginx, relaie `/api` vers le backend) |
+| `YOUTUBE_API_KEY` | — | Clé YouTube Data v3 pour les vidéos (sinon carte « non configurée ») |
 | `MONGO_ROOT_USERNAME` | `p13`              | Utilisateur administrateur MongoDB       |
 | `MONGO_ROOT_PASSWORD` | `change-me`        | Mot de passe MongoDB (à changer)         |
 | `MONGODB_DB_NAME` | `p13`                  | Nom de la base de données                |
@@ -89,14 +97,23 @@ cd backend
 uv run pytest --cov
 ```
 
-Les outils de l'agent et leur contrat sont décrits dans
-[docs/contrat-tools.md](docs/contrat-tools.md).
+Documentation :
+
+| Document | Contenu |
+|---|---|
+| [docs/processus.md](docs/processus.md) | Processus, étapes, graphe de l'agent |
+| [docs/contrat-tools.md](docs/contrat-tools.md) | Les sept outils de l'agent et leur contrat |
+| [docs/outil-rag.md](docs/outil-rag.md) | RAG agentique, phases 0 à 7 et mesures |
+| [docs/outil-videos.md](docs/outil-videos.md) | Recherche de vidéos YouTube, quotas, mesure |
+| [docs/frontend.md](docs/frontend.md) | Front Angular : services, panneau, synchronisation |
+| [docs/deploiement.md](docs/deploiement.md) | Conteneurs, volumes, installation fraîche, démo |
 
 ## Services
 
 | Service  | Technologie | État    |
 |----------|-------------|---------|
-| backend  | FastAPI     | En place |
-| frontend | Angular 21  | Échiquier en place (hors Docker, voir `frontend/README.md`) |
-| milvus   | Milvus      | À venir |
-| mongodb  | MongoDB 8.0 | En place |
+| frontend | Angular 21 servi par nginx | En place (port 8080) |
+| backend  | FastAPI, LangGraph, Stockfish 17.1 | En place (port 8001) |
+| milvus   | Milvus 2.6  | En place (base vectorielle du RAG) |
+| mongodb  | MongoDB 8.0 | En place (corpus, cache vidéos, quota) |
+| langfuse | Langfuse v4 (profil `tracing`, optionnel) | Arrêté par défaut |

@@ -304,7 +304,7 @@ frontend/src/app/
   annule la requête précédente).
 - **Moins d'appels :** un appel seulement après un coup terminé, et un cache local par FEN.
 
-### Étape 6 : Containerisation et démo
+### Étape 6 : Containerisation et démo ✅ (réalisation dans `docs/deploiement.md`)
 
 **`docker-compose.yml` complet :** `frontend`, `backend` (avec Stockfish), `mongodb`,
 `milvus` (+ `etcd`, `minio`). Chaque service a un healthcheck et des `depends_on`.

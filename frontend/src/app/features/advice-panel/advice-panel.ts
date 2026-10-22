@@ -166,6 +166,10 @@ export class AdvicePanel {
     return `${new Intl.NumberFormat('fr-FR', { notation: 'compact' }).format(views)} vues`;
   }
 
+  protected compactNumber(value: number): string {
+    return new Intl.NumberFormat('fr-FR', { notation: 'compact' }).format(value);
+  }
+
   protected percent(value: number): string {
     return `${Math.round(value)} %`;
   }
