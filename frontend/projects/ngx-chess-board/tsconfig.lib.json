@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../out-tsc/lib",
+    "declaration": true,
+    "declarationMap": true,
+    "inlineSources": true,
+    "types": [],
+    "strict": false,
+    "noImplicitOverride": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "noImplicitReturns": false
+  },
+  "angularCompilerOptions": {
+    "strictTemplates": false,
+    "strictInputAccessModifiers": false
+  },
+  "exclude": ["**/*.spec.ts"]
+}

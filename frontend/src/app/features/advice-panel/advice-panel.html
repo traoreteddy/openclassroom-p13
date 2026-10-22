@@ -1,0 +1,65 @@
+<section class="card">
+  <header class="card__header">
+    <h2>Position</h2>
+    <span class="turn" [class.turn--black]="game.turn() === 'black'">{{ turnLabel() }}</span>
+  </header>
+
+  @if (statusLabel()) {
+    <p class="status" role="status">{{ statusLabel() }}</p>
+  }
+
+  <div class="fen">
+    <code class="fen__value" data-testid="current-fen">{{ game.fen() }}</code>
+    <button type="button" class="btn btn--ghost" (click)="copyFen()">
+      {{ copied() ? 'Copiée ✓' : 'Copier' }}
+    </button>
+  </div>
+
+  <form class="fen-form" (submit)="$event.preventDefault(); loadFen()">
+    <label for="fen-input">Charger une position (FEN)</label>
+    <div class="fen-form__row">
+      <input
+        id="fen-input"
+        type="text"
+        spellcheck="false"
+        autocomplete="off"
+        placeholder="rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"
+        [value]="fenInput()"
+        (input)="fenInput.set($any($event.target).value)"
+      />
+      <button type="submit" class="btn" [disabled]="!fenInput().trim()">Charger</button>
+    </div>
+    @if (fenError(); as error) {
+      <p class="error" role="alert">FEN invalide : {{ error }}</p>
+    }
+  </form>
+</section>
+
+<section class="card">
+  <header class="card__header">
+    <h2>Coups joués</h2>
+  </header>
+  @if (movePairs().length) {
+    <ol class="moves">
+      @for (pair of movePairs(); track pair.number) {
+        <li>
+          <span class="moves__number">{{ pair.number }}.</span>
+          <span>{{ pair.white }}</span>
+          <span>{{ pair.black ?? '' }}</span>
+        </li>
+      }
+    </ol>
+  } @else {
+    <p class="muted">Jouez un coup sur l’échiquier pour commencer.</p>
+  }
+</section>
+
+<section class="card card--placeholder">
+  <header class="card__header">
+    <h2>Conseils de l’agent</h2>
+  </header>
+  <p class="muted">
+    Coups théoriques, évaluation Stockfish, contexte de l’ouverture et vidéos
+    s’afficheront ici une fois l’API branchée.
+  </p>
+</section>

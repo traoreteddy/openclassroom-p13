@@ -1,0 +1,12 @@
+<ngx-chess-board
+  #board
+  [size]="size()"
+  [lightTileColor]="'#f0d9b5'"
+  [darkTileColor]="'#b58863'"
+  [showLastMove]="true"
+  [showLegalMoves]="true"
+  [dragDisabled]="locked()"
+  [lightDisabled]="locked()"
+  [darkDisabled]="locked()"
+  (moveChange)="onMoveChange($event)"
+/>

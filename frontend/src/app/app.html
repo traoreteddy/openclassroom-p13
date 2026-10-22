@@ -1,0 +1,24 @@
+<header class="topbar">
+  <h1>Coach d’ouvertures</h1>
+  <span class="topbar__subtitle">FFE · Jeunes espoirs</span>
+</header>
+
+<main class="layout">
+  <section class="board-column" aria-label="Échiquier">
+    <app-chess-board (rejected)="showNotice($event)" />
+
+    <div class="controls">
+      <button type="button" class="btn" (click)="undo()" [disabled]="!game.history().length">
+        ↶ Annuler
+      </button>
+      <button type="button" class="btn" (click)="flip()">⇅ Retourner</button>
+      <button type="button" class="btn btn--ghost" (click)="reset()">Nouvelle partie</button>
+    </div>
+
+    @if (notice(); as message) {
+      <p class="notice" role="alert">{{ message }}</p>
+    }
+  </section>
+
+  <app-advice-panel />
+</main>

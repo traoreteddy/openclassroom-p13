@@ -1,0 +1,17 @@
+{
+  "name": "ngx-chess-board",
+  "version": "2.2.3",
+  "description": "Chess game component (vendored from OpenClassrooms material-chessboard, MIT)",
+  "peerDependencies": {
+    "@angular/common": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/cdk": "^21.0.0",
+    "lodash": "^4.17.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/grzegorz103/ngx-chess-board.git"
+  },
+  "license": "MIT",
+  "sideEffects": false
+}
