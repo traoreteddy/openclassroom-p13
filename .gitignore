@@ -27,3 +27,6 @@ node_modules/
 # Couverture de tests
 .coverage
 htmlcov/
+
+# Cache des embeddings des expériences (régénérable)
+backend/data/eval/cache/

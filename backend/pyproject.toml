@@ -22,7 +22,10 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "beautifulsoup4>=4.13",
     "httpx2>=2.13.1",
+    "langchain-experimental>=0.4.2",
+    "lxml>=6.0",
     "pytest>=9.1.1",
     "pytest-asyncio>=1.4.0",
     "pytest-cov>=7.1.0",

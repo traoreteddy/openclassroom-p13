@@ -356,12 +356,25 @@ bon article en tête, filtre) : **réussi** (`uv run pytest -m integration`).
 | 0,60 | 93 % | 65 % |
 | 0,70 | 67 % | 85 % |
 
-**Étape 2.9 : exécution dans Docker** 🚧. Image reconstruite (2,67 Go ; un premier échec
-de `uv sync` était passager, dû à un téléchargement interrompu). Ingestion lancée **dans le
-conteneur** : modèle téléchargé une fois dans le volume `hf_models` (1,1 Go), embeddings
-calculés **sur CPU** (7 cœurs à 100 %), car Docker n'a pas accès au GPU du Mac. Durée :
-plus de 15 minutes, contre 30 s sur l'hôte avec le GPU. Résultat final et appel de
-`/vector-search` depuis l'hôte : à compléter.
+**Étape 2.9 : exécution dans Docker** ✅.
+- **Image** reconstruite (2,67 Go). Un premier échec de `uv sync` était passager
+  (téléchargement interrompu).
+- **Ingestion dans le conteneur : fonctionnelle mais trop lente.** Modèle téléchargé une
+  fois dans le volume `hf_models` (1,1 Go), embeddings calculés **sur CPU** (7 cœurs à
+  100 %), Docker n'ayant pas accès au GPU du Mac : environ **9 minutes par article**
+  (4 articles en 37 min), soit environ 1 h 30 pour le corpus, contre **31 s** sur l'hôte.
+  Elle a été arrêtée une fois ce constat établi.
+- **Décision** : l'ingestion, opération ponctuelle, se lance **depuis l'hôte** vers le Milvus
+  conteneurisé (`uv run python -m scripts.ingest_corpus --recreate`) ; les données
+  persistent dans le volume `milvus_data`. La commande dans le conteneur reste disponible
+  pour une machine Linux ou une exécution de nuit.
+- **Requêtes depuis le conteneur backend, mesurées depuis l'hôte** (`curl`) :
+  pendant le préchauffage (≈ 12 s), `/vector-search` répond immédiatement
+  `model_loading` ; ensuite, **0,5 à 0,8 s par recherche** de bout en bout (encodage
+  d'une question sur CPU + Milvus), bien sous le timeout de 5 s.
+- **Cohérence hôte / conteneur** : les scores sont identiques (0,7896 pour « Qui a donné
+  son nom au gambit Evans ? »), les vecteurs calculés sur l'hôte et dans le conteneur sont
+  compatibles.
 
 **Décision : seuil 0,50.** Il garde toutes les bonnes réponses et écarte toutes les
 questions hors sujet. Les questions d'échecs hors corpus ou relevant d'un autre outil ont
@@ -369,7 +382,7 @@ des scores aussi élevés que les vraies réponses (même vocabulaire) : **aucun
 sépare** sans perdre de bonnes réponses. Les éviter relève de la **décision de l'agent**
 (phase 5), pas du seuil.
 
-### Phase 3 : comparer les découpages ⏳
+### Phase 3 : comparer les découpages ✅
 
 | Tâche | Détail |
 |---|---|
@@ -382,6 +395,173 @@ sépare** sans perdre de bonnes réponses. Les éviter relève de la **décision
 | **Recouvrement** | 0 %, 10 %, 25 % → recall@5 et **redondance induite** (part de tokens dupliqués dans l'index) |
 | Sémantique vs récursif | Nombre de chunks, longueur (moyenne et dispersion), **cohérence** (similarité moyenne entre phrases d'un même chunk) |
 | **Late chunking** | Explication : encoder le document entier, puis moyenner les vecteurs de tokens par segment. Prototype si le modèle s'y prête (limite à documenter : Qwen3 est un modèle causal, peu adapté) |
+
+#### Résultats de la phase 3
+
+##### Les familles de découpage
+
+| Famille | Principe | Forces | Limites |
+|---|---|---|---|
+| **Fixe** | Fenêtres de N tokens, sans regarder le texte | Tailles régulières, simple, prévisible | Coupe au milieu des phrases : il faut un recouvrement |
+| **Récursif** | Essaie les séparateurs du plus fort au plus faible (section → paragraphe → phrase → mot) jusqu'à tenir dans la taille | Respecte la structure tant que possible ; standard | Tailles inégales ; le recouvrement ne joue qu'à l'intérieur d'un long paragraphe |
+| **Structurel** | Une unité du document = un chunk (section Markdown, section HTML) | Chunks qui ont un sens ; coupe aux vrais changements de sujet | Tailles très inégales (de 17 à 4 405 tokens ici) |
+| **Sémantique** | Encode chaque phrase et coupe là où la distance entre deux phrases voisines dépasse un seuil (ici le 95ᵉ percentile des distances de l'article) | Coupe là où le sens change, sans dépendre de la mise en forme | Coûteux (un embedding par phrase) ; tailles imprévisibles |
+| **Hiérarchique** | Petits chunks (enfants) pour **chercher**, unité plus large (parent) **renvoyée** à l'agent | Recherche précise et contexte suffisant | Deux niveaux à gérer ; le parent doit être plafonné |
+
+##### Méthode
+
+`app/rag/eval/strategies.py` (stratégies), `app/rag/eval/bench.py` (banc),
+`scripts/compare_chunking.py` (expériences), résultats dans
+`data/eval/results/phase3-chunking.json`.
+
+- **Même procédure pour toutes les stratégies** : découpage des 12 articles, encodage
+  (cache disque : un texte n'est jamais encodé deux fois), recherche **exacte en mémoire**.
+  On compare des découpages, pas des index : avec quelques centaines de chunks, le calcul
+  exact est instantané et évite l'approximation de HNSW.
+- **50 requêtes** : Réf-30 + les 20 sous-questions de Multi-10. Avec 30 seulement, une
+  question vaut 3,3 points.
+- **Mesures** : recall@5 et MRR ; **atteignables** (part des requêtes dont l'extrait est
+  entier dans au moins un chunk : le plafond du recall) ; **tokens renvoyés** pour un top-5 ;
+  **recall à budget égal** (meilleurs chunks pris dans l'ordre jusqu'à 2 000 tokens) ;
+  **redondance** (part des tokens indexés en double à cause du recouvrement).
+- **Significativité** : test de McNemar apparié contre la référence (récursif 512).
+- Les dépendances `langchain-experimental` (SemanticChunker) et `beautifulsoup4` sont
+  installées en **dépendances de développement** : elles ne servent qu'aux expériences.
+
+##### A. Familles, à taille comparable
+
+| Stratégie | Chunks | Tokens moy. (min-max) | Atteignables | recall@5 (50) | MRR | Tokens top-5 | recall à 2 000 tokens | vs référence |
+|---|---|---|---|---|---|---|---|---|
+| Fixe 512, recouvrement 51 | 112 | 488 (207-512) | 100 % | 0,80 | 0,68 | 2 469 | 0,76 | +4 / −3 |
+| **Récursif 512 / 51 (référence)** | 148 | 341 (57-552) | 100 % | 0,78 | 0,65 | 1 788 | 0,78 | — |
+| Titres Markdown (sections) | 110 | 451 (17-4 405) | 100 % | 0,80 | 0,66 | 2 169 | 0,80 | +2 / −1 |
+| Sections HTML (brut) | 114 | 484 (7-4 446) | **28 %** | 0,16 | 0,13 | 2 699 | 0,16 | +2 / −33 |
+| Sections HTML (balises de liens retirées) | 114 | 472 (10-4 392) | 100 % | 0,76 | 0,66 | 2 311 | 0,76 | +3 / −4 |
+| Sémantique (percentile 95) | 180 | 276 (3-3 174) | 96 % | 0,68 | 0,61 | 2 179 | 0,68 | +1 / −6 |
+| Hiérarchique (enfants 256 → section) | 323 | 158 (4-255) | 100 % | **0,86** | **0,70** | 2 593 | **0,84** | +4 / −0 |
+| **Hiérarchique (enfants 256 → parent ≤ 1 024)** | 325 | 157 (4-256) | 100 % | **0,86** | **0,70** | **1 945** | **0,84** | **+4 / −0** |
+
+« vs référence » : requêtes gagnées / perdues par rapport au récursif 512. Seul l'écart
+du HTML brut est significatif (p < 0,01) ; les autres ont p ≥ 0,12.
+
+**Le cas du HTML**, analysé en deux temps :
+1. Dans le HTML de Wikipédia, chaque titre est enveloppé dans `<div class="mw-heading">`.
+   `HTMLHeaderTextSplitter` ne rattache alors pas le texte suivant à son titre (métadonnées
+   vides) : les sections de références n'étaient pas exclues. Corrigé par un prétraitement
+   (`unwrap_wikipedia_headings`) ; effet faible sur le recall.
+2. Le vrai problème : le découpeur **déplace le texte des liens à la fin du bloc**.
+   « Le <a>gambit</a> porte le nom… » devient « Le porte le nom… \n gambit ». Les phrases
+   sont cassées : seuls **28 %** des extraits attendus restent entiers. Une fois les balises
+   de mise en forme retirées (`flatten_inline`), on passe à **100 %** d'extraits atteignables
+   et **0,76** de recall, au niveau du découpage Markdown (mêmes sections).
+   **Leçon** : partir du HTML exige un nettoyage spécifique à la source ; le Markdown issu de
+   l'API texte est plus simple et aussi bon.
+
+##### B. Taille des chunks (récursif, recouvrement 10 %)
+
+| Taille | Chunks | Tokens moy. | recall@5 (50) | MRR | Tokens top-5 | **recall à 2 000 tokens** |
+|---|---|---|---|---|---|---|
+| 256 | 288 | 176 | 0,80 | 0,64 | **861** | **0,82** |
+| 512 | 148 | 341 | 0,78 | 0,65 | 1 788 | 0,78 |
+| 1 024 | 71 | 710 | **0,86** | **0,70** | 3 774 | 0,76 |
+
+Le 1 024 obtient le meilleur recall@5 parce que chaque résultat contient **plus de texte** :
+il renvoie 4,4 fois plus de tokens que le 256. **À quantité de texte égale, il est dernier**
+(0,76) et le 256 premier (0,82). Le recall@5 seul favorise les gros chunks : il faut le lire
+avec le coût en tokens.
+
+##### C. Recouvrement et redondance
+
+| Recouvrement | Fixe 512 : redondance | Fixe : atteignables | Fixe : recall@5 | Récursif 512 : redondance | Récursif : recall@5 |
+|---|---|---|---|---|---|
+| 0 % | 0 % | **94 %** | 0,82 | 0 % | 0,78 |
+| 10 % (51 tokens) | 9 % | 100 % | 0,80 | **2 %** | 0,78 |
+| 25 % (128 tokens) | **24 %** | 100 % | 0,84 | **4 %** | 0,78 |
+
+- **Le recouvrement sert à ne pas couper les phrases** : en découpage fixe, sans
+  recouvrement, 6 % des extraits sont coupés en deux (94 % atteignables) ; à 10 %, aucun.
+- **La redondance suit le recouvrement nominal en découpage fixe** (9 % et 24 %), au prix
+  d'un index plus gros et de doublons dans les résultats.
+- **En récursif, le recouvrement n'a presque pas d'effet** (redondance 2 % et 4 %, recall
+  identique) : les coupures tombent entre paragraphes ou sections, et
+  `RecursiveCharacterTextSplitter` n'applique le recouvrement qu'à l'intérieur d'un
+  paragraphe trop long. Le réglage nominal ne dit pas la redondance réelle : il faut la
+  mesurer.
+
+##### Sémantique contre récursif : nombre, longueur, cohérence
+
+| Stratégie | Chunks | Tokens moy. | Écart-type | Min-max | Cohésion | Similarité aux coupures |
+|---|---|---|---|---|---|---|
+| Récursif 512 | 148 | 341 | 147 | 57-552 | 0,653 | 0,417 |
+| Titres Markdown | 110 | 451 | 636 | 17-4 405 | 0,646 | **0,354** |
+| Sémantique (p95) | 180 | 276 | **357** | **3-3 174** | **0,660** | 0,384 |
+
+- **Cohésion** : similarité moyenne de chaque phrase au centre de son chunk. La sémantique
+  est légèrement plus cohésive (0,660 contre 0,653) : ses chunks parlent d'un seul sujet.
+- **Similarité aux coupures** : entre la dernière phrase d'un chunk et la première du
+  suivant. Plus elle est basse, plus les coupures tombent sur de vrais changements de sujet.
+  La sémantique coupe mieux que le récursif (0,384 contre 0,417), mais **les titres font
+  encore mieux** (0,354) : sur une encyclopédie, l'auteur a déjà placé les coupures.
+- **Mais la sémantique cherche moins bien** (recall 0,68, 6 requêtes perdues pour une
+  gagnée) : ses chunks sont très inégaux (de 3 à 3 174 tokens). Les tout petits chunks
+  manquent de contexte, les très gros diluent leur sujet.
+- Une première mesure de cohérence (similarité entre phrases voisines **à l'intérieur** des
+  chunks) donnait 0,44 pour toutes les stratégies : elle ne voit pas les coupures, qui sont
+  la seule chose qui diffère. Elle a été remplacée par les deux mesures ci-dessus.
+- `langchain-experimental` **n'est plus maintenu** : raison supplémentaire de ne pas
+  l'utiliser en production.
+
+##### Late chunking
+
+**Principe.** En découpage classique, chaque chunk est encodé seul : « Elle s'obtient après
+5.a4 Ff5 » ne sait pas que « elle » est la variante Alapine de la défense slave. Le late
+chunking encode **d'abord le document entier** (chaque token reçoit un vecteur qui tient
+compte du contexte), **puis** agrège les vecteurs des tokens de chaque segment.
+
+**Prototype** (`app/rag/eval/late_chunking.py`, `scripts/late_chunking.py`) : mêmes chunks
+(récursif 256), mêmes 50 requêtes.
+
+| Variante | recall@5 (50) | MRR |
+|---|---|---|
+| **Classique (chunk encodé seul)** | **0,80** | **0,62** |
+| Late chunking, moyenne des tokens | 0,56 | 0,30 |
+| Late chunking, dernier token du segment | 0,64 | 0,45 |
+
+**Explication.** Le late chunking suppose un modèle **bidirectionnel** entraîné à produire
+des vecteurs de tokens exploitables (comme jina-embeddings-v3). Qwen3-Embedding est
+**causal** et entraîné à résumer un texte entier par son dernier token : ses vecteurs
+intermédiaires ne sont pas alignés avec ceux des questions. La variante « dernier token »,
+plus fidèle à son entraînement, limite la perte sans l'annuler.
+**Conclusion** : le late chunking demanderait de changer de modèle d'embedding ; il n'est
+pas retenu.
+
+##### Décision
+
+**Stratégie retenue pour la suite : hiérarchique, enfants récursifs de 256 tokens, parents
+= sections plafonnées à 1 024 tokens.**
+
+| Critère | Hiérarchique ≤ 1 024 | Pourquoi |
+|---|---|---|
+| Recall | 0,86 (meilleur, à égalité avec 1 024) | Les petits enfants rendent la recherche précise |
+| Coût | 1 945 tokens pour un top-5 | Le plafond borne ce qui est envoyé à l'agent (budget de 6 000 tokens en phase 6) |
+| Robustesse | +4 requêtes, **aucune perdue** | La tendance la plus nette du banc |
+| Phase 4 | Le parent est une section : son titre fournit directement le fil d'Ariane | Prépare l'enrichissement |
+
+Écartées : **HTML brut** (phrases cassées), **sémantique** (tailles imprévisibles, recall
+plus faible, bibliothèque abandonnée), **late chunking** (incompatible avec le modèle),
+**fixe** (coupe les phrases, impose 10 à 25 % de redondance), **1 024 tokens** (coût).
+Option de repli simple : **récursif 256** (le moins coûteux : 861 tokens pour un top-5).
+
+**Mise en production** : l'index Milvus (`openings`) reste en récursif 512 pour l'instant.
+La stratégie hiérarchique y sera intégrée en **phase 4**, en même temps que l'enrichissement
+des chunks (fil d'Ariane, questions hypothétiques, résumé), pour ne réindexer qu'une fois.
+
+**Prudence** : aucun écart avec la référence n'est significatif (p ≥ 0,12 sur 50 requêtes),
+hors le HTML brut. La décision repose sur une **tendance cohérente** (recall, recall à budget
+égal, aucune requête perdue) et sur le **coût**, pas sur une preuve statistique.
+
+**Tests** : 17 tests des stratégies et du banc (faux tokenizer, faux modèle, faux HTML),
+307 tests au total, couverture de branches 98 %.
 
 ### Phase 4 : enrichir les chunks et choisir une stratégie par type ⏳
 
