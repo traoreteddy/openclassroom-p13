@@ -28,6 +28,15 @@ class Settings(BaseSettings):
 
     http_timeout_s: float = 5.0
 
+    # RAG
+    milvus_uri: str = "http://localhost:19530"
+    milvus_collection: str = "openings"
+    embedding_model: str = "Qwen/Qwen3-Embedding-0.6B"
+
+    # LLM local (Ollama sur la machine hôte, hors Docker)
+    ollama_base_url: str = "http://localhost:11434"
+    llm_model: str = "phi4-mini"
+
 
 @lru_cache
 def get_settings() -> Settings:

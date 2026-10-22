@@ -9,10 +9,22 @@ services:
       API_V1_PREFIX: ${API_V1_PREFIX:-/api/v1}
       MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME:-p13}:${MONGO_ROOT_PASSWORD:-change-me}@mongodb:27017
       MONGODB_DB_NAME: ${MONGODB_DB_NAME:-p13}
+      MILVUS_URI: http://milvus:19530
+      # Ollama tourne sur la machine hôte (accès au GPU du Mac), hors Docker
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      HF_HOME: /models/huggingface
     ports:
       - "${BACKEND_PORT:-8001}:8000"
+    volumes:
+      # Modèle d'embedding téléchargé une seule fois, conservé entre les reconstructions
+      - hf_models:/models/huggingface
+    extra_hosts:
+      # Nécessaire sous Linux ; Docker Desktop (Mac, Windows) le résout déjà
+      - "host.docker.internal:host-gateway"
     depends_on:
       mongodb:
+        condition: service_healthy
+      milvus:
         condition: service_healthy
     healthcheck:
       test:
@@ -44,5 +56,76 @@ services:
       start_period: 10s
     restart: unless-stopped
 
+  # --- Milvus standalone (configuration officielle de la v2.6.25) ---------------------
+  # https://github.com/milvus-io/milvus/releases/download/v2.6.25/milvus-standalone-docker-compose.yml
+
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.25
+    container_name: p13-milvus-etcd
+    environment:
+      ETCD_AUTO_COMPACTION_MODE: revision
+      ETCD_AUTO_COMPACTION_RETENTION: "1000"
+      ETCD_QUOTA_BACKEND_BYTES: "4294967296"
+      ETCD_SNAPSHOT_COUNT: "50000"
+    volumes:
+      - milvus_etcd:/etcd
+    command: etcd -advertise-client-urls=http://etcd:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped
+
+  minio:
+    image: milvusdb/minio:RELEASE.2024-12-18T13-15-44Z
+    container_name: p13-milvus-minio
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+    volumes:
+      - milvus_minio:/minio_data
+    command: minio server /minio_data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped
+
+  milvus:
+    image: milvusdb/milvus:v2.6.25
+    container_name: p13-milvus
+    command: ["milvus", "run", "standalone"]
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: minio:9000
+      MINIO_ACCESS_KEY_ID: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_ACCESS_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      MQ_TYPE: woodpecker
+    volumes:
+      - milvus_data:/var/lib/milvus
+    ports:
+      # Exposé pour le développement hors Docker et les tests d'intégration
+      - "${MILVUS_PORT:-19530}:19530"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 30s
+      start_period: 90s
+      timeout: 20s
+      retries: 3
+    depends_on:
+      etcd:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   mongodb_data:
+  milvus_etcd:
+  milvus_minio:
+  milvus_data:
+  hf_models:
