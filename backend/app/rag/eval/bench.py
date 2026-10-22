@@ -32,7 +32,7 @@ from app.rag.eval.datasets import (
 from app.rag.eval.retrieval import RetrievalReport, evaluate
 from app.rag.eval.strategies import HierarchicalChunk, sentences
 from app.rag.milvus_store import opening_filter
-from app.rag.text import contains_excerpt
+from app.rag.text import contains_excerpt, normalize_query
 
 CACHE_DIR = EVAL_DIR / "cache"
 
@@ -172,6 +172,7 @@ class StrategyResult:
     redundancy: float
     reachable: float  # part des requêtes dont l'extrait est entier dans au moins un chunk
     recall_ref30: float
+    recall_multi: float  # sous-questions de Multi-10 (rédigées sans phi4-mini)
     recall_all: float
     mrr_all: float
     context_tokens: float  # tokens renvoyés à l'agent pour un top-5 (moyenne)
@@ -205,7 +206,7 @@ async def run_strategy(
     index = MemoryIndex(chunks, embedder.encode([c.text for c in chunks]), parents)
 
     async def search(query: str, top: int, opening: str | None):
-        return index.search(embedder.encode([query], query=True)[0], top, opening)
+        return index.search(embedder.encode([normalize_query(query)], query=True)[0], top, opening)
 
     returned_tokens: list[int] = []
 
@@ -237,8 +238,12 @@ async def run_strategy(
         tokens_max=max(tokens),
         redundancy=round(max(0.0, 1 - document_tokens / sum(tokens)), 3),
         reachable=round(reachable, 3),
-        recall_ref30=round(
-            statistics.fmean(r.rank is not None and r.rank <= k for r in ref_results), 3
+        recall_ref30=round(_mean(r.rank is not None and r.rank <= k for r in ref_results), 3),
+        recall_multi=round(
+            _mean(
+                r.rank is not None and r.rank <= k for r in report.results if r.id not in ref_ids
+            ),
+            3,
         ),
         recall_all=round(report.recall, 3),
         mrr_all=round(report.mrr, 3),
@@ -248,6 +253,11 @@ async def run_strategy(
         cohesion=round(chunk_cohesion(chunks, embedder), 3) if coherence else None,
         cut_similarity=round(cut_similarity(chunks, embedder), 3) if coherence else None,
     )
+
+
+def _mean(values) -> float:
+    values = [float(v) for v in values]
+    return statistics.fmean(values) if values else 0.0
 
 
 def found_within_budget(
@@ -265,7 +275,8 @@ def found_within_budget(
     from app.rag.eval.retrieval import is_relevant
 
     used = 0
-    for hit in index.search(embedder.encode([question.question], query=True)[0], 60, None):
+    vector = embedder.encode([normalize_query(question.question)], query=True)[0]
+    for hit in index.search(vector, 60, None):
         used += count(hit.text)
         if used > budget:
             return False

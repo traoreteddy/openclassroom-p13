@@ -16,26 +16,73 @@ from __future__ import annotations
 import asyncio
 import threading
 from collections.abc import Callable, Sequence
+from dataclasses import dataclass
 from typing import Any
 
-from app.rag.chunking import Chunk
+from app.rag.indexing import IndexUnit
 from app.tools.errors import ToolTransientError, ToolUnavailableError
 from app.tools.knowledge import Passage
 
 TEXT_MAX_LENGTH = 16_384
-OUTPUT_FIELDS = [
-    "text",
-    "article_id",
-    "title",
-    "opening",
-    "opening_family",
-    "section",
-    "source_url",
-]
+OUTPUT_FIELDS = ["article_id", "title", "opening", "opening_family", "section", "source_url"]
+PARENT_FIELDS = ["parent_id", "parent_text", "unit_kind"]
+# Plusieurs unités (enfants, résumé) renvoient à la même section : on en récupère davantage,
+# puis on garde la meilleure par section.
+OVERFETCH = 4
+MAX_FETCH = 64
 HNSW = {"M": 16, "efConstruction": 200}
 SEARCH_EF = 64
 
 ClientFactory = Callable[[], Any]
+
+# Niveaux de confidentialité, du plus ouvert au plus restreint
+CONFIDENTIALITY_LEVELS = ("public", "interne", "confidentiel")
+
+
+@dataclass(frozen=True)
+class MetadataFilter:
+    """Filtres de métadonnées appliqués par le **serveur** à toutes les recherches.
+
+    Ils ne sont pas exposés au LLM : un modèle ne doit pas choisir son propre niveau
+    d'habilitation (une requête piégée pourrait demander les documents confidentiels).
+
+    | Champ             | Rôle                                                       |
+    |-------------------|------------------------------------------------------------|
+    | max_confidentiality | niveau maximal visible (public < interne < confidentiel) |
+    | services          | services émetteurs autorisés (None = tous)                 |
+    | date_from         | documents révisés à partir de cette date (ISO 8601)        |
+    """
+
+    max_confidentiality: str = "public"
+    services: tuple[str, ...] | None = None
+    date_from: str | None = None
+
+    def expression(self) -> str:
+        if self.max_confidentiality not in CONFIDENTIALITY_LEVELS:
+            raise ValueError(f"Niveau de confidentialité inconnu : {self.max_confidentiality}")
+        allowed = CONFIDENTIALITY_LEVELS[
+            : CONFIDENTIALITY_LEVELS.index(self.max_confidentiality) + 1
+        ]
+        parts = [f"confidentialite in {_string_list(allowed)}"]
+        if self.services is not None:
+            parts.append(f"service_emetteur in {_string_list(self.services)}")
+        if self.date_from is not None:
+            parts.append(f'date >= "{_escape(self.date_from)}"')
+        return " and ".join(parts)
+
+
+def _escape(value: str) -> str:
+    return value.replace("\\", "\\\\").replace('"', '\\"')
+
+
+def _string_list(values) -> str:
+    return "[" + ", ".join(f'"{_escape(v)}"' for v in values) + "]"
+
+
+def combine(*expressions: str | None) -> str:
+    """Combine des filtres Milvus par « et » (chacun entre parenthèses)."""
+    kept = [e for e in expressions if e]
+    return " and ".join(f"({e})" for e in kept)
 
 
 def opening_filter(opening: str | None) -> str | None:
@@ -46,10 +93,8 @@ def opening_filter(opening: str | None) -> str | None:
     """
     if not opening:
         return None
-    family = opening.split(":", 1)[0].strip()
-    exact = opening.replace("\\", "\\\\").replace('"', '\\"')
-    family = family.replace("\\", "\\\\").replace('"', '\\"')
-    return f'opening == "{exact}" or opening_family == "{family}"'
+    family = _escape(opening.split(":", 1)[0].strip())
+    return f'opening == "{_escape(opening)}" or opening_family == "{family}"'
 
 
 class MilvusVectorStore:
@@ -60,8 +105,10 @@ class MilvusVectorStore:
         *,
         dimension: int = 1024,
         client_factory: ClientFactory | None = None,
+        default_filter: MetadataFilter | None = None,
     ) -> None:
         self.uri = uri
+        self.default_filter = default_filter or MetadataFilter()
         self.collection = collection
         self.dimension = dimension
         self._factory = client_factory or self._default_factory
@@ -73,7 +120,8 @@ class MilvusVectorStore:
     async def search(
         self, vector: list[float], *, limit: int, opening: str | None
     ) -> list[Passage]:
-        return await self._run(self._search, vector, limit, opening_filter(opening))
+        expression = combine(self.default_filter.expression(), opening_filter(opening))
+        return await self._run(self._search, vector, limit, expression)
 
     def _search(self, vector: list[float], limit: int, expr: str | None) -> list[Passage]:
         client = self._get_client()
@@ -86,19 +134,29 @@ class MilvusVectorStore:
         results = client.search(
             collection_name=self.collection,
             data=[vector],
-            limit=limit,
+            limit=min(limit * OVERFETCH, MAX_FETCH),
             filter=expr or "",
-            output_fields=OUTPUT_FIELDS,
-            search_params={"metric_type": "COSINE", "params": {"ef": max(SEARCH_EF, limit)}},
+            output_fields=OUTPUT_FIELDS + PARENT_FIELDS,
+            search_params={"metric_type": "COSINE", "params": {"ef": SEARCH_EF}},
         )
-        return [
-            Passage(
-                chunk_id=str(hit["id"]),
-                score=round(float(hit["distance"]), 4),
-                **{key: hit["entity"][key] for key in OUTPUT_FIELDS},
+        passages: list[Passage] = []
+        seen: set[str] = set()
+        for hit in results[0]:  # triés par score décroissant
+            entity = hit["entity"]
+            if entity["parent_id"] in seen:
+                continue
+            seen.add(entity["parent_id"])
+            passages.append(
+                Passage(
+                    chunk_id=entity["parent_id"],
+                    text=entity["parent_text"],
+                    score=round(float(hit["distance"]), 4),
+                    **{key: entity[key] for key in OUTPUT_FIELDS},
+                )
             )
-            for hit in results[0]
-        ]
+            if len(passages) == limit:
+                break
+        return passages
 
     # --- Indexation (utilisée par l'ingestion) --------------------------------------------
 
@@ -109,13 +167,9 @@ class MilvusVectorStore:
         await self._run(self._ensure_collection)
 
     async def replace_article(
-        self,
-        article_id: str,
-        strategy: str,
-        chunks: Sequence[Chunk],
-        vectors: Sequence[list[float]],
+        self, article_id: str, units: Sequence[IndexUnit], vectors: Sequence[list[float]]
     ) -> None:
-        await self._run(self._replace_article, article_id, strategy, chunks, vectors)
+        await self._run(self._replace_article, article_id, units, vectors)
 
     async def count(self) -> int:
         return await self._run(self._count)
@@ -138,6 +192,7 @@ class MilvusVectorStore:
         schema.add_field("id", DataType.VARCHAR, is_primary=True, max_length=128)
         schema.add_field("vector", DataType.FLOAT_VECTOR, dim=self.dimension)
         schema.add_field("text", DataType.VARCHAR, max_length=TEXT_MAX_LENGTH)
+        schema.add_field("parent_text", DataType.VARCHAR, max_length=TEXT_MAX_LENGTH)
         for name, length in [
             ("article_id", 64),
             ("title", 256),
@@ -145,6 +200,8 @@ class MilvusVectorStore:
             ("opening_family", 128),
             ("section", 512),
             ("strategy", 64),
+            ("parent_id", 128),
+            ("unit_kind", 16),
             ("source_url", 512),
             ("date", 32),
             ("service_emetteur", 64),
@@ -161,20 +218,15 @@ class MilvusVectorStore:
         client.create_collection(collection_name=self.collection, schema=schema, index_params=index)
 
     def _replace_article(
-        self,
-        article_id: str,
-        strategy: str,
-        chunks: Sequence[Chunk],
-        vectors: Sequence[list[float]],
+        self, article_id: str, units: Sequence[IndexUnit], vectors: Sequence[list[float]]
     ) -> None:
         client = self._get_client()
-        # Supprimer d'abord : si le nouveau découpage produit moins de chunks, les anciens
+        # Supprimer d'abord : si le nouveau découpage produit moins d'unités, les anciennes
         # ne doivent pas rester dans l'index.
         client.delete(
-            collection_name=self.collection,
-            filter=f'article_id == "{article_id}" and strategy == "{strategy}"',
+            collection_name=self.collection, filter=f'article_id == "{_escape(article_id)}"'
         )
-        rows = [row(chunk, vector) for chunk, vector in zip(chunks, vectors, strict=True)]
+        rows = [row(unit, vector) for unit, vector in zip(units, vectors, strict=True)]
         if rows:
             client.upsert(collection_name=self.collection, data=rows)
 
@@ -222,12 +274,15 @@ class MilvusVectorStore:
             ) from exc
 
 
-def row(chunk: Chunk, vector: list[float]) -> dict[str, Any]:
-    meta = chunk.metadata
+def row(unit: IndexUnit, vector: list[float]) -> dict[str, Any]:
+    chunk, meta = unit.chunk, unit.chunk.metadata
     return {
-        "id": chunk.id,
+        "id": unit.id,
         "vector": vector,
-        "text": chunk.text,
+        "text": unit.text,
+        "parent_id": unit.parent_id,
+        "parent_text": unit.parent_text,
+        "unit_kind": unit.kind,
         "article_id": chunk.article_id,
         "title": chunk.title,
         "opening": chunk.opening,

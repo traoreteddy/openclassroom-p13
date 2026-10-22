@@ -49,6 +49,14 @@ def test_every_article_has_a_reference_question(sets, corpus):
     assert covered == {article.id for article in corpus}
 
 
+def test_holdout_is_disjoint_from_the_tuning_sets(sets):
+    tuning = {q.question for q in sets.ref30}
+    tuning |= {h.sub_question for m in sets.multi10 for h in m.hops}
+
+    assert len(sets.holdout20) == 20
+    assert not tuning & {q.question for q in sets.holdout20}
+
+
 def test_validator_detects_a_missing_excerpt(sets, corpus):
     sets.ref30[0].expected[0] = ExpectedPassage(
         article_id=sets.ref30[0].expected[0].article_id,

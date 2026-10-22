@@ -8,11 +8,11 @@ import threading
 import numpy as np
 import pytest
 
-from app.rag.chunking import chunk_article
 from app.rag.embedding import SentenceTransformerEmbedder
+from app.rag.indexing import build_units
 from app.rag.milvus_store import MilvusVectorStore, opening_filter, row
 from app.tools.errors import ToolTransientError, ToolUnavailableError
-from tests.rag.test_chunking import CONFIG, MARKDOWN, words
+from tests.rag.test_chunking import MARKDOWN, words
 from tests.rag.test_text_and_passages import article
 
 
@@ -147,12 +147,14 @@ class FakeMilvus:
         return [{"count(*)": 42}]
 
 
-def hit(chunk_id: str, score: float) -> dict:
+def hit(unit_id: str, score: float, parent: str = "parent:defense-sicilienne:000") -> dict:
     return {
-        "id": chunk_id,
+        "id": unit_id,
         "distance": score,
         "entity": {
-            "text": "Les Noirs contestent le centre.",
+            "parent_id": parent,
+            "parent_text": f"Texte de la section {parent}.",
+            "unit_kind": "enfant",
             "article_id": "defense-sicilienne",
             "title": "Défense sicilienne",
             "opening": "Sicilian Defense",
@@ -169,18 +171,44 @@ def store_with(client: FakeMilvus) -> MilvusVectorStore:
     )
 
 
-async def test_search_maps_hits_to_passages():
-    client = FakeMilvus(hits=[hit("recursive:defense-sicilienne:000", 0.81234)])
+async def test_search_returns_parent_sections():
+    client = FakeMilvus(hits=[hit("typed:defense-sicilienne:003", 0.81234)])
 
     (passage,) = await store_with(client).search([0.1, 0.2, 0.3], limit=4, opening=None)
 
-    assert passage.chunk_id == "recursive:defense-sicilienne:000"
+    assert passage.chunk_id == "parent:defense-sicilienne:000"  # la section, pas l'unité
+    assert passage.text == "Texte de la section parent:defense-sicilienne:000."
     assert passage.score == 0.8123
     assert passage.title == "Défense sicilienne"
     _, search = client.calls[-1]
-    assert search["limit"] == 4
-    assert search["filter"] == ""
+    assert search["limit"] == 16  # 4 x 4 : plusieurs unités par section
+    assert "parent_text" in search["output_fields"]
+    assert search["filter"] == '(confidentialite in ["public"])'
     assert search["search_params"]["metric_type"] == "COSINE"
+
+
+async def test_search_keeps_the_best_unit_per_section():
+    hits = [
+        hit("typed:a:000", 0.90, parent="parent:a:000"),
+        hit("resume:parent:a:000", 0.85, parent="parent:a:000"),  # même section : ignorée
+        hit("typed:a:004", 0.80, parent="parent:a:001"),
+        hit("typed:b:000", 0.70, parent="parent:b:000"),
+    ]
+
+    passages = await store_with(FakeMilvus(hits=hits)).search([0.1], limit=2, opening=None)
+
+    assert [(p.chunk_id, p.score) for p in passages] == [
+        ("parent:a:000", 0.9),
+        ("parent:a:001", 0.8),
+    ]
+
+
+async def test_overfetch_is_capped():
+    client = FakeMilvus()
+
+    await store_with(client).search([0.1], limit=50, opening=None)
+
+    assert client.calls[-1][1]["limit"] == 64
 
 
 async def test_search_with_opening_filter():
@@ -189,7 +217,8 @@ async def test_search_with_opening_filter():
     await store_with(client).search([0.1], limit=2, opening="Italian Game: Evans Gambit")
 
     assert client.calls[-1][1]["filter"] == (
-        'opening == "Italian Game: Evans Gambit" or opening_family == "Italian Game"'
+        '(confidentialite in ["public"]) and '
+        '(opening == "Italian Game: Evans Gambit" or opening_family == "Italian Game")'
     )
 
 
@@ -248,24 +277,22 @@ def test_default_factory_reports_unreachable_milvus(monkeypatch):
 
 async def test_replace_article_deletes_then_upserts():
     client = FakeMilvus()
-    chunks = chunk_article(article(MARKDOWN), words, CONFIG)
+    units = build_units(article(MARKDOWN), words)
 
-    await store_with(client).replace_article(
-        "test", "test", chunks, [[0.1, 0.2, 0.3]] * len(chunks)
-    )
+    await store_with(client).replace_article("test", units, [[0.1, 0.2, 0.3]] * len(units))
 
     (delete, delete_args), (upsert, upsert_args) = client.calls
     assert delete == "delete"
-    assert delete_args["filter"] == 'article_id == "test" and strategy == "test"'
+    assert delete_args["filter"] == 'article_id == "test"'
     assert upsert == "upsert"
-    assert len(upsert_args["data"]) == len(chunks)
-    assert upsert_args["data"][0]["id"] == "test:test:000"
+    assert len(upsert_args["data"]) == len(units)
+    assert upsert_args["data"][0]["id"] == "typed:test:000"
 
 
 async def test_replace_article_with_no_chunk_only_deletes():
     client = FakeMilvus()
 
-    await store_with(client).replace_article("test", "test", [], [])
+    await store_with(client).replace_article("test", [], [])
 
     assert [name for name, _ in client.calls] == ["delete"]
 
@@ -287,6 +314,9 @@ async def test_recreate_drops_and_creates_with_hnsw_index():
         "version",
         "service_emetteur",
         "confidentialite",
+        "parent_id",
+        "parent_text",
+        "unit_kind",
     } <= fields
 
 
@@ -307,13 +337,76 @@ async def test_count_uses_count_star_not_stats():
     assert client.calls[-1][1]["output_fields"] == ["count(*)"]
 
 
-def test_row_contains_filterable_metadata():
-    chunk = chunk_article(article(MARKDOWN), words, CONFIG)[0]
+def test_row_contains_filterable_metadata_and_parent():
+    unit = build_units(article(MARKDOWN), words)[0]
 
-    data = row(chunk, [0.1, 0.2, 0.3])
+    data = row(unit, [0.1, 0.2, 0.3])
 
     assert data["version"] == 1
     assert data["date"] == "2026-01-01T00:00:00Z"
     assert data["confidentialite"] == "public"
     assert data["type_document"] == "article"
-    assert data["strategy"] == "test"
+    assert data["strategy"] == "typed-texte"
+    assert data["parent_id"] == "parent:test:000"
+    assert data["unit_kind"] == "enfant"
+    assert data["parent_text"].startswith("# Défense test")
+
+
+# --- Métadonnées filtrables -----------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("level", "visible"),
+    [
+        ("public", '["public"]'),
+        ("interne", '["public", "interne"]'),
+        ("confidentiel", '["public", "interne", "confidentiel"]'),
+    ],
+)
+def test_confidentiality_levels_are_cumulative(level, visible):
+    from app.rag.milvus_store import MetadataFilter
+
+    assert MetadataFilter(max_confidentiality=level).expression() == f"confidentialite in {visible}"
+
+
+def test_all_metadata_filters_combined():
+    from app.rag.milvus_store import MetadataFilter
+
+    expression = MetadataFilter(
+        max_confidentiality="interne", services=("ffe",), date_from="2025-01-01"
+    ).expression()
+
+    assert expression == (
+        'confidentialite in ["public", "interne"] and service_emetteur in ["ffe"] '
+        'and date >= "2025-01-01"'
+    )
+
+
+def test_unknown_confidentiality_is_refused():
+    from app.rag.milvus_store import MetadataFilter
+
+    with pytest.raises(ValueError, match="inconnu"):
+        MetadataFilter(max_confidentiality="secret-défense").expression()
+
+
+async def test_server_filter_applies_to_every_search():
+    from app.rag.milvus_store import MetadataFilter
+
+    client = FakeMilvus()
+    store = MilvusVectorStore(
+        "http://milvus.test",
+        "openings",
+        client_factory=lambda: client,
+        default_filter=MetadataFilter(services=("ffe",)),
+    )
+
+    await store.search([0.1], limit=1, opening=None)
+
+    assert 'service_emetteur in ["ffe"]' in client.calls[-1][1]["filter"]
+
+
+def test_combine_ignores_empty_parts():
+    from app.rag.milvus_store import combine
+
+    assert combine("a == 1", None, "") == "(a == 1)"
+    assert combine() == ""

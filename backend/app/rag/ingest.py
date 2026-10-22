@@ -1,18 +1,20 @@
-"""Pipeline d'ingestion : corpus → chunks → vecteurs → Milvus (+ textes bruts dans MongoDB).
+"""Pipeline d'ingestion : corpus → unités d'index → vecteurs → Milvus (+ textes bruts).
 
-Relançable : les chunks d'un article sont supprimés puis réinsérés (identifiants
+Unités : enfants découpés par type + résumés de section (voir `app.rag.indexing`).
+Relançable : les unités d'un article sont supprimées puis réinsérées (identifiants
 stables), donc deux ingestions successives donnent le même index, sans doublon.
 """
 
 from __future__ import annotations
 
 import time
-from collections.abc import Awaitable, Callable, Sequence
+from collections.abc import Awaitable, Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
-from app.rag.chunking import BASELINE, ChunkingConfig, TokenCounter, chunk_article
+from app.rag.chunking import TokenCounter
 from app.rag.corpus import Article
+from app.rag.indexing import IndexUnit, build_units
 
 
 class DocumentEmbedder(Protocol):
@@ -25,7 +27,7 @@ class IndexStore(Protocol):
     async def ensure_collection(self) -> None: ...
 
     async def replace_article(
-        self, article_id: str, strategy: str, chunks: Sequence[Any], vectors: Sequence[list[float]]
+        self, article_id: str, units: Sequence[IndexUnit], vectors: Sequence[list[float]]
     ) -> None: ...
 
     async def count(self) -> int: ...
@@ -40,6 +42,7 @@ class IngestReport:
     collection_count: int = 0
     chunks_per_article: dict[str, int] = field(default_factory=dict)
     tokens: int = 0
+    summaries: int = 0
     duration_s: float = 0.0
 
     @property
@@ -53,7 +56,7 @@ async def ingest(
     count_tokens: TokenCounter,
     embedder: DocumentEmbedder,
     store: IndexStore,
-    config: ChunkingConfig = BASELINE,
+    summaries: Mapping[str, str] | None = None,
     recreate: bool = False,
     save_article: ArticleSink | None = None,
 ) -> IngestReport:
@@ -65,13 +68,14 @@ async def ingest(
         await store.ensure_collection()
 
     for article in articles:
-        chunks = chunk_article(article, count_tokens, config)
-        vectors = await embedder.embed_documents([chunk.text for chunk in chunks])
-        await store.replace_article(article.id, config.strategy, chunks, vectors)
+        units = build_units(article, count_tokens, summaries)
+        vectors = await embedder.embed_documents([unit.text for unit in units])
+        await store.replace_article(article.id, units, vectors)
         if save_article is not None:
             await save_article(article)
-        report.chunks_per_article[article.id] = len(chunks)
-        report.tokens += sum(chunk.token_count for chunk in chunks)
+        report.chunks_per_article[article.id] = len(units)
+        report.tokens += sum(count_tokens(unit.text) for unit in units)
+        report.summaries += sum(unit.kind == "resume" for unit in units)
 
     report.collection_count = await store.count()
     report.duration_s = round(time.perf_counter() - started, 1)

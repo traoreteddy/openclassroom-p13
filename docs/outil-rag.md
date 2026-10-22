@@ -563,7 +563,7 @@ hors le HTML brut. La décision repose sur une **tendance cohérente** (recall, 
 **Tests** : 17 tests des stratégies et du banc (faux tokenizer, faux modèle, faux HTML),
 307 tests au total, couverture de branches 98 %.
 
-### Phase 4 : enrichir les chunks et choisir une stratégie par type ⏳
+### Phase 4 : enrichir les chunks et choisir une stratégie par type ✅
 
 | Tâche | Détail |
 |---|---|
@@ -572,6 +572,249 @@ hors le HTML brut. La décision repose sur une **tendance cohérente** (recall, 
 | **Taille par type de document** | Règle de décision documentée pour **procédure, code source, tableau, courriel**. Dans notre domaine : règlement FFE (procédure), notation PGN et suites de coups (≈ code), tableaux de variantes (tableau). Le courriel est absent du corpus : sa règle est documentée sans données |
 | Règle de décision | Une stratégie par type de document, justifiée et documentée ici |
 | **Revue par un pair** | Grille de **8 critères** : pertinence de la taille, respect de la structure, autonomie du chunk, qualité des métadonnées, redondance, coût d'indexation, mesurabilité, maintenabilité. Relecteurs : un agent relecteur indépendant et l'auteur du projet |
+
+#### Résultats de la phase 4
+
+Base : stratégie hiérarchique retenue en phase 3 (enfants récursifs de 256 tokens,
+parents = sections ≤ 1 024 tokens). Banc et 50 requêtes identiques à la phase 3 ;
+résultats dans `data/eval/results/phase4-enrichment.json` (banc) et
+`phase4-production.json` (Milvus).
+
+> Les sections 4.1 à 4.5 présentent les mesures **avant la revue par un pair**. La
+> section 4.6 donne les constats de la revue, les corrections apportées et les **mesures
+> finales**, qui remplacent les précédentes.
+
+##### 4.1 Fil d'Ariane en tête de chaque chunk
+
+Le texte **indexé** de chaque enfant commence par le chemin de sa section ; la section
+renvoyée à l'agent est inchangée.
+
+```
+Défense slave > Principales variantes > Variante Alapine (ligne principale) > Variante tchèque
+
+Elle s'obtient après les coups 5. a4 Ff5. 5...Ff5 empêche 6. e4.
+```
+
+Ce chunk, sans fil d'Ariane, ne dit pas de quelle variante « elle » parle : la question
+« Par quels coups obtient-on la variante Alapine ? » ne le trouvait pas dans les 20
+premiers résultats ; avec le fil d'Ariane, il est **4ᵉ**.
+
+| | recall@5 (50) | MRR | recall à 2 000 tokens |
+|---|---|---|---|
+| Sans fil d'Ariane | 0,86 | 0,70 | 0,84 |
+| Avec fil d'Ariane | 0,84 | **0,76** | **0,86** |
+
+Effet mesuré requête par requête : **14 requêtes mieux classées, 5 moins bien.** Le fil
+d'Ariane rend atteignables des chunks « listes » isolés, mais il rapproche aussi les
+chunks d'un même article (ils commencent tous par « Défense scandinave > … »), ce qui
+complique le choix du bon chunk entre voisins. Retenu pour le gain de classement (MRR).
+Coût : la **redondance** (tokens indexés en double) passe de 1,7 % à 11 %, chaque enfant
+répétant son fil d'Ariane. La revue (4.6) montrera que les 4 points perdus sur Réf-30
+venaient en réalité d'un problème de notation des coups, pas du fil d'Ariane.
+
+##### 4.2 Questions hypothétiques et résumé
+
+phi4-mini génère pour chaque section, en un appel en sortie structurée, **3 questions**
+auxquelles elle répond et un **résumé** de 2 phrases (`app/rag/enrich.py`,
+`scripts/generate_enrichment.py`). Chacun devient un vecteur supplémentaire qui renvoie à
+la section (index multi-vecteurs). Génération : **127 sections, 381 questions,
+127 résumés en 14 min**, tous valides ; mis en cache
+(`data/enrichment/phi4-mini.jsonl`, clé = empreinte du texte de la section).
+
+**Contrôle d'un biais** : les questions de Réf-30 ont été générées par phi4-mini à partir
+des mêmes passages ; des questions hypothétiques du même modèle pourraient leur
+ressembler et gonfler le recall. Le gain est donc mesuré aussi sur les **20 sous-questions
+de Multi-10**, rédigées sans phi4-mini.
+
+| Variante (avec fil d'Ariane) | Unités | recall@5 Réf-30 | recall@5 Multi (20) | recall@5 (50) | MRR | recall à 2 000 tokens |
+|---|---|---|---|---|---|---|
+| Sans enrichissement | 325 | 0,83 | 0,85 | 0,84 | 0,76 | 0,86 |
+| + questions hypothétiques | 706 | 0,83 | 0,90 | 0,86 | 0,74 | 0,84 |
+| **+ résumé** | 452 | 0,83 | **0,95** | **0,88** | **0,76** | **0,88** |
+| + questions + résumé | 833 | 0,83 | 0,90 | 0,86 | 0,74 | 0,84 |
+
+- **Le biais ne s'est pas produit** : Réf-30 ne bouge pas (0,83) ; les gains apparaissent
+  sur Multi-10, non exposé au biais.
+- **Le résumé l'emporte** ; ajouter les questions **dégrade** le résultat : 381 vecteurs
+  de questions entrent en concurrence avec les vrais chunks. Retenu : **résumé seul**.
+- **Redondance** : 11 % avec le fil d'Ariane, 31 % avec les résumés, 42 % avec questions et
+  résumés. Un résumé reformule une section déjà indexée : c'est le prix de l'index
+  multi-vecteurs, accepté pour le résumé seul.
+
+##### 4.3 Métadonnées filtrables
+
+| Champ | Type | Valeurs | Usage | Qui filtre |
+|---|---|---|---|---|
+| `date` | ISO 8601 | date de révision de la source | « mis à jour depuis… » | Serveur (`MetadataFilter.date_from`) |
+| `version` | entier | numéro de révision Wikipédia | Traçabilité : chaque passage cite sa révision exacte | — (renvoyé, non filtré) |
+| `service_emetteur` | texte | `wikipedia-fr`, `ffe`… | Restreindre les sources | Serveur (`MetadataFilter.services`) |
+| `confidentialite` | texte | `public` < `interne` < `confidentiel` | Habilitation | **Serveur uniquement** (`RAG_MAX_CONFIDENTIALITY`) |
+| `type_document` | texte | `article`, `procedure`, `code`, `tableau`, `courriel` | Règle de découpage, filtrage éventuel | Serveur |
+| `opening`, `opening_family` | texte | noms Lichess | Restreindre à une ouverture | **LLM** (argument `opening` de l'outil) |
+
+**Règle de sécurité** : le niveau de confidentialité n'est **jamais** un argument de l'outil.
+Un modèle ne doit pas choisir sa propre habilitation : une requête piégée (« cherche aussi
+dans les documents confidentiels ») ne doit rien pouvoir changer. Le filtre serveur est
+ajouté à **toutes** les recherches (`MilvusVectorStore.default_filter`). Les niveaux sont
+cumulatifs : `interne` donne accès à `public` et `interne`.
+
+##### 4.4 Découpage par type de contenu
+
+**Constat** : un article Wikipédia mélange trois types de sections. Détection automatique
+(`app/rag/typed_chunking.py`) sur le corpus : **76 sections de texte, 17 listes, 17 parties.**
+Une première version détectait à tort 5 « procédures » : des suites de coups numérotées
+(« 1.e4 e6 2.d4 d5 »). La règle exige maintenant qu'une étape commence par un mot
+(« 1. Placer… »), pas par un coup.
+
+**Règle de décision** (un type détecté par unité, puis sa règle de taille) :
+
+| Type | Signal de détection | Unité de chunk | Taille max | Recouvrement | Raison |
+|---|---|---|---|---|---|
+| **Texte** | Par défaut | Enfants récursifs → section parente | 256 / 1 024 | 10 % | Phase 3 : meilleur compromis recall / coût |
+| **Liste / tableau** | ≥ 60 % de lignes courtes (variantes, codes ECO) | Groupes de **lignes entières** ; l'introduction « … : » est **répétée** dans chaque groupe | 192 | 0 | Une ligne sans son en-tête n'a pas de sens ; une ligne coupée est illisible |
+| **Partie** (propre aux échecs) | > 50 % de coups, ou titre « Exemple(s) de partie » | **Une unité par partie** (en-tête des joueurs + coups), jamais coupée | 1 024 | 0 | Couper une partie au 23ᵉ coup ne sert à rien |
+| **Procédure** | ≥ 3 lignes « 1. Mot… » ou « Étape 2 : » | Groupes d'**étapes entières**, titre répété | 512 | 0 | Une étape coupée devient fausse ; les étapes sont autonomes |
+| **Code source** | ≥ 2 lignes `def`, `class`, `import`… | Une **fonction ou classe** entière (séparateurs du langage) | 512 | 0 | L'unité de sens d'un code est la fonction |
+| **Courriel** | ≥ 2 en-têtes « De : », « Objet : »… | Le **message seul**, sans citations ni signature | 1 024 | 0 | Les citations dupliquent d'autres messages ; la signature est du bruit |
+
+Les trois derniers types n'existent pas dans le corpus : leurs règles sont vérifiées par
+des tests sur de petits exemples **fictifs**, jamais indexés.
+
+| Variante (fil d'Ariane, banc) | Unités | recall@5 Réf-30 | Multi | recall@5 (50) | MRR | recall à 2 000 tokens |
+|---|---|---|---|---|---|---|
+| Hiérarchique + résumé | 452 | 0,83 | 0,95 | 0,88 | 0,76 | 0,88 |
+| **Par type + résumé** | **365** | **0,87** | **0,95** | **0,90** | **0,77** | **0,90** |
+
+Le découpage par type récupère **une question** de Réf-30 (0,83 → 0,87, soit 1 question
+sur 30) avec **moins de vecteurs** (les parties ne sont plus morcelées).
+
+**Premier gain statistiquement significatif** : contre le RAG de la phase 2 (récursif 512),
+**6 requêtes gagnées, aucune perdue** (McNemar, p = 0,031). Restent manquées : 4 questions
+Réf-30 de type « liste » (ref-07, 09, 10, 11) et 1 sous-question de Multi-10.
+
+##### 4.5 Mise en production
+
+- **Code** : les briques partagées (sections, fil d'Ariane, parent/enfant) sont passées de
+  `app/rag/eval/` à `app/rag/chunking.py` ; aucun module de production n'importe le code
+  d'évaluation. `app/rag/indexing.py` construit les unités (enfants typés + résumés).
+- **Milvus** : index **multi-vecteurs**. Chaque unité porte `parent_id`, `parent_text` et
+  `unit_kind` ; la recherche récupère 4 fois plus d'unités que demandé (64 au plus), garde
+  la meilleure par section et renvoie les sections.
+- **Ingestion** (`scripts/ingest_corpus.py`) : résumés lus dans le cache, générés par
+  phi4-mini seulement s'ils manquent (`--no-summaries` pour ingérer sans LLM).
+  **365 unités, dont 127 résumés, en 48 s.**
+
+**Mesure sur le vrai Milvus** (Réf-30) :
+
+| | Phase 2 | **Phase 4** |
+|---|---|---|
+| recall@1 | 0,50 | **0,70** |
+| recall@5 sans filtre | 0,77 | **0,87** |
+| recall@5 avec filtre d'ouverture | 0,80 | **0,93** |
+| MRR | 0,60 | **0,76** |
+
+**Seuil de pertinence recalibré : 0,50 → 0,60.** Les scores des bonnes réponses ont monté
+(minimum 0,62 au lieu de 0,51). À 0,60, **100 %** des bonnes réponses sont gardées et
+**65 %** des questions hors corpus écartées (40 % à 0,50). Le seuil qui maximise
+l'exactitude équilibrée (0,70) ferait perdre 17 % de bonnes réponses : écarté, selon la
+règle de la phase 2 (ne jamais sacrifier de vraies réponses au seuil).
+
+##### 4.6 Revue par un pair, corrections et mesures finales
+
+**Dispositif.** Un agent relecteur indépendant (sans accès aux choix faits, en lecture
+seule) a noté la stratégie sur la grille de 8 critères, en vérifiant les chiffres de la
+doc dans le code et les fichiers de résultats. Note : **22 / 32**. L'auteur a ensuite relu
+et vérifié chaque constat avant d'agir.
+
+| Critère | Note | Constat du relecteur |
+|---|---|---|
+| 1. Pertinence de la taille | 3 | Choix mesuré (recall à budget égal), mais des unités « partie » à 1 035 tokens et un top-5 (≈ 1 950 tokens) qui laisse peu de marge pour 3 recherches sous 6 000 tokens |
+| 2. Respect de la structure | **2** | **« Partie : jamais coupée » était faux** : 4 sections de parties de plus de 1 024 tokens étaient redécoupées par le séparateur récursif (un parent commençait par « 30... Rh6 31. Dh4+ ») |
+| 3. Autonomie du chunk | 3 | Fil d'Ariane et introduction répétée efficaces ; mais 6 enfants de moins de 30 tokens (un fil d'Ariane seul, un titre orphelin) |
+| 4. Métadonnées | 3 | Confidentialité filtrée côté serveur : bon point ; identifiants positionnels ; `type_document` non filtrable sur le type réel |
+| 5. Redondance | 3 | Pas de doublon dans les résultats, mais la hausse de redondance (1,7 % → 11 % → 31 %) n'était pas documentée |
+| 6. Coût d'indexation | 3 | Coût payé une fois et mis en cache ; le gain du résumé tient à 2 requêtes |
+| 7. Mesurabilité | **2** | **Risque de sur-ajustement** : une vingtaine de configurations comparées sur les mêmes 50 requêtes, et le seul p < 0,05 vient de cette sélection cumulée |
+| 8. Maintenabilité | 3 | Production et évaluation séparées, tests verts ; découpage des parents dupliqué ; pas de test sur une partie de plus de 1 024 tokens |
+
+**Écarts entre la doc et la réalité**, tous vérifiés et reconnus : « jamais coupée »
+(faux), « taille max 1 024 » (enfants à 1 035), « récupère les 4 points » (1 seule
+question), redondance non mentionnée. Les chiffres de production (0,87 / 0,93, MRR 0,76,
+seuil 0,60 → 65 %, p = 0,031) ont été confirmés exacts.
+
+**Corrections apportées** (chacune vérifiée sur le corpus et couverte par des tests) :
+
+| # | Faiblesse | Correction | Effet mesuré |
+|---|---|---|---|
+| C1 | Parties coupées | `split_games` : **une unité par partie**, détectée par son en-tête (« Karpov-Larsen, Montréal, 1979 ») ; l'introduction « … : » suit la partie, l'analyse qui la commente reste avec elle ; une partie unique > 1 024 tokens est coupée **entre deux coups**, en-tête répété | 45 → **41 parties** entières, plus aucun parent qui commence au milieu d'une partie ; enfant le plus long **682 tokens** (1 035 avant), parent max 990 |
+| C2 | Questions sur des listes de coups manquées ; notation différente entre questions (« 1.d4 Cf6 ») et corpus (« 1. d4 Cf6 ») | `normalize_moves` : numéros de coups collés au coup (« 1. e4 » → « 1.e4 », « 4… Cd7 » → « 4...Cd7 »), appliquée **au corpus et aux questions** (`normalize_query`, dans l'outil et le banc) | Les 4 points que le fil d'Ariane semblait perdre sur Réf-30 sont récupérés : **0,83 → 0,87** ; les 4 questions « liste » restent manquées (voir ci-dessous) |
+| C3 | Enfants vides de sens | `merge_short` : un enfant de moins de 30 tokens est fusionné avec son voisin | 6 → **3** enfants de moins de 30 tokens (22 tokens au minimum) |
+| C4 | Génération fragile (délai dépassé, JSON tronqué par phi4-mini) | Génération bornée (`num_predict` = 400), délai de 120 s, **2 essais puis section sautée et signalée** ; clé de cache insensible aux espaces (C2 ne force pas à tout régénérer) | 1 section sur 174 a échoué au 1er essai et réussi au 2ᵉ |
+| C5 | Sur-ajustement aux 50 requêtes | **Holdout-20** : 20 questions rédigées à la main **après le gel** de la configuration, jamais utilisées pour un choix (7 sur des coups, 6 idées, 6 histoire, 1 partie ; 11 articles) | Voir ci-dessous |
+
+**Mesures finales sur le banc** (50 requêtes, remplacent les tableaux 4.1 à 4.4) :
+
+| Variante | Unités | Redondance | recall@5 Réf-30 | Multi (20) | recall@5 (50) | MRR | Tokens top-5 | recall à 2 000 tokens |
+|---|---|---|---|---|---|---|---|---|
+| Hiérarchique (phase 3) | 322 | 2 % | 0,87 | 0,85 | 0,86 | 0,70 | 1 860 | 0,84 |
+| + fil d'Ariane | 322 | 11 % | 0,87 | 0,85 | 0,86 | 0,78 | 1 863 | 0,86 |
+| + fil d'Ariane + résumé | 447 | 31 % | 0,87 | 0,95 | 0,90 | **0,80** | 1 890 | 0,90 |
+| Par type + fil d'Ariane | 229 | 8 % | 0,87 | 0,85 | 0,86 | 0,78 | **1 593** | 0,86 |
+| **Par type + fil d'Ariane + résumé (gelée)** | 367 | 32 % | 0,87 | **0,95** | **0,90** | 0,79 | 1 597 | **0,90** |
+| Par type + résumé préfixé du fil d'Ariane | 367 | 34 % | 0,83 | 0,95 | 0,88 | 0,77 | 1 601 | 0,88 |
+
+Enseignements : avec la notation normalisée, le fil d'Ariane ne coûte plus rien sur
+Réf-30 et apporte +0,08 de MRR ; préfixer **aussi** les résumés par le fil d'Ariane
+(suggestion du relecteur) **dégrade** (−1 question) : un résumé est déjà autonome, le
+préfixe le rapproche des enfants voisins. Non retenu.
+
+**Validation sur Holdout-20** (jamais vu, configuration gelée) :
+
+| Configuration | recall@5 | MRR | Tokens top-5 | recall à 2 000 tokens | vs phase 2 |
+|---|---|---|---|---|---|
+| Phase 2 : récursif 512 | 0,90 | 0,69 | 1 803 | 0,95 | — |
+| Phase 3 : hiérarchique | 0,95 | 0,76 | 1 888 | 0,90 | +1 / −0 |
+| **Phase 4 : configuration gelée** | **1,00** | **0,88** | **1 640** | **1,00** | **+2 / −0** (p = 0,50) |
+
+Les gains se **confirment sur des questions nouvelles** : même ordre (phase 2 < 3 < 4),
+aucune question perdue, MRR de 0,69 à 0,88, 9 % de tokens en moins. Avec 20 questions,
+l'écart n'est pas significatif (p = 0,50) : l'objection du relecteur reste valable en
+rigueur statistique, mais la **direction** du gain est reproduite sur un jeu indépendant.
+
+**Mesures finales en production** (Milvus, Réf-30, 367 unités dont 138 résumés) :
+
+| | Phase 2 | Phase 4 avant revue | **Phase 4 finale** |
+|---|---|---|---|
+| recall@1 | 0,50 | 0,70 | **0,73** |
+| recall@3 | 0,70 | 0,80 | **0,83** |
+| recall@5 sans filtre | 0,77 | 0,87 | **0,87** |
+| recall@5 avec filtre d'ouverture | 0,80 | 0,93 | 0,90 |
+| MRR | 0,60 | 0,76 | **0,79** |
+
+Seuil 0,60 confirmé (100 % des bonnes réponses gardées, 65 % des questions hors corpus
+écartées).
+
+**Toujours manquées : ref-07, 09, 10, 11**, les quatre questions dont la réponse est une
+ligne de liste (« 3...dxe4 (variante Rubinstein) »). La normalisation ne suffit pas : une
+ligne de 6 mots noyée dans un groupe de 190 tokens pèse peu dans un vecteur. La piste
+indiquée par le relecteur, une **recherche lexicale (BM25) fusionnée** avec la recherche
+vectorielle pour les requêtes contenant des coups, est notée pour la suite ; elle sort du
+cadre de la phase 4.
+
+**Reportés, avec leur phase** :
+- **`limit` dépendant du budget de tokens** (le top-5 consomme ≈ 1 600 tokens, 3 recherches
+  ≈ 4 800 sur 6 000) : c'est la logique de la boucle de recherche, traitée en **phase 6**
+  (budget de 3 recherches et 6 000 tokens).
+- Identifiants positionnels (`typed:article:n`) : sans conséquence tant qu'un article est
+  toujours réindexé en entier (suppression puis réinsertion), ce qui est le cas.
+- `parent_text` copié dans chaque unité : 367 lignes pour 138 parents, négligeable à cette
+  échelle ; à revoir si le corpus grossit.
+- Découpage des parents dupliqué entre le banc et la production, imports dans les
+  fonctions : dette de maintenabilité notée.
+
+**Tests** : 48 tests pour le découpage par type et l'enrichissement (dont 12 issus des
+corrections), 365 au total, couverture de branches 98 %. Test d'intégration Milvus
+(ingestion réelle, relance sans doublon, filtre) : réussi.
 
 ### Phase 5 : retrieval décidé par l'agent + traces ⏳
 
@@ -633,7 +876,7 @@ Chaque consigne est rattachée à la phase qui la traite.
 | Métadonnées filtrables : date, version, service émetteur, confidentialité | 0, 4 |
 | Taille de chunk adaptée au type : procédure, code source, tableau, courriel | 4 |
 | Stratégie par type de document et règle de décision documentée | 4 |
-| Revue de la stratégie de chunking par un pair (grille de 8 critères) | 4 |
+| Revue de la stratégie de chunking par un pair (grille de 8 critères) | 4 (§ 4.6) |
 | Familles de découpage : fixe, récursif, structurel, sémantique, hiérarchique | 3 |
 | `RecursiveCharacterTextSplitter` avec séparateurs adaptés au français | 3 |
 | `MarkdownHeaderTextSplitter` et découpage par sections HTML | 3 |
@@ -651,4 +894,4 @@ Chaque consigne est rattachée à la phase qui la traite.
 | Point | Quand le trancher |
 |---|---|
 | Modèle et mode de l'agent : phi4-mini (sortie structurée, 4/5) ou qwen3 (appel natif, 5/5) | Phase 5, par la mesure sur Tâches-30 |
-| Faut-il ajouter quelques documents de chaque type (procédure, code, tableau, courriel), marqués comme exemples, pour tester la règle par type ? | Phase 4 |
+| ~~Faut-il ajouter des documents de chaque type (procédure, code, tableau, courriel) ?~~ Tranché en phase 4 : règles documentées pour les 6 types, appliquées aux 3 types présents dans le corpus (texte, liste, partie), vérifiées par des tests sur exemples fictifs pour les 3 autres, jamais indexés | — |

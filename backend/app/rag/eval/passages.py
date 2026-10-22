@@ -11,7 +11,7 @@ import re
 from dataclasses import dataclass
 
 from app.rag.corpus import Article
-from app.rag.text import normalize_text
+from app.rag.text import move_ratio, normalize_text
 
 EXCLUDED_SECTIONS = {
     "notes et références",
@@ -26,10 +26,6 @@ EXCLUDED_SECTIONS = {
 MIN_CHARS = 200
 MAX_MOVE_RATIO = 0.25  # au-delà, le passage est surtout une suite de coups
 _HEADING = re.compile(r"^(#{1,6})\s+(.+)$")
-# Coup en notation française : « 4.Cf3 », « 4...Fc5 », « exd4 », « O-O », « Dxf7+ »
-_MOVE = re.compile(
-    r"^(\d+\.{1,3})?(O-O(-O)?|[RDTFC]?[a-h]?[1-8]?x?[a-h][1-8](=[DTFC])?)[+#!?]*[,;.)]*$"
-)
 
 
 @dataclass(frozen=True)
@@ -50,13 +46,6 @@ class CandidatePassage:
     @property
     def is_prose(self) -> bool:
         return self.move_ratio <= MAX_MOVE_RATIO
-
-
-def move_ratio(text: str) -> float:
-    words = text.split()
-    if not words:
-        return 0.0
-    return sum(bool(_MOVE.match(word)) for word in words) / len(words)
 
 
 def iter_passages(article: Article, min_chars: int = MIN_CHARS) -> list[CandidatePassage]:

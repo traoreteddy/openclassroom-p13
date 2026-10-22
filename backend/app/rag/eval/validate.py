@@ -24,7 +24,7 @@ from app.rag.eval.datasets import (
 )
 from app.rag.text import contains_excerpt
 
-EXPECTED_SIZES = {"ref30": 30, "decision50": 50, "tasks30": 30, "multi10": 10}
+EXPECTED_SIZES = {"ref30": 30, "decision50": 50, "tasks30": 30, "multi10": 10, "holdout20": 20}
 EXPECTED_DECISION = {"dans_corpus": 30, "echecs_hors_corpus": 8, "autre_outil": 6, "hors_sujet": 6}
 
 
@@ -44,6 +44,7 @@ class EvalSets:
     decision50: list[DecisionQuestion]
     tasks30: list[ToolTask]
     multi10: list[MultiHopQuestion]
+    holdout20: list[RefQuestion] = field(default_factory=list)  # validation tenue à l'écart
 
     @classmethod
     def load(cls, directory: Path) -> EvalSets:
@@ -52,6 +53,7 @@ class EvalSets:
             decision50=load_jsonl(DecisionQuestion, directory / "decision50.jsonl"),
             tasks30=load_jsonl(ToolTask, directory / "tasks30.jsonl"),
             multi10=load_jsonl(MultiHopQuestion, directory / "multi10.jsonl"),
+            holdout20=load_jsonl(RefQuestion, directory / "holdout20.jsonl"),
         )
 
 
@@ -74,9 +76,13 @@ def validate(sets: EvalSets, articles: list[Article], tool_names: set[str]) -> R
         if duplicates:
             report.errors.append(f"{name} : identifiants en double {duplicates}")
 
-    for question in sets.ref30:
+    for question in [*sets.ref30, *sets.holdout20]:
         for passage in question.expected:
             check_passage(question.id, passage)
+    ref_questions = {q.question for q in sets.ref30}
+    for question in sets.holdout20:
+        if question.question in ref_questions:
+            report.errors.append(f"{question.id} : question déjà présente dans Réf-30")
 
     categories = Counter(item.category for item in sets.decision50)
     if dict(categories) != EXPECTED_DECISION:

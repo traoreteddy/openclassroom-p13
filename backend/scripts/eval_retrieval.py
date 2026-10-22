@@ -17,6 +17,7 @@ from app.rag.embedding import SentenceTransformerEmbedder
 from app.rag.eval.datasets import EVAL_DIR, DecisionQuestion, RefQuestion, load_jsonl
 from app.rag.eval.retrieval import calibrate, evaluate
 from app.rag.milvus_store import MilvusVectorStore
+from app.rag.text import normalize_query
 
 RESULTS_DIR = EVAL_DIR / "results"
 
@@ -29,7 +30,9 @@ async def main(collection: str, label: str) -> None:
     store = MilvusVectorStore(settings.milvus_uri, collection)
 
     async def search(query: str, k: int, opening: str | None):
-        return await store.search(await embedder.embed(query), limit=k, opening=opening)
+        return await store.search(
+            await embedder.embed(normalize_query(query)), limit=k, opening=opening
+        )
 
     plain = await evaluate(ref30, search, k=5)
     filtered = await evaluate(ref30, search, k=5, use_filter=True)

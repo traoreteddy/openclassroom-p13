@@ -30,3 +30,4 @@ htmlcov/
 
 # Cache des embeddings des expériences (régénérable)
 backend/data/eval/cache/
+*.bak

@@ -34,9 +34,31 @@ def normalize_notation(text: str) -> str:
     return text.translate(_FIGURINE_TABLE)
 
 
+# Un coup juste après un numéro : « e4 », « exd5 », « Cf3 », « Cbd7 », « Fxb4 », « O-O »
+_NEXT_MOVE = r"(?=[RDTFC][a-h]?[1-8]?x?[a-h][1-8]|[a-h](?:x[a-h])?[1-8]|O-O|0-0)"
+_WHITE_NUMBER = re.compile(r"\b(\d{1,3})\.\s+" + _NEXT_MOVE)
+_BLACK_NUMBER = re.compile(r"\b(\d{1,3})\s*(?:\.\.\.|…)\s*" + _NEXT_MOVE)
+
+
+def normalize_moves(text: str) -> str:
+    """« 1. e4 » → « 1.e4 », « 4… Cd7 » / « 3 ... Ff5 » → « 4...Cd7 » / « 3...Ff5 ».
+
+    Les questions écrivent souvent « 1.d4 Cf6 2.c4 » et le corpus « 1. d4 Cf6 2. c4 » : sans
+    normalisation, le tokenizer découpe différemment et les vecteurs s'éloignent. Seuls les
+    numéros suivis d'un vrai coup sont touchés (« 1987. Les Noirs » reste intact).
+    """
+    text = _BLACK_NUMBER.sub(r"\1...", text)
+    return _WHITE_NUMBER.sub(r"\1.", text)
+
+
+def normalize_query(text: str) -> str:
+    """Normalisation appliquée aux questions avant leur encodage (même règle que le corpus)."""
+    return normalize_moves(normalize_notation(text)).strip()
+
+
 def normalize_text(text: str) -> str:
-    """Notation en lettres, espaces simples (y compris insécables), au plus une ligne vide."""
-    text = normalize_notation(text)
+    """Notation en lettres, numéros de coups collés, espaces simples, au plus une ligne vide."""
+    text = normalize_moves(normalize_notation(text))
     text = _SPACES.sub(" ", text)
     text = "\n".join(line.strip() for line in text.splitlines())
     return _BLANK_LINES.sub("\n\n", text).strip()
@@ -53,3 +75,16 @@ def match_key(text: str) -> str:
 
 def contains_excerpt(chunk: str, excerpt: str) -> bool:
     return match_key(excerpt) in match_key(chunk)
+
+
+# Coup en notation française : « 4.Cf3 », « 4...Fc5 », « exd4 », « O-O », « Dxf7+ »
+_MOVE = re.compile(
+    r"^(\d+\.{1,3})?(O-O(-O)?|[RDTFC]?[a-h]?[1-8]?x?[a-h][1-8](=[DTFC])?)[+#!?]*[,;.)]*$"
+)
+
+
+def move_ratio(text: str) -> float:
+    words = text.split()
+    if not words:
+        return 0.0
+    return sum(bool(_MOVE.match(word)) for word in words) / len(words)

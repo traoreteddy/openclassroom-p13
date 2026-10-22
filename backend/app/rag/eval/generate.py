@@ -10,13 +10,12 @@ on écarte le candidat. Chaque candidat garde son statut pour la relecture (éta
 
 from __future__ import annotations
 
-import json
 from typing import Any, Literal
 
-import httpx
 from pydantic import BaseModel
 
 from app.rag.eval.passages import CandidatePassage
+from app.rag.llm import OllamaChat
 from app.rag.text import contains_excerpt
 
 GENERATION_SCHEMA: dict[str, Any] = {
@@ -63,35 +62,6 @@ class Candidate(BaseModel):
     excerpt: str | None = None
     answer: str | None = None
     rejection: str | None = None
-
-
-class OllamaChat:
-    """Appel minimal à l'API chat d'Ollama avec sortie structurée."""
-
-    def __init__(self, client: httpx.AsyncClient, *, base_url: str, model: str) -> None:
-        self._client = client
-        self._url = base_url.rstrip("/") + "/api/chat"
-        self.model = model
-
-    async def structured(
-        self, system: str, user: str, schema: dict[str, Any], *, temperature: float = 0.0
-    ) -> dict[str, Any]:
-        response = await self._client.post(
-            self._url,
-            json={
-                "model": self.model,
-                "stream": False,
-                "format": schema,
-                "options": {"temperature": temperature},
-                "messages": [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user},
-                ],
-            },
-            timeout=300,
-        )
-        response.raise_for_status()
-        return json.loads(response.json()["message"]["content"])
 
 
 def user_prompt(passage: CandidatePassage, feedback: str | None = None) -> str:

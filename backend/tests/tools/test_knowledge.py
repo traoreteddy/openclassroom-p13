@@ -107,3 +107,4 @@ def test_default_dependencies_use_milvus_and_the_embedding_model(settings):
     assert isinstance(knowledge._store, MilvusVectorStore)
     assert knowledge._store.collection == settings.milvus_collection
     assert knowledge._min_score == settings.rag_min_score
+    assert knowledge._store.default_filter.max_confidentiality == "public"

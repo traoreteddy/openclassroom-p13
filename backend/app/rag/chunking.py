@@ -20,7 +20,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from functools import lru_cache
 
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
 
 from app.rag.corpus import Article, DocumentMetadata
 from app.rag.text import normalize_text
@@ -184,3 +184,59 @@ def chunk_article(
             )
         )
     return chunks
+
+
+# --- Briques de la stratégie hiérarchique (phases 3 et 4) ---------------------------------
+
+HEADERS = [("#", "h1"), ("##", "h2"), ("###", "h3"), ("####", "h4")]
+
+
+def build(
+    article: Article, texts: list[tuple[str, str]], strategy: str, count: TokenCounter
+) -> list[Chunk]:
+    """Construit les chunks à partir de couples (section, texte)."""
+    chunks = []
+    for index, (section, text) in enumerate(t for t in texts if t[1].strip()):
+        chunks.append(
+            Chunk(
+                id=f"{strategy}:{article.id}:{index:03d}",
+                article_id=article.id,
+                title=article.title,
+                opening=article.opening,
+                opening_family=article.opening_family,
+                section=section or article.title,
+                chunk_index=index,
+                strategy=strategy,
+                text=text.strip(),
+                token_count=count(text),
+                metadata=article.metadata,
+            )
+        )
+    return chunks
+
+
+def markdown_sections(article: Article) -> list[tuple[str, str]]:
+    """(fil d'Ariane, texte) pour chaque section Markdown, titres conservés."""
+    splitter = MarkdownHeaderTextSplitter(headers_to_split_on=HEADERS, strip_headers=False)
+    sections = []
+    for doc in splitter.split_text(prepare_document(article)):
+        path = [doc.metadata[key] for _, key in HEADERS if key in doc.metadata]
+        sections.append((" > ".join(path), doc.page_content))
+    return sections
+
+
+@dataclass(frozen=True)
+class HierarchicalChunk:
+    """Enfant indexé pour la recherche ; `parent` est le texte renvoyé à l'agent."""
+
+    child: Chunk
+    parent_id: str
+    parent: str
+
+
+def with_breadcrumb(breadcrumb: str, text: str) -> str:
+    """Préfixe le texte par son fil d'Ariane (sans répéter un titre déjà présent en tête)."""
+    first_line = text.lstrip().split("\n", 1)[0].lstrip("# ").strip()
+    if first_line and breadcrumb.endswith(first_line):
+        text = text.lstrip().split("\n", 1)[1] if "\n" in text.lstrip() else ""
+    return f"{breadcrumb}\n\n{text.strip()}".strip()

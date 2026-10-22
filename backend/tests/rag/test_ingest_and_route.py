@@ -8,7 +8,7 @@ from app.api.deps import get_registry
 from app.main import app
 from app.rag.ingest import ingest, mongo_sink
 from tests.conftest import StubVectorStore, passage
-from tests.rag.test_chunking import CONFIG, MARKDOWN, words
+from tests.rag.test_chunking import MARKDOWN, words
 from tests.rag.test_text_and_passages import article
 
 
@@ -23,9 +23,10 @@ class RecordingStore:
     async def ensure_collection(self) -> None:
         self.calls.append("ensure")
 
-    async def replace_article(self, article_id, strategy, chunks, vectors) -> None:
-        assert len(chunks) == len(vectors)
-        self.rows[article_id] = len(chunks)
+    async def replace_article(self, article_id, units, vectors) -> None:
+        assert len(units) == len(vectors)
+        self.rows[article_id] = len(units)
+        self.units = units
 
     async def count(self) -> int:
         return sum(self.rows.values())
@@ -52,7 +53,7 @@ async def test_ingest_chunks_embeds_and_indexes_each_article():
         count_tokens=words,
         embedder=embedder,
         store=store,
-        config=CONFIG,
+        summaries={},
         save_article=sink,
     )
 
@@ -63,6 +64,27 @@ async def test_ingest_chunks_embeds_and_indexes_each_article():
     assert saved == ["test"]
 
 
+async def test_ingest_adds_one_summary_unit_per_summarized_section():
+    from app.rag.indexing import parent_sections
+
+    page = article(MARKDOWN)
+    first_section = parent_sections(page, words)[0][1]
+    store = RecordingStore()
+
+    report = await ingest(
+        [page],
+        count_tokens=words,
+        embedder=CountingEmbedder(),
+        store=store,
+        summaries={first_section: "Résumé de la section."},
+    )
+
+    assert report.summaries == 1
+    summary = [u for u in store.units if u.kind == "resume"]
+    assert [u.text for u in summary] == ["Résumé de la section."]
+    assert summary[0].parent_text == first_section
+
+
 async def test_ingest_can_recreate_the_collection():
     store = RecordingStore()
 
@@ -71,7 +93,6 @@ async def test_ingest_can_recreate_the_collection():
         count_tokens=words,
         embedder=CountingEmbedder(),
         store=store,
-        config=CONFIG,
         recreate=True,
     )
 

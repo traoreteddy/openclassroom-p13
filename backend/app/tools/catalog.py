@@ -12,7 +12,7 @@ import httpx
 
 from app.core.config import Settings
 from app.rag.embedding import SentenceTransformerEmbedder
-from app.rag.milvus_store import MilvusVectorStore
+from app.rag.milvus_store import MetadataFilter, MilvusVectorStore
 from app.tools.base import ToolRegistry
 from app.tools.deep_analysis import DeepAnalysisJobs, build_deep_analysis_tools
 from app.tools.knowledge import KnowledgeSearch, build_search_knowledge_tool
@@ -47,7 +47,11 @@ class ToolDependencies:
 def default_dependencies(settings: Settings) -> ToolDependencies:
     """Dépendances réelles. Rien n'est contacté ni chargé avant le premier appel d'outil."""
     embedder = SentenceTransformerEmbedder(settings.embedding_model)
-    store = MilvusVectorStore(settings.milvus_uri, settings.milvus_collection)
+    store = MilvusVectorStore(
+        settings.milvus_uri,
+        settings.milvus_collection,
+        default_filter=MetadataFilter(max_confidentiality=settings.rag_max_confidentiality),
+    )
     return ToolDependencies(
         http=httpx.AsyncClient(timeout=settings.http_timeout_s),
         analyzer=StockfishAnalyzer(

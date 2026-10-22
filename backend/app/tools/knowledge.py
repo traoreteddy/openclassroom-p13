@@ -13,6 +13,7 @@ from typing import Protocol
 
 from pydantic import ConfigDict, Field, field_validator
 
+from app.rag.text import normalize_query
 from app.tools.base import SideEffect, ToolInput, ToolOutput, ToolSpec
 from app.tools.resilience import ResiliencePolicy
 
@@ -99,7 +100,7 @@ class KnowledgeSearch:
         self._min_score = min_score
 
     async def search(self, params: SearchKnowledgeInput) -> SearchKnowledgeOutput:
-        vector = await self._embedder.embed(params.query)
+        vector = await self._embedder.embed(normalize_query(params.query))
         hits = await self._store.search(vector, limit=params.limit, opening=params.opening)
         relevant = sorted(
             (hit for hit in hits if hit.score >= self._min_score),

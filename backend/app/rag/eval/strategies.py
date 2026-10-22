@@ -17,24 +17,25 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable
-from dataclasses import dataclass, replace
+from dataclasses import replace
 from functools import lru_cache
 from typing import Any
 
-from langchain_text_splitters import MarkdownHeaderTextSplitter
-
-from app.rag.chunking import (
+from app.rag.chunking import (  # briques partagées avec la production
     EXCLUDED_SECTIONS,
     Chunk,
     ChunkingConfig,
+    HierarchicalChunk,
     TokenCounter,
+    build,
     chunk_article,
+    markdown_sections,
     prepare_document,
+    with_breadcrumb,
 )
 from app.rag.corpus import Article
 from app.rag.text import normalize_text
 
-HEADERS = [("#", "h1"), ("##", "h2"), ("###", "h3"), ("####", "h4")]
 # Fin de phrase en français (y compris les points de suspension « … »)
 FRENCH_SENTENCE = r"(?<=[.?!…])\s+"
 
@@ -44,30 +45,6 @@ def model_tokenizer(model_name: str) -> Any:
     from transformers import AutoTokenizer
 
     return AutoTokenizer.from_pretrained(model_name)
-
-
-def build(
-    article: Article, texts: list[tuple[str, str]], strategy: str, count: TokenCounter
-) -> list[Chunk]:
-    """Construit les chunks à partir de couples (section, texte)."""
-    chunks = []
-    for index, (section, text) in enumerate(t for t in texts if t[1].strip()):
-        chunks.append(
-            Chunk(
-                id=f"{strategy}:{article.id}:{index:03d}",
-                article_id=article.id,
-                title=article.title,
-                opening=article.opening,
-                opening_family=article.opening_family,
-                section=section or article.title,
-                chunk_index=index,
-                strategy=strategy,
-                text=text.strip(),
-                token_count=count(text),
-                metadata=article.metadata,
-            )
-        )
-    return chunks
 
 
 # --- Fixe -------------------------------------------------------------------------------
@@ -100,16 +77,6 @@ def recursive_chunks(
 
 
 # --- Structurelle -----------------------------------------------------------------------
-
-
-def markdown_sections(article: Article) -> list[tuple[str, str]]:
-    """(fil d'Ariane, texte) pour chaque section Markdown, titres conservés."""
-    splitter = MarkdownHeaderTextSplitter(headers_to_split_on=HEADERS, strip_headers=False)
-    sections = []
-    for doc in splitter.split_text(prepare_document(article)):
-        path = [doc.metadata[key] for _, key in HEADERS if key in doc.metadata]
-        sections.append((" > ".join(path), doc.page_content))
-    return sections
 
 
 def markdown_chunks(article: Article, count: TokenCounter) -> list[Chunk]:
@@ -195,15 +162,6 @@ def semantic_chunks(
 # --- Hiérarchique -----------------------------------------------------------------------
 
 
-@dataclass(frozen=True)
-class HierarchicalChunk:
-    """Enfant indexé pour la recherche ; `parent` est le texte renvoyé à l'agent."""
-
-    child: Chunk
-    parent_id: str
-    parent: str
-
-
 def hierarchical_chunks(
     article: Article,
     count: TokenCounter,
@@ -211,11 +169,16 @@ def hierarchical_chunks(
     child_size: int = 256,
     child_overlap: int = 25,
     parent_max_tokens: int | None = None,
+    breadcrumb: bool = False,
 ) -> list[HierarchicalChunk]:
     """Parents = sections Markdown ; enfants = découpage récursif de chaque parent.
 
     Avec `parent_max_tokens`, une section trop longue est découpée (récursivement) en
     plusieurs parents : le texte renvoyé à l'agent reste borné.
+
+    Avec `breadcrumb`, le texte **indexé** de chaque enfant commence par le fil d'Ariane de
+    sa section (« Défense slave > Principales variantes > Variante Alapine ») ; le parent
+    renvoyé à l'agent est inchangé.
     """
     from langchain_text_splitters import RecursiveCharacterTextSplitter
 
@@ -247,14 +210,47 @@ def hierarchical_chunks(
     result: list[HierarchicalChunk] = []
     for parent_index, (section, text) in enumerate(parents):
         parent_id = f"parent:{article.id}:{parent_index:03d}"
-        for child in build(
-            article, [(section, t) for t in splitter.split_text(text)], "hierarchical", count
-        ):
+        pieces = splitter.split_text(text)
+        if breadcrumb:
+            pieces = [with_breadcrumb(section or article.title, piece) for piece in pieces]
+        for child in build(article, [(section, t) for t in pieces], "hierarchical", count):
             child = replace(
                 child, id=f"hierarchical:{article.id}:{len(result):03d}", chunk_index=len(result)
             )
             result.append(HierarchicalChunk(child=child, parent_id=parent_id, parent=text))
     return result
+
+
+def add_generated_units(
+    items: list[HierarchicalChunk],
+    generated: dict[str, list[str]],
+    kind: str,
+    count: TokenCounter,
+    *,
+    breadcrumb: bool = False,
+) -> list[HierarchicalChunk]:
+    """Ajoute des unités d'indexation supplémentaires (questions, résumé) par parent.
+
+    `generated` associe un texte de parent à ses textes générés. Chaque texte généré devient
+    un vecteur de plus, qui renvoie au même parent que les enfants (index multi-vecteurs).
+    """
+    by_parent: dict[str, HierarchicalChunk] = {}
+    for item in items:
+        by_parent.setdefault(item.parent_id, item)
+    extra: list[HierarchicalChunk] = []
+    for parent_id, first in by_parent.items():
+        for index, text in enumerate(generated.get(first.parent, [])):
+            if breadcrumb:
+                text = f"{first.child.section}\n\n{text}"
+            unit = replace(
+                first.child,
+                id=f"{kind}:{parent_id}:{index}",
+                text=text,
+                token_count=count(text),
+                strategy=f"hierarchical+{kind}",
+            )
+            extra.append(HierarchicalChunk(child=unit, parent_id=parent_id, parent=first.parent))
+    return items + extra
 
 
 # --- Mesures descriptives ---------------------------------------------------------------

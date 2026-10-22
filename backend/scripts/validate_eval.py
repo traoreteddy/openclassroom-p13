@@ -27,7 +27,7 @@ def main() -> None:
     report = validate(EvalSets.load(EVAL_DIR), load_corpus(CORPUS_DIR), TOOL_NAMES)
     print(json.dumps(report.stats, ensure_ascii=False, indent=2))
     if report.ok:
-        print("✓ Les 4 jeux de référence sont cohérents.")
+        print("✓ Les 5 jeux de référence sont cohérents.")
     else:
         print("\n".join(f"✗ {error}" for error in report.errors))
         raise SystemExit(1)
