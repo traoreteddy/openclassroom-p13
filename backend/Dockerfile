@@ -7,6 +7,11 @@ ENV UV_COMPILE_BYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PATH="/app/.venv/bin:$PATH"
 
+# Stockfish (moteur UCI) : paquet Debian, exécutable /usr/games/stockfish
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends stockfish \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 COPY pyproject.toml uv.lock ./

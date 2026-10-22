@@ -1,9 +1,14 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import APIRouter, FastAPI, HTTPException, status
 from pymongo.errors import PyMongoError
 
+from app.agent.graph import AgentConfig, ChessAgent
+from app.agent.llm import ollama_factory
+from app.agent.tracing import configure_tracing
+from app.api.routes import agent as agent_routes
 from app.api.routes import tools as tool_routes
 from app.core.config import settings
 from app.core.database import close_db, ping_db
@@ -13,9 +18,26 @@ from app.tools.catalog import build_registry, default_dependencies
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     deps = default_dependencies(settings)
-    app.state.tool_registry = build_registry(settings, deps)
+    registry = build_registry(settings, deps)
+    app.state.tool_registry = registry
     deps.start_warm_up()  # chargement du modèle d'embedding sans retarder le démarrage
+    tracing = configure_tracing(
+        environment=settings.app_env,
+        langfuse_base_url=settings.langfuse_base_url,
+        langfuse_public_key=settings.langfuse_public_key,
+        langfuse_secret_key=settings.langfuse_secret_key,
+        journal_path=Path(settings.decision_journal_path)
+        if settings.decision_journal_path
+        else None,
+    )
+    app.state.agent = ChessAgent(
+        registry,
+        tracing,
+        ollama_factory(base_url=settings.ollama_base_url, model=settings.agent_model),
+        AgentConfig(selection=settings.agent_selection),  # type: ignore[arg-type]
+    )
     yield
+    tracing.shutdown()
     await deps.aclose()
     await close_db()
 
@@ -46,4 +68,5 @@ async def healthcheck_database() -> dict[str, str]:
 
 
 router.include_router(tool_routes.router)
+router.include_router(agent_routes.router)
 app.include_router(router)

@@ -41,6 +41,16 @@ class Settings(BaseSettings):
     # LLM local (Ollama sur la machine hôte, hors Docker)
     ollama_base_url: str = "http://localhost:11434"
     llm_model: str = "phi4-mini"
+    # Modèle et mode de sélection de l'agent (choisis par la mesure en phase 5)
+    agent_model: str = "qwen3:14b"
+    agent_selection: str = "native"  # native (appel d'outils) ou structured (schéma JSON)
+
+    # Traces : Langfuse auto-hébergé (profil docker compose « tracing »). Sans clés, les
+    # spans OpenTelemetry restent locaux (journal de décision seulement).
+    langfuse_base_url: str = "http://localhost:3000"
+    langfuse_public_key: str | None = None
+    langfuse_secret_key: str | None = None
+    decision_journal_path: str | None = "data/journal/decisions.jsonl"
 
 
 @lru_cache

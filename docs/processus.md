@@ -63,16 +63,25 @@ les positions théoriques ») :
 - **en théorie**, il donne une évaluation rapide (profondeur réduite) en complément des coups Lichess ;
 - **hors théorie**, il est la source principale : évaluation plus profonde et 3 meilleurs coups.
 
-### Graphe LangGraph
+### Graphe LangGraph (implémenté : `backend/app/agent/graph.py`)
 
-Un nœud par étape :
+Deux entrées, selon que la requête porte une position (FEN) ou non :
 
 ```
-identify_position → opening_lookup → [routeur conditionnel]
-                                       ├── theory_branch
-                                       └── engine_branch
-                    → rag_context → video_search → compose_answer
+START ─ FEN fournie ?
+  ├─ oui ─► inspect ► theory (Lichess) ─ en théorie ?
+  │                    ├─ oui ─► quick_eval (Stockfish, profondeur 12) ► context (RAG) ► videos ► answer
+  │                    └─ non, ou Lichess en panne ─► engine (Stockfish, profondeur 18, 3 lignes) ► answer
+  └─ non (question libre) ─► decide ⇄ tools ► answer
 ```
+
+- **Parcours « position »** : déterministe, aucun choix laissé au modèle. C'est la logique
+  de l'énoncé : Lichess d'abord ; si aucun coup théorique (ou si Lichess est indisponible),
+  Stockfish devient la source principale. En théorie, Stockfish est aussi appelé en
+  complément à profondeur réduite. Le LLM ne fait que **rédiger** le conseil à partir des
+  résultats d'outils. Exposé par `POST /api/v1/agent/analyze`.
+- **Parcours « question »** : le modèle décide des outils (ou flot fixe pour comparaison,
+  voir `docs/outil-rag.md`, phase 5). Exposé par `POST /api/v1/agent/ask`.
 
 ---
 

@@ -1,0 +1,1103 @@
+{
+  "phi4-mini/structured": {
+    "model": "phi4-mini",
+    "selection": "structured",
+    "tool_correct": 0.7333333333333333,
+    "tool_and_arguments_correct": 0.6666666666666666,
+    "mean_latency_s": 1.55,
+    "tokens_in": 39149,
+    "tokens_out": 2484,
+    "cloud_equivalent_eur": 0.006847,
+    "errors": {
+      "inspect_position → evaluate_position": 1,
+      "get_opening_theory → evaluate_position": 1,
+      "get_opening_theory → search_opening_knowledge": 1,
+      "get_opening_theory → inspect_position": 2,
+      "aucun → inspect_position": 1,
+      "aucun → search_opening_knowledge": 2
+    },
+    "rows": [
+      {
+        "task": "task-01",
+        "expected": "inspect_position",
+        "got": "inspect_position",
+        "arguments": {
+          "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1"
+        },
+        "tool_ok": true,
+        "arguments_ok": false,
+        "latency_s": 9.13
+      },
+      {
+        "task": "task-02",
+        "expected": "inspect_position",
+        "got": "inspect_position",
+        "arguments": {
+          "fen": "r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 2.38
+      },
+      {
+        "task": "task-03",
+        "expected": "inspect_position",
+        "got": "evaluate_position",
+        "arguments": {
+          "fen": "rnbqkbnr/pppp1ppp/8/4p3/5P2/5P2/PPPPPPPP/RNBQ1RK1 w KQkq - 1 b3"
+        },
+        "tool_ok": false,
+        "arguments_ok": false,
+        "latency_s": 1.46
+      },
+      {
+        "task": "task-04",
+        "expected": "inspect_position",
+        "got": "inspect_position",
+        "arguments": {
+          "fen": "rnbqkbnr/ppp2ppp/4p3/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.25
+      },
+      {
+        "task": "task-05",
+        "expected": "get_opening_theory",
+        "got": "evaluate_position",
+        "arguments": {
+          "fen": "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1",
+          "depth": 20,
+          "lines": 10
+        },
+        "tool_ok": false,
+        "arguments_ok": false,
+        "latency_s": 1.38
+      },
+      {
+        "task": "task-06",
+        "expected": "get_opening_theory",
+        "got": "search_opening_knowledge",
+        "arguments": {
+          "fen": "r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3",
+          "opening": null
+        },
+        "tool_ok": false,
+        "arguments_ok": false,
+        "latency_s": 1.42
+      },
+      {
+        "task": "task-07",
+        "expected": "get_opening_theory",
+        "got": "get_opening_theory",
+        "arguments": {
+          "fen": "r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4",
+          "database": "lichess",
+          "max_moves": 3,
+          "include_games": true
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.77
+      },
+      {
+        "task": "task-08",
+        "expected": "get_opening_theory",
+        "got": "inspect_position",
+        "arguments": {
+          "fen": "rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2"
+        },
+        "tool_ok": false,
+        "arguments_ok": false,
+        "latency_s": 1.15
+      },
+      {
+        "task": "task-09",
+        "expected": "get_opening_theory",
+        "got": "inspect_position",
+        "arguments": {
+          "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPPKPPP/RNBQ1BNR b kq - 1 2"
+        },
+        "tool_ok": false,
+        "arguments_ok": false,
+        "latency_s": 1.06
+      },
+      {
+        "task": "task-10",
+        "expected": "evaluate_position",
+        "got": "evaluate_position",
+        "arguments": {
+          "fen": "r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4",
+          "depth": 20,
+          "lines": 1
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.49
+      },
+      {
+        "task": "task-11",
+        "expected": "evaluate_position",
+        "got": "evaluate_position",
+        "arguments": {
+          "fen": "rnbqkbnr/pp2pppp/2p5/8/3PN3/8/PPP2PPP/R1BQKBNR b KQkq - 0 4",
+          "depth": 20,
+          "lines": 3
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.76
+      },
+      {
+        "task": "task-12",
+        "expected": "evaluate_position",
+        "got": "evaluate_position",
+        "arguments": {
+          "fen": "rnbqk2r/ppp1ppbp/3p1np1/8/2PPP3/2N5/PP3PPP/R1BQKBNR w KQkq - 0 5",
+          "depth": 20,
+          "lines": 10
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.69
+      },
+      {
+        "task": "task-13",
+        "expected": "evaluate_position",
+        "got": "evaluate_position",
+        "arguments": {
+          "fen": "r1bqkbnr/pppp1ppp/8/4n3/4P3/8/PPPP1PPP/RNB1KBNR w KQkq - 0 4"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.48
+      },
+      {
+        "task": "task-14",
+        "expected": "evaluate_position",
+        "got": "evaluate_position",
+        "arguments": {
+          "fen": "rnbqkbnr/ppp2ppp/4p3/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3",
+          "depth": 20,
+          "lines": 1
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.51
+      },
+      {
+        "task": "task-15",
+        "expected": "search_opening_knowledge",
+        "got": "search_opening_knowledge",
+        "arguments": {
+          "query": "Pourquoi les Noirs jouent-ils c5 dans la défense sicilienne?",
+          "opening": "Sicilienne",
+          "limit": 1
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.01
+      },
+      {
+        "task": "task-16",
+        "expected": "search_opening_knowledge",
+        "got": "search_opening_knowledge",
+        "arguments": {
+          "query": "histoire du gambit Evans",
+          "opening": "Evans",
+          "limit": 1
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.96
+      },
+      {
+        "task": "task-17",
+        "expected": "search_opening_knowledge",
+        "got": "search_opening_knowledge",
+        "arguments": {
+          "query": "plans typiques de la défense est-indienne",
+          "opening": "defense est-indienne",
+          "limit": 5
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.99
+      },
+      {
+        "task": "task-18",
+        "expected": "search_opening_knowledge",
+        "got": "search_opening_knowledge",
+        "arguments": {
+          "query": "grands joueurs défense Caro-Kann",
+          "opening": "defense Caro-Kann",
+          "limit": 5
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.05
+      },
+      {
+        "task": "task-19",
+        "expected": "search_opening_knowledge",
+        "got": "search_opening_knowledge",
+        "arguments": {
+          "query": "Panov-Botvinnik Attack Caro-Kann",
+          "limit": 1
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.0
+      },
+      {
+        "task": "task-20",
+        "expected": "search_opening_knowledge",
+        "got": "search_opening_knowledge",
+        "arguments": {
+          "query": "Pourquoi la partie espagnole est-elle une ouverture forte?",
+          "opening": "Spanish Opening",
+          "limit": 1
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.9
+      },
+      {
+        "task": "task-21",
+        "expected": "find_opening_videos",
+        "got": "find_opening_videos",
+        "arguments": {
+          "query": "défense française",
+          "max_results": 1,
+          "duration": "medium"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.91
+      },
+      {
+        "task": "task-22",
+        "expected": "find_opening_videos",
+        "got": "find_opening_videos",
+        "arguments": {
+          "query": "gambit dame explication",
+          "max_results": 1,
+          "duration": "medium"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.19
+      },
+      {
+        "task": "task-23",
+        "expected": "find_opening_videos",
+        "got": "find_opening_videos",
+        "arguments": {
+          "query": "partie italienne pour débutants",
+          "max_results": 1,
+          "duration": "medium"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.07
+      },
+      {
+        "task": "task-24",
+        "expected": "find_opening_videos",
+        "got": "find_opening_videos",
+        "arguments": {
+          "query": "ouverture anglaise",
+          "max_results": 3,
+          "duration": "medium"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.17
+      },
+      {
+        "task": "task-25",
+        "expected": "start_deep_analysis",
+        "got": "start_deep_analysis",
+        "arguments": {
+          "fen": "rnbqkbnr/pp2pppp/2p5/8/3PN3/8/PPP2PPP/R1BQKBNR b KQkq - 0 4",
+          "depth": 30
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.36
+      },
+      {
+        "task": "task-26",
+        "expected": "start_deep_analysis",
+        "got": "start_deep_analysis",
+        "arguments": {
+          "fen": "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+          "depth": 35
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.43
+      },
+      {
+        "task": "task-27",
+        "expected": "get_deep_analysis",
+        "got": "get_deep_analysis",
+        "arguments": {
+          "fen": "a1b2c3d4"
+        },
+        "tool_ok": true,
+        "arguments_ok": false,
+        "latency_s": 0.72
+      },
+      {
+        "task": "task-28",
+        "expected": null,
+        "got": "inspect_position",
+        "arguments": {
+          "fen": "rnbqkb1r/pppppppp/3n4/8/8/8/8/PPPP1PPP/1N1B1RK1 b2r2"
+        },
+        "tool_ok": false,
+        "arguments_ok": false,
+        "latency_s": 1.28
+      },
+      {
+        "task": "task-29",
+        "expected": null,
+        "got": "search_opening_knowledge",
+        "arguments": {
+          "query": "capitale du Japon",
+          "opening": null,
+          "limit": 1
+        },
+        "tool_ok": false,
+        "arguments_ok": false,
+        "latency_s": 0.93
+      },
+      {
+        "task": "task-30",
+        "expected": null,
+        "got": "search_opening_knowledge",
+        "arguments": {
+          "query": "combien de cases y a-t-il sur un échiquier",
+          "opening": null,
+          "limit": 1
+        },
+        "tool_ok": false,
+        "arguments_ok": false,
+        "latency_s": 1.47
+      }
+    ],
+    "session": "eval-tasks30-phi4-mini-structured-20261022T171232"
+  },
+  "qwen3:1.7b/native": {
+    "model": "qwen3:1.7b",
+    "selection": "native",
+    "tool_correct": 0.7,
+    "tool_and_arguments_correct": 0.5666666666666667,
+    "mean_latency_s": 0.82,
+    "tokens_in": 63055,
+    "tokens_out": 2521,
+    "cloud_equivalent_eur": 0.010214,
+    "errors": {
+      "inspect_position → aucun": 1,
+      "get_opening_theory → aucun": 1,
+      "evaluate_position → aucun": 1,
+      "evaluate_position → inspect_position": 1,
+      "search_opening_knowledge → aucun": 4,
+      "get_deep_analysis → aucun": 1
+    },
+    "rows": [
+      {
+        "task": "task-01",
+        "expected": "inspect_position",
+        "got": "inspect_position",
+        "arguments": {
+          "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 5.71
+      },
+      {
+        "task": "task-02",
+        "expected": "inspect_position",
+        "got": "inspect_position",
+        "arguments": {
+          "fen": "r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.55
+      },
+      {
+        "task": "task-03",
+        "expected": "inspect_position",
+        "got": null,
+        "arguments": {},
+        "tool_ok": false,
+        "arguments_ok": false,
+        "latency_s": 0.32
+      },
+      {
+        "task": "task-04",
+        "expected": "inspect_position",
+        "got": "inspect_position",
+        "arguments": {
+          "fen": "rnbqkbnr/ppp2ppp/4p3/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.49
+      },
+      {
+        "task": "task-05",
+        "expected": "get_opening_theory",
+        "got": "get_opening_theory",
+        "arguments": {
+          "fen": "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.51
+      },
+      {
+        "task": "task-06",
+        "expected": "get_opening_theory",
+        "got": "get_opening_theory",
+        "arguments": {
+          "fen": "r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3",
+          "include_games": true
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.58
+      },
+      {
+        "task": "task-07",
+        "expected": "get_opening_theory",
+        "got": "get_opening_theory",
+        "arguments": {
+          "fen": "r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R",
+          "include_games": true
+        },
+        "tool_ok": true,
+        "arguments_ok": false,
+        "latency_s": 0.55
+      },
+      {
+        "task": "task-08",
+        "expected": "get_opening_theory",
+        "got": null,
+        "arguments": {},
+        "tool_ok": false,
+        "arguments_ok": false,
+        "latency_s": 0.58
+      },
+      {
+        "task": "task-09",
+        "expected": "get_opening_theory",
+        "got": "get_opening_theory",
+        "arguments": {
+          "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPPKPPP/RNBQ1BNR b kq - 1 2"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.49
+      },
+      {
+        "task": "task-10",
+        "expected": "evaluate_position",
+        "got": "evaluate_position",
+        "arguments": {
+          "fen": "r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.53
+      },
+      {
+        "task": "task-11",
+        "expected": "evaluate_position",
+        "got": "evaluate_position",
+        "arguments": {
+          "fen": "rnbqkbnr/pp2pppp/2p5/8/3PN3/8/PPP2PPP/R1BQKBNR",
+          "lines": 3
+        },
+        "tool_ok": true,
+        "arguments_ok": false,
+        "latency_s": 0.48
+      },
+      {
+        "task": "task-12",
+        "expected": "evaluate_position",
+        "got": null,
+        "arguments": {},
+        "tool_ok": false,
+        "arguments_ok": false,
+        "latency_s": 0.54
+      },
+      {
+        "task": "task-13",
+        "expected": "evaluate_position",
+        "got": "inspect_position",
+        "arguments": {
+          "fen": "r1bqkbnr/pppp1ppp/8/4n3/4P3/8/PPPP1PPP/RNB1KBNR w KQkq - 0 4"
+        },
+        "tool_ok": false,
+        "arguments_ok": false,
+        "latency_s": 0.48
+      },
+      {
+        "task": "task-14",
+        "expected": "evaluate_position",
+        "got": "evaluate_position",
+        "arguments": {
+          "fen": "rnbqkbnr/ppp2ppp/4p3/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.47
+      },
+      {
+        "task": "task-15",
+        "expected": "search_opening_knowledge",
+        "got": "search_opening_knowledge",
+        "arguments": {
+          "query": "idées principales de la défense sicilienne",
+          "opening": "Sicilian Defense"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.32
+      },
+      {
+        "task": "task-16",
+        "expected": "search_opening_knowledge",
+        "got": null,
+        "arguments": {},
+        "tool_ok": false,
+        "arguments_ok": false,
+        "latency_s": 6.97
+      },
+      {
+        "task": "task-17",
+        "expected": "search_opening_knowledge",
+        "got": null,
+        "arguments": {},
+        "tool_ok": false,
+        "arguments_ok": false,
+        "latency_s": 0.37
+      },
+      {
+        "task": "task-18",
+        "expected": "search_opening_knowledge",
+        "got": null,
+        "arguments": {},
+        "tool_ok": false,
+        "arguments_ok": false,
+        "latency_s": 0.79
+      },
+      {
+        "task": "task-19",
+        "expected": "search_opening_knowledge",
+        "got": "search_opening_knowledge",
+        "arguments": {
+          "query": "idées principales de la défense caro-kann",
+          "opening": "Caro-Kann Defense"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.41
+      },
+      {
+        "task": "task-20",
+        "expected": "search_opening_knowledge",
+        "got": null,
+        "arguments": {},
+        "tool_ok": false,
+        "arguments_ok": false,
+        "latency_s": 0.25
+      },
+      {
+        "task": "task-21",
+        "expected": "find_opening_videos",
+        "got": "find_opening_videos",
+        "arguments": {
+          "query": "défense française explication",
+          "duration": "medium"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.34
+      },
+      {
+        "task": "task-22",
+        "expected": "find_opening_videos",
+        "got": "find_opening_videos",
+        "arguments": {
+          "query": "dame explication gambit",
+          "duration": "medium"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.3
+      },
+      {
+        "task": "task-23",
+        "expected": "find_opening_videos",
+        "got": "find_opening_videos",
+        "arguments": {
+          "duration": "medium",
+          "query": "partie italienne explication ouverture"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.31
+      },
+      {
+        "task": "task-24",
+        "expected": "find_opening_videos",
+        "got": "find_opening_videos",
+        "arguments": {
+          "query": "ouverture anglaise explication",
+          "duration": "medium"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.27
+      },
+      {
+        "task": "task-25",
+        "expected": "start_deep_analysis",
+        "got": "start_deep_analysis",
+        "arguments": {
+          "fen": "rnbqkbnr/pp2pppp/2p5/8/3PN3/8/PPP2PPP/R1BQKBNR",
+          "depth": 30
+        },
+        "tool_ok": true,
+        "arguments_ok": false,
+        "latency_s": 0.5
+      },
+      {
+        "task": "task-26",
+        "expected": "start_deep_analysis",
+        "got": "start_deep_analysis",
+        "arguments": {
+          "fen": "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR",
+          "depth": 35
+        },
+        "tool_ok": true,
+        "arguments_ok": false,
+        "latency_s": 0.49
+      },
+      {
+        "task": "task-27",
+        "expected": "get_deep_analysis",
+        "got": null,
+        "arguments": {},
+        "tool_ok": false,
+        "arguments_ok": false,
+        "latency_s": 0.43
+      },
+      {
+        "task": "task-28",
+        "expected": null,
+        "got": null,
+        "arguments": {},
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.25
+      },
+      {
+        "task": "task-29",
+        "expected": null,
+        "got": null,
+        "arguments": {},
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.12
+      },
+      {
+        "task": "task-30",
+        "expected": null,
+        "got": null,
+        "arguments": {},
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 0.15
+      }
+    ],
+    "session": "eval-tasks30-qwen3_1.7b-native-20261022T171232"
+  },
+  "qwen3:14b/native": {
+    "model": "qwen3:14b",
+    "selection": "native",
+    "tool_correct": 0.9666666666666667,
+    "tool_and_arguments_correct": 0.9666666666666667,
+    "mean_latency_s": 3.08,
+    "tokens_in": 63055,
+    "tokens_out": 1700,
+    "cloud_equivalent_eur": 0.009763,
+    "errors": {
+      "evaluate_position → inspect_position": 1
+    },
+    "rows": [
+      {
+        "task": "task-01",
+        "expected": "inspect_position",
+        "got": "inspect_position",
+        "arguments": {
+          "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 16.19
+      },
+      {
+        "task": "task-02",
+        "expected": "inspect_position",
+        "got": "inspect_position",
+        "arguments": {
+          "fen": "r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 2.82
+      },
+      {
+        "task": "task-03",
+        "expected": "inspect_position",
+        "got": "inspect_position",
+        "arguments": {
+          "fen": "rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 2.59
+      },
+      {
+        "task": "task-04",
+        "expected": "inspect_position",
+        "got": "inspect_position",
+        "arguments": {
+          "fen": "rnbqkbnr/ppp2ppp/4p3/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 2.47
+      },
+      {
+        "task": "task-05",
+        "expected": "get_opening_theory",
+        "got": "get_opening_theory",
+        "arguments": {
+          "fen": "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+          "database": "masters",
+          "include_games": true,
+          "max_moves": 5
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 3.37
+      },
+      {
+        "task": "task-06",
+        "expected": "get_opening_theory",
+        "got": "get_opening_theory",
+        "arguments": {
+          "fen": "r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 2.98
+      },
+      {
+        "task": "task-07",
+        "expected": "get_opening_theory",
+        "got": "get_opening_theory",
+        "arguments": {
+          "fen": "r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4",
+          "database": "masters",
+          "include_games": true
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 3.44
+      },
+      {
+        "task": "task-08",
+        "expected": "get_opening_theory",
+        "got": "get_opening_theory",
+        "arguments": {
+          "fen": "rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2",
+          "database": "lichess"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 2.98
+      },
+      {
+        "task": "task-09",
+        "expected": "get_opening_theory",
+        "got": "get_opening_theory",
+        "arguments": {
+          "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPPKPPP/RNBQ1BNR b kq - 1 2",
+          "database": "masters",
+          "include_games": false,
+          "max_moves": 5
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 3.27
+      },
+      {
+        "task": "task-10",
+        "expected": "evaluate_position",
+        "got": "evaluate_position",
+        "arguments": {
+          "fen": "r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 3.04
+      },
+      {
+        "task": "task-11",
+        "expected": "evaluate_position",
+        "got": "evaluate_position",
+        "arguments": {
+          "lines": 3,
+          "fen": "rnbqkbnr/pp2pppp/2p5/8/3PN3/8/PPP2PPP/R1BQKBNR b KQkq - 0 4"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 2.88
+      },
+      {
+        "task": "task-12",
+        "expected": "evaluate_position",
+        "got": "evaluate_position",
+        "arguments": {
+          "fen": "rnbqk2r/ppp1ppbp/3p1np1/8/2PPP3/2N5/PP3PPP/R1BQKBNR w KQkq - 0 5"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 2.96
+      },
+      {
+        "task": "task-13",
+        "expected": "evaluate_position",
+        "got": "inspect_position",
+        "arguments": {
+          "fen": "r1bqkbnr/pppp1ppp/8/4n3/4P3/8/PPPP1PPP/RNB1KBNR w KQkq - 0 4"
+        },
+        "tool_ok": false,
+        "arguments_ok": false,
+        "latency_s": 2.83
+      },
+      {
+        "task": "task-14",
+        "expected": "evaluate_position",
+        "got": "evaluate_position",
+        "arguments": {
+          "fen": "rnbqkbnr/ppp2ppp/4p3/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3",
+          "lines": 3
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 3.24
+      },
+      {
+        "task": "task-15",
+        "expected": "search_opening_knowledge",
+        "got": "search_opening_knowledge",
+        "arguments": {
+          "query": "Pourquoi les Noirs jouent-ils c5 dans la défense sicilienne ?",
+          "opening": "Sicilian Defense"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 2.11
+      },
+      {
+        "task": "task-16",
+        "expected": "search_opening_knowledge",
+        "got": "search_opening_knowledge",
+        "arguments": {
+          "query": "histoire du gambit Evans",
+          "opening": "Evans Gambit"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.73
+      },
+      {
+        "task": "task-17",
+        "expected": "search_opening_knowledge",
+        "got": "search_opening_knowledge",
+        "arguments": {
+          "query": "plans typiques de la défense est-indienne",
+          "opening": "King's Indian Defense"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.94
+      },
+      {
+        "task": "task-18",
+        "expected": "search_opening_knowledge",
+        "got": "search_opening_knowledge",
+        "arguments": {
+          "query": "Quels grands joueurs ont joué la défense Caro-Kann ?",
+          "opening": "Caro-Kann Defense"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 2.11
+      },
+      {
+        "task": "task-19",
+        "expected": "search_opening_knowledge",
+        "got": "search_opening_knowledge",
+        "arguments": {
+          "query": "idées principales de l'attaque Panov dans la Caro-Kann",
+          "opening": "Caro-Kann Defense"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 2.24
+      },
+      {
+        "task": "task-20",
+        "expected": "search_opening_knowledge",
+        "got": "search_opening_knowledge",
+        "arguments": {
+          "query": "Pourquoi dit-on que la partie espagnole est une ouverture forte ?",
+          "opening": "Ruy Lopez"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.95
+      },
+      {
+        "task": "task-21",
+        "expected": "find_opening_videos",
+        "got": "find_opening_videos",
+        "arguments": {
+          "max_results": 3,
+          "query": "défense française explication ouverture",
+          "duration": "medium",
+          "language": "fr"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 2.05
+      },
+      {
+        "task": "task-22",
+        "expected": "find_opening_videos",
+        "got": "find_opening_videos",
+        "arguments": {
+          "query": "gambit dame explication courte",
+          "duration": "short",
+          "language": "fr",
+          "max_results": 1
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 2.17
+      },
+      {
+        "task": "task-23",
+        "expected": "find_opening_videos",
+        "got": "find_opening_videos",
+        "arguments": {
+          "query": "partie italienne explication ouverture",
+          "duration": "medium",
+          "language": "fr",
+          "max_results": 3
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 2.09
+      },
+      {
+        "task": "task-24",
+        "expected": "find_opening_videos",
+        "got": "find_opening_videos",
+        "arguments": {
+          "query": "ouverture anglaise explication",
+          "duration": "medium",
+          "language": "fr",
+          "max_results": 3
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 2.03
+      },
+      {
+        "task": "task-25",
+        "expected": "start_deep_analysis",
+        "got": "start_deep_analysis",
+        "arguments": {
+          "fen": "rnbqkbnr/pp2pppp/2p5/8/3PN3/8/PPP2PPP/R1BQKBNR b KQkq - 0 4",
+          "depth": 30
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 3.22
+      },
+      {
+        "task": "task-26",
+        "expected": "start_deep_analysis",
+        "got": "start_deep_analysis",
+        "arguments": {
+          "fen": "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+          "depth": 35
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 3.53
+      },
+      {
+        "task": "task-27",
+        "expected": "get_deep_analysis",
+        "got": "get_deep_analysis",
+        "arguments": {
+          "job_id": "a1b2c3d4"
+        },
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 2.5
+      },
+      {
+        "task": "task-28",
+        "expected": null,
+        "got": null,
+        "arguments": {},
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 3.18
+      },
+      {
+        "task": "task-29",
+        "expected": null,
+        "got": null,
+        "arguments": {},
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 1.47
+      },
+      {
+        "task": "task-30",
+        "expected": null,
+        "got": null,
+        "arguments": {},
+        "tool_ok": true,
+        "arguments_ok": true,
+        "latency_s": 3.1
+      }
+    ],
+    "session": "eval-tasks30-qwen3_14b-native-20261022T171232"
+  }
+}

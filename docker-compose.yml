@@ -10,9 +10,18 @@ services:
       MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME:-p13}:${MONGO_ROOT_PASSWORD:-change-me}@mongodb:27017
       MONGODB_DB_NAME: ${MONGODB_DB_NAME:-p13}
       MILVUS_URI: http://milvus:19530
+      STOCKFISH_PATH: /usr/games/stockfish
+      LICHESS_TOKEN: ${LICHESS_TOKEN:-}
+      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY:-}
       # Ollama tourne sur la machine hôte (accès au GPU du Mac), hors Docker
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
       HF_HOME: /models/huggingface
+      # Traces (profil « tracing ») : sans clés, l'agent trace en local seulement
+      LANGFUSE_BASE_URL: http://langfuse-web:3000
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+      AGENT_MODEL: ${AGENT_MODEL:-qwen3:14b}
+      AGENT_SELECTION: ${AGENT_SELECTION:-native}
     ports:
       - "${BACKEND_PORT:-8001}:8000"
     volumes:
@@ -123,8 +132,163 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  # --- Langfuse auto-hébergé (profil « tracing ») --------------------------------------
+  # Configuration officielle (docker-compose.yml du dépôt langfuse/langfuse, v4), services
+  # préfixés pour ne pas entrer en conflit avec ceux de Milvus. Lancer :
+  #   docker compose --profile tracing up -d
+  # Interface : http://localhost:3000 (compte et clés créés au premier démarrage via
+  # les variables LANGFUSE_INIT_*).
+
+  langfuse-web:
+    image: docker.langfuse.com/langfuse/langfuse:4
+    container_name: p13-langfuse-web
+    profiles: ["tracing"]
+    depends_on: &langfuse-depends-on
+      langfuse-postgres:
+        condition: service_healthy
+      langfuse-minio:
+        condition: service_healthy
+      langfuse-redis:
+        condition: service_healthy
+      langfuse-clickhouse:
+        condition: service_healthy
+    ports:
+      - "${LANGFUSE_PORT:-3000}:3000"
+    environment: &langfuse-env
+      NEXTAUTH_URL: http://localhost:${LANGFUSE_PORT:-3000}
+      NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-change-me-nextauth}
+      DATABASE_URL: postgresql://postgres:${LANGFUSE_POSTGRES_PASSWORD:-change-me}@langfuse-postgres:5432/postgres
+      SALT: ${LANGFUSE_SALT:-change-me-salt}
+      ENCRYPTION_KEY: ${LANGFUSE_ENCRYPTION_KEY:-0000000000000000000000000000000000000000000000000000000000000000}
+      TELEMETRY_ENABLED: "false"
+      LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: "false"
+      CLICKHOUSE_MIGRATION_URL: clickhouse://langfuse-clickhouse:9000
+      CLICKHOUSE_URL: http://langfuse-clickhouse:8123
+      CLICKHOUSE_USER: clickhouse
+      CLICKHOUSE_PASSWORD: ${LANGFUSE_CLICKHOUSE_PASSWORD:-change-me}
+      CLICKHOUSE_CLUSTER_ENABLED: "false"
+      LANGFUSE_S3_EVENT_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_EVENT_UPLOAD_REGION: auto
+      LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: minio
+      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: ${LANGFUSE_MINIO_PASSWORD:-change-me-minio}
+      LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: http://langfuse-minio:9000
+      LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: "true"
+      LANGFUSE_S3_EVENT_UPLOAD_PREFIX: events/
+      LANGFUSE_S3_MEDIA_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_MEDIA_UPLOAD_REGION: auto
+      LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID: minio
+      LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY: ${LANGFUSE_MINIO_PASSWORD:-change-me-minio}
+      LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: http://localhost:${LANGFUSE_MINIO_PORT:-9090}
+      LANGFUSE_S3_MEDIA_UPLOAD_INTERNAL_ENDPOINT: http://langfuse-minio:9000
+      LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: "true"
+      LANGFUSE_S3_MEDIA_UPLOAD_PREFIX: media/
+      REDIS_HOST: langfuse-redis
+      REDIS_PORT: "6379"
+      REDIS_AUTH: ${LANGFUSE_REDIS_PASSWORD:-change-me-redis}
+      REDIS_TLS_ENABLED: "false"
+      # Organisation, projet, clés d'API et compte créés au premier démarrage
+      LANGFUSE_INIT_ORG_ID: ffe
+      LANGFUSE_INIT_ORG_NAME: FFE
+      LANGFUSE_INIT_PROJECT_ID: p13
+      LANGFUSE_INIT_PROJECT_NAME: P13 agent ouvertures
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-pk-lf-p13-local}
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-sk-lf-p13-local}
+      LANGFUSE_INIT_USER_EMAIL: ${LANGFUSE_INIT_USER_EMAIL:-admin@p13.local}
+      LANGFUSE_INIT_USER_NAME: Admin P13
+      LANGFUSE_INIT_USER_PASSWORD: ${LANGFUSE_INIT_USER_PASSWORD:-change-me-p13}
+    restart: unless-stopped
+
+  langfuse-worker:
+    image: docker.langfuse.com/langfuse/langfuse-worker:4
+    container_name: p13-langfuse-worker
+    profiles: ["tracing"]
+    depends_on: *langfuse-depends-on
+    environment: *langfuse-env
+    restart: unless-stopped
+
+  langfuse-clickhouse:
+    image: docker.io/clickhouse/clickhouse-server:25.12
+    container_name: p13-langfuse-clickhouse
+    profiles: ["tracing"]
+    user: "101:101"
+    environment:
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_USER: clickhouse
+      CLICKHOUSE_PASSWORD: ${LANGFUSE_CLICKHOUSE_PASSWORD:-change-me}
+    volumes:
+      - langfuse_clickhouse_data:/var/lib/clickhouse
+      - langfuse_clickhouse_logs:/var/log/clickhouse-server
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 1s
+    restart: unless-stopped
+
+  langfuse-minio:
+    image: cgr.dev/chainguard/minio
+    container_name: p13-langfuse-minio
+    profiles: ["tracing"]
+    entrypoint: sh
+    command: -c 'mkdir -p /data/langfuse && minio server --address ":9000" --console-address ":9001" /data'
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: ${LANGFUSE_MINIO_PASSWORD:-change-me-minio}
+    ports:
+      - "${LANGFUSE_MINIO_PORT:-9090}:9000"
+    volumes:
+      - langfuse_minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 1s
+      timeout: 5s
+      retries: 5
+      start_period: 1s
+    restart: unless-stopped
+
+  langfuse-redis:
+    image: docker.io/redis:7
+    container_name: p13-langfuse-redis
+    profiles: ["tracing"]
+    command: >
+      --requirepass ${LANGFUSE_REDIS_PASSWORD:-change-me-redis}
+      --maxmemory-policy noeviction
+    volumes:
+      - langfuse_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 10s
+      retries: 10
+    restart: unless-stopped
+
+  langfuse-postgres:
+    image: docker.io/postgres:17
+    container_name: p13-langfuse-postgres
+    profiles: ["tracing"]
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${LANGFUSE_POSTGRES_PASSWORD:-change-me}
+      POSTGRES_DB: postgres
+      TZ: UTC
+      PGTZ: UTC
+    volumes:
+      - langfuse_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
 volumes:
   mongodb_data:
+  langfuse_postgres_data:
+  langfuse_clickhouse_data:
+  langfuse_clickhouse_logs:
+  langfuse_minio_data:
+  langfuse_redis_data:
   milvus_etcd:
   milvus_minio:
   milvus_data:

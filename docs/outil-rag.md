@@ -816,7 +816,7 @@ cadre de la phase 4.
 corrections), 365 au total, couverture de branches 98 %. Test d'intégration Milvus
 (ingestion réelle, relance sans doublon, filtre) : réussi.
 
-### Phase 5 : retrieval décidé par l'agent + traces ⏳
+### Phase 5 : retrieval décidé par l'agent + traces 🚧
 
 | Tâche | Détail |
 |---|---|
@@ -828,6 +828,120 @@ corrections), 365 au total, couverture de branches 98 %. Test d'intégration Mil
 | Coût en local | Tokens d'entrée et de sortie + durée ; 0 € en local, avec une estimation de l'équivalent cloud pour comparer |
 | Choix du modèle de l'agent | phi4-mini (sortie structurée), qwen3:1.7b et qwen3:14b (appel natif) comparés sur Tâches-30 |
 | Mesures | **Appels d'outil corrects** sur Tâches-30 ; **appels inutiles** sur Décision-50 (les 20 questions hors corpus ne devraient déclencher aucune recherche) |
+
+#### Résultats de la phase 5 🚧
+
+##### 5.0 Le graphe : la position commande, le modèle rédige
+
+Première version du graphe en phase 5 : une boucle unique « le modèle choisit un outil →
+exécution → le modèle rechoisit ». Essai réel : qwen3:1.7b répondait de mémoire à une
+question d'ouverture sans chercher ; phi4-mini (mode structuré) appelait
+`get_opening_theory` trois fois de suite pour un simple « Bonjour ! ». Laisser au modèle
+le choix d'appeler Lichess ou Stockfish pour une position est à la fois **inutile** (la
+règle est connue : Lichess d'abord, Stockfish hors théorie) et **risqué** (petits modèles).
+
+Graphe retenu (`app/agent/graph.py`), deux entrées :
+
+```
+START ─ FEN fournie ?
+  ├─ oui ─► inspect ► theory (Lichess) ─ en théorie ?
+  │                    ├─ oui ─► quick_eval (Stockfish) ► context (RAG) ► videos ► answer
+  │                    └─ non, ou Lichess en panne ─► engine (Stockfish) ► answer
+  └─ non (question libre) ─► decide ⇄ tools ► answer
+```
+
+| Parcours | Qui décide des outils | Rôle du LLM | Route |
+|---|---|---|---|
+| Position (FEN fournie) | **Le graphe**, de façon déterministe (énoncé) | Rédiger le conseil à partir des résultats | `POST /api/v1/agent/analyze` |
+| Question libre | **Le modèle** (sélection native ou structurée), ou flot fixe | Décider, puis répondre | `POST /api/v1/agent/ask` |
+
+Comportement vérifié par les tests (modèle scripté, Lichess simulé) et en réel :
+- en théorie : `inspect → theory → quick_eval (profondeur 12) → context (RAG filtré sur
+  le nom Lichess de l'ouverture) → videos → answer` ;
+- hors théorie : `inspect → theory → engine (profondeur 18, 3 lignes) → answer`, sans
+  contexte ni vidéo (pas de nom d'ouverture) ;
+- **Lichess en panne** (503 ×3 tentatives, ou jeton absent → 401) : traité comme hors
+  théorie, Stockfish prend le relais ; **FEN invalide** : aucun service externe n'est
+  appelé, chaque outil répond `invalid_arguments`, le modèle l'explique ;
+- essai réel sans jeton Lichess ni Stockfish installé : les deux outils échouent, la
+  réponse dit « les outils Lichess et Stockfish sont introuvables » au lieu d'inventer.
+
+Chaque étape est un span OpenTelemetry (`tool_call`, `decision`, `answer`) ; le journal
+de décision et Langfuse en découlent (voir 5.3).
+
+##### 5.1 Choix du modèle de l'agent : taux d'appels d'outil corrects (Tâches-30)
+
+Protocole (`scripts/eval_agent.py --tasks`) : pour chacune des 30 demandes, seule la
+**première décision** du modèle est jouée (aucun outil exécuté) ; elle est correcte si
+l'outil choisi est l'outil attendu (ou « aucun ») et si les arguments imposés par la
+demande sont présents (`lines=3`, `database=lichess`, `depth=35`, FEN exacte…).
+Même consigne système et mêmes descriptions d'outils pour les trois configurations.
+Résultats dans `data/eval/results/phase5-tool-selection.json`.
+
+| Configuration | Outil correct | Outil + arguments | Latence / décision | Tokens entrée / sortie (30 décisions) |
+|---|---|---|---|---|
+| phi4-mini, sortie structurée | 73 % (22/30) | 67 % | 1,6 s | 39 149 / 2 484 |
+| qwen3:1.7b, appel natif | 70 % (21/30) | 57 % | 0,8 s | 63 055 / 2 521 |
+| **qwen3:14b, appel natif** | **97 % (29/30)** | **97 %** | 3,1 s | 63 055 / 1 700 |
+
+Erreurs par configuration :
+- **phi4-mini** : appelle un outil quand il ne faut pas (3 fois : « Merci », « capitale
+  du Japon », « 64 cases »), et confond `get_opening_theory` avec un autre outil
+  (`inspect_position` 2 fois, `evaluate_position` 1, `search_opening_knowledge` 1) ; en
+  mode structuré, le modèle semble poussé à toujours remplir `tool`.
+- **qwen3:1.7b** : l'inverse, il **n'appelle pas** d'outil 8 fois sur 9 erreurs, surtout
+  pour les questions d'idées (`search_opening_knowledge → aucun` : 4 fois) : il répond de
+  mémoire malgré la consigne.
+- **qwen3:14b** : une seule erreur, « Quel est le meilleur coup pour les Blancs ici ? »
+  → `inspect_position` au lieu de `evaluate_position` (la demande est ambiguë : les coups
+  légaux sont aussi une réponse).
+
+**Décision : qwen3:14b, appel d'outils natif, pour l'agent** (`AGENT_MODEL=qwen3:14b`,
+`AGENT_SELECTION=native`). Le coût est la latence (3 s par décision, sur GPU Mac).
+phi4-mini reste le modèle de génération hors agent (résumés d'index, questions de
+test), où il n'a pas d'outil à choisir.
+
+Lecture des tokens : en appel natif, les 7 définitions d'outils (descriptions avec
+exemples et contre-exemples) coûtent ≈ 2 000 tokens d'entrée par décision ; en mode
+structuré, le catalogue est résumé à la première ligne de chaque description (≈ 1 300).
+Coût équivalent cloud (hypothèse 0,14 € / 0,55 € par million) : **< 0,01 €** pour les
+30 décisions, quelle que soit la configuration ; en local, 0 €.
+
+##### 5.3 Journal de décision et traces OpenTelemetry → Langfuse
+
+**Une seule instrumentation, deux sorties.** Chaque étape de l'agent ouvre un span
+OpenTelemetry (`app/agent/tracing.py`) portant des attributs `p13.*`. Un `SpanProcessor`
+(`app/agent/journal.py`) transforme les spans terminés en entrées du **journal de
+décision** (mémoire + JSON Lines, `data/journal/`) ; le SDK Langfuse (v5, bâti sur
+OpenTelemetry) exporte les mêmes spans vers Langfuse quand ses clés sont configurées.
+Sans clés, rien ne sort de la machine.
+
+**Schéma d'une entrée du journal :**
+
+| Champ | Contenu | Exemple |
+|---|---|---|
+| `timestamp` | Début de l'étape, ISO 8601 UTC | `2026-10-22T16:57:05.211+00:00` |
+| `session_id` | Session de conversation (regroupement Langfuse) | `partie-1` |
+| `trace_id` | Identifiant OpenTelemetry du tour, identique dans Langfuse | `c855e83a…` |
+| `step` | Numéro de l'étape dans le tour | `2` |
+| `kind` | `decision` (choix du modèle), `tool_call` (exécution), `answer` (rédaction) | `tool_call` |
+| `choice` | Outil choisi, ou `answer` / `none` | `search_opening_knowledge` |
+| `arguments` | Arguments de l'appel | `{"query": "idées de la Sicilienne"}` |
+| `status` | `success`, `error`, `skipped` | `error` |
+| `duration_ms` | Durée de l'étape | `134.2` |
+| `tokens_in`, `tokens_out` | Tokens du modèle (0 pour un appel d'outil) | `1974`, `65` |
+| `cost_eur` | 0 en local ; estimation « équivalent cloud » si un tarif est réglé | `0.000312` |
+| `outcome` | Issue courte : code d'erreur, nombre de passages, extrait de réponse | `[not_indexed] collection absente` |
+
+Dans Langfuse, les spans portent `langfuse.session.id` (regroupement par session),
+`langfuse.trace.name` (`analyze_position`, `agent_turn`, `first_decision`) et le type
+d'observation (`tool` pour les appels d'outil). Les générations du modèle (entrées,
+sorties, tokens) sont ajoutées par le `CallbackHandler` LangChain de Langfuse.
+
+**Coût.** Les modèles tournent en local : coût réel 0 €. Le journal calcule un
+« équivalent cloud » à partir des tokens (tarif réglable, hypothèse 0,14 € / 0,55 € par
+million de tokens d'entrée / sortie), pour donner un ordre de grandeur de ce que
+coûterait le même trafic chez un fournisseur.
 
 ### Phase 6 : recherche multi-sauts sous budget ⏳
 
