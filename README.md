@@ -23,40 +23,76 @@ P13/
 
 ## Prérequis
 
-- Git
-- Docker et Docker Compose
-- [uv](https://docs.astral.sh/uv/) (uniquement pour lancer le backend hors Docker)
+| Outil | Pourquoi |
+|---|---|
+| Git | récupérer le dépôt |
+| Docker Desktop (ou Docker Engine + Compose v2), **8 Go de RAM** alloués | tous les services tournent en conteneurs |
+| [Ollama](https://ollama.com) sur la machine hôte | le modèle de langage de l'agent (hors Docker, pour utiliser le GPU du Mac) |
+| 6 Go d'espace disque | images, modèle d'embedding (1,2 Go), modèle Ollama (9 Go pour qwen3:14b) |
+| Facultatif : jeton Lichess, clé YouTube Data v3 | coups des maîtres sans limite de débit ; vidéos |
+| Facultatif : [uv](https://docs.astral.sh/uv/), Node 22 | backend et front hors Docker (développement) |
 
-## Démarrage
-
-```bash
-cp .env.example .env            # LICHESS_TOKEN et YOUTUBE_API_KEY facultatifs mais recommandés
-ollama pull qwen3:14b           # modèle de l'agent, sur la machine hôte (hors Docker)
-docker compose up -d --build    # frontend (nginx), backend (Stockfish), MongoDB, Milvus
-docker compose exec backend uv run python -m scripts.ingest_corpus   # corpus → Milvus, une fois
-```
-
-L'application est sur <http://localhost:8080> (échiquier, coups des maîtres, conseil de
-l'agent, analyse profonde, vidéos, questions). Détails et positions de démo dans
-[docs/deploiement.md](docs/deploiement.md).
-
-Vérifier que l'API répond :
+## Installation et démarrage
 
 ```bash
-curl http://localhost:8001/api/v1/healthcheck
-# {"status":"ok","environment":"development"}
-
-curl http://localhost:8001/api/v1/healthcheck/database
-# {"status":"ok","database":"p13"}
+git clone <dépôt> P13 && cd P13
+cp .env.example .env
 ```
 
-La documentation interactive de l'API est disponible sur <http://localhost:8001/docs>.
-
-Arrêter les services :
+Dans `.env`, renseigner si vous les avez `LICHESS_TOKEN` et `YOUTUBE_API_KEY` ; les
+autres valeurs par défaut conviennent pour une démonstration locale.
 
 ```bash
-docker compose down
+ollama pull qwen3:14b                 # modèle de l'agent (une fois, ≈ 9 Go)
+ollama pull phi4-mini                 # résumés d'enrichissement du corpus (une fois)
+docker compose up -d --build          # frontend, backend, MongoDB, Milvus (+ etcd, minio)
+docker compose ps                     # attendre que tout soit « healthy » (1 à 3 min)
+docker compose exec backend uv run python -m scripts.ingest_corpus   # corpus → Milvus (une fois)
 ```
+
+Ouvrir <http://localhost:8080>. L'API est aussi exposée sur <http://localhost:8001>
+(documentation interactive sur `/docs`).
+
+### Vérifier que tout est interfacé
+
+```bash
+./scripts/smoke.sh
+```
+
+Le script appelle chaque service **à travers le front** : page, backend, MongoDB, Lichess,
+Stockfish (évaluation et analyse différée), Milvus, YouTube, puis l'agent (conseil complet
+et question libre). Il affiche une ligne par vérification et sort en erreur si l'une échoue.
+
+### Positions pour la démonstration
+
+| Scénario | Comment l'obtenir | Ce que l'on voit |
+|---|---|---|
+| En théorie | jouer 1.e4 e5 2.Cf3 Cc6 3.Fc4, ou charger la FEN `r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3` | « Italian Game · C50 », Fc5 25 k parties, vidéos françaises, conseil avec évaluation et extraits de l'encyclopédie |
+| Sicilienne | 1.e4 c5 2.Cf3 d6 3.d4 | statistiques, nom ECO, vidéos sur la Sicilienne |
+| Hors théorie | 1.a4 h5 2.Ta3 Th6 3.Tg3 | badge « Hors théorie », conseil fondé sur Stockfish, pas de vidéo |
+| Position invalide | FEN `rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0` | message « FEN invalide », aucun appel à l'API |
+| Analyse profonde | bouton « Analyse profonde » | suivi de la tâche de fond, résultat à la profondeur 28 |
+| Question libre | « Quelles sont les idées de la Caro-Kann ? » | réponse rédigée à partir de l'encyclopédie |
+
+### Arrêter, repartir, nettoyer
+
+```bash
+docker compose down                   # arrête et supprime les conteneurs, garde les volumes
+docker compose up -d                  # repart avec les données (corpus, index, cache)
+docker compose down -v                # supprime aussi les volumes (réinstallation complète)
+docker compose --profile tracing up -d   # facultatif : Langfuse sur http://localhost:3000
+```
+
+### En cas de problème
+
+| Symptôme | Cause probable | Remède |
+|---|---|---|
+| `backend` reste « starting » | Milvus ou MongoDB pas encore sains, ou machine chargée | `docker compose ps`, attendre ; `docker compose logs backend` |
+| Carte « Coups des maîtres » en erreur 503 | Lichess injoignable ou limite de débit sans jeton | renseigner `LICHESS_TOKEN` |
+| Conseil de l'agent en erreur | Ollama absent ou modèle non téléchargé | `ollama list`, `ollama pull qwen3:14b` ; sous Linux, vérifier `host.docker.internal` |
+| « Vidéos : non configurée » | pas de clé YouTube | renseigner `YOUTUBE_API_KEY` |
+| Recherche vectorielle `not_indexed` | corpus non ingéré | lancer `scripts.ingest_corpus` |
+| Port déjà utilisé | un autre service écoute sur 8080, 8001, 27017 ou 19530 | changer `FRONTEND_PORT`, `BACKEND_PORT`, `MONGO_PORT`, `MILVUS_PORT` dans `.env` |
 
 ## Configuration
 
