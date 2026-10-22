@@ -9,16 +9,28 @@ dependencies = [
     "fastapi>=0.141.1",
     "httpx>=0.28.1",
     "langchain-core>=1.0",
+    "langchain-ollama>=1.1",
+    "langchain-text-splitters>=1.0",
+    "langfuse>=5.0",
+    "langgraph>=1.2",
+    "opentelemetry-exporter-otlp-proto-http>=1.45",
+    "opentelemetry-sdk>=1.45",
     "pydantic>=2.12",
     "pydantic-settings>=2.15.0",
+    "pymilvus>=2.6.17,<2.7",
     "pymongo>=4.18.2",
+    "sentence-transformers>=5.1",
     "tenacity>=9.2.1",
+    "torch>=2.8",
     "uvicorn[standard]>=0.54.0",
 ]
 
 [dependency-groups]
 dev = [
+    "beautifulsoup4>=4.13",
     "httpx2>=2.13.1",
+    "langchain-experimental>=0.4.2",
+    "lxml>=6.0",
     "pytest>=9.1.1",
     "pytest-asyncio>=1.4.0",
     "pytest-cov>=7.1.0",
@@ -55,3 +67,13 @@ target-version = "py313"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC", "RUF"]
+
+# PyTorch en version CPU dans le conteneur Linux (l'index par défaut embarque CUDA, ~2 Go
+# inutiles ici). Sur macOS, la version standard de PyPI est déjà sans CUDA.
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]

@@ -20,7 +20,7 @@ Il sert de référence pour l'implémentation (`backend/app/tools/`), les tests
 | 1 | `inspect_position` | python-chess (local) | aucun | oui | ✅ |
 | 2 | `get_opening_theory` | Lichess Explorer | lecture externe | oui | ✅ |
 | 3 | `evaluate_position` | Stockfish (local) | aucun | oui | ✅ |
-| 4 | `search_opening_knowledge` | Milvus (RAG Wikichess) | lecture externe | oui | 🔌 Milvus à l'étape 2 |
+| 4 | `search_opening_knowledge` | Milvus (corpus Wikipédia FR) | lecture externe | oui | ✅ |
 | 5 | `find_opening_videos` | YouTube Data API v3 | lecture externe (quota) | oui | ✅ |
 | 6 | `start_deep_analysis` | Stockfish (tâche de fond) | crée une tâche | oui, par clé | ✅ |
 | 7 | `get_deep_analysis` | Stockfish (tâche de fond) | aucun | oui | ✅ |
@@ -279,12 +279,12 @@ Position terminée (mat, pat) : pas d'erreur, `lines` est vide et `assessment` l
 
 ---
 
-### 4.4 `search_opening_knowledge` 🔌
+### 4.4 `search_opening_knowledge` ✅
 
 **Rôle** : contexte de l'ouverture (idées, plans, pièges, histoire) par recherche vectorielle.
 
 **Description donnée au modèle :**
-> Recherche dans la base de connaissances sur les ouvertures (articles Wikichess
+> Recherche dans la base de connaissances sur les ouvertures (articles Wikipédia
 > indexés dans Milvus) les passages les plus proches d'une question : idées, plans
 > typiques, pièges, histoire. Renvoie des extraits avec leur source.
 >
@@ -307,14 +307,18 @@ Position terminée (mat, pat) : pas d'erreur, `lines` est vide et `assessment` l
 
 | Champ | Type | Description |
 |---|---|---|
-| `passages[]` | `{text, opening, section, source_url, score}` | Triés par similarité décroissante (cosinus, 0 à 1) |
-| `found` | bool | `false` si aucun passage ne dépasse le seuil de pertinence (0,5 par défaut) |
+| `passages[]` | `{chunk_id, article_id, title, opening, opening_family, section, text, source_url, score}` | Triés par similarité décroissante (cosinus, 0 à 1) ; `section` est le fil d'Ariane (« Défense slave > Principales variantes ») |
+| `found` | bool | `false` si aucun passage ne dépasse le seuil de pertinence (`RAG_MIN_SCORE`, 0,50, calibré sur Réf-30 et Décision-50 : voir `docs/outil-rag.md`, phase 2) |
 
 | Effets | Idempotent | Erreurs | Résilience |
 |---|---|---|---|
-| Lecture de Milvus et calcul d'un embedding | Oui | `invalid_arguments`, `timeout`, `network_error`, `retries_exhausted`, `circuit_open` | Timeout 5 s, 2 tentatives, disjoncteur 5 / 30 s |
+| Lecture de Milvus et calcul d'un embedding (≈ 50 à 100 ms, modèle chargé) | Oui | `invalid_arguments`, `model_loading` (modèle en cours de chargement, réessayer après `retry_after_s`), `embedding_unavailable`, `not_indexed` (collection absente : lancer l'ingestion), `vector_store_error`, `network_error`, `timeout`, `retries_exhausted`, `circuit_open` | Timeout 5 s, 2 tentatives, disjoncteur 5 / 30 s ; modèle préchauffé au démarrage de l'API |
 
 **Repli** : `found=false`, et l'agent explique avec les seules données Lichess et Stockfish.
+
+**Filtre `opening`** : le nom Lichess renvoyé par `get_opening_theory` (ex. « Italian Game: Evans Gambit ») sélectionne l'article exact **et** sa famille (« Italian Game »).
+
+**Endpoint HTTP** : `GET /api/v1/vector-search?query=…&opening=…&limit=…` appelle cet outil.
 
 ---
 
@@ -823,7 +827,6 @@ seraient dupliquées pour chaque outil. Cette variante ne serait retenue que si 
 | Limite | Conséquence | Suite prévue |
 |---|---|---|
 | Fixtures construites, pas enregistrées | Un changement de format d'API ne serait pas détecté | Lancer `record_fixtures.py` dès que le jeton Lichess et la clé YouTube sont disponibles |
-| Base vectorielle non branchée | `search_opening_knowledge` répond `not_configured` dans l'application | Étape 2 : adaptateur Milvus (ses erreurs de connexion devront devenir des `ToolTransientError`) |
 | Pas de cache YouTube | Une même recherche consomme du quota à chaque fois | Étape 3 : cache MongoDB par requête |
 | Stockfish absent de l'image Docker | `evaluate_position` répond `engine_not_found` dans le conteneur | Étape 6 : installer Stockfish dans le `Dockerfile` |
 | Tâches différées en mémoire | Perdues au redémarrage ; un seul processus | Si besoin : stockage MongoDB ou file de tâches |

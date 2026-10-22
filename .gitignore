@@ -27,3 +27,10 @@ node_modules/
 # Couverture de tests
 .coverage
 htmlcov/
+
+# Cache des embeddings des expériences (régénérable)
+backend/data/eval/cache/
+*.bak
+
+# Journal de décision de l'agent (sortie d'exécution)
+backend/data/journal/

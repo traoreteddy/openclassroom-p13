@@ -1,0 +1,1049 @@
+{
+  "fixed": {
+    "useless_rate": 1.0,
+    "missed_rate": 0.0,
+    "by_category": {
+      "dans_corpus": {
+        "total": 30,
+        "searched": 30,
+        "useless_rate": null,
+        "missed_rate": 0.0
+      },
+      "echecs_hors_corpus": {
+        "total": 8,
+        "searched": 8,
+        "useless_rate": 1.0,
+        "missed_rate": null
+      },
+      "autre_outil": {
+        "total": 6,
+        "searched": 6,
+        "useless_rate": 1.0,
+        "missed_rate": null
+      },
+      "hors_sujet": {
+        "total": 6,
+        "searched": 6,
+        "useless_rate": 1.0,
+        "missed_rate": null
+      }
+    },
+    "mean_latency_s": 10.38,
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "cloud_equivalent_eur": 0.0,
+    "rows": [
+      {
+        "id": "dec-01",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-02",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-03",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-04",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-05",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-06",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-07",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-08",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-09",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-10",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-11",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-12",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-13",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-14",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-15",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-16",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-17",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-18",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-19",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-20",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-21",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-22",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-23",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-24",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-25",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-26",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-27",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-28",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-29",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-30",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-31",
+        "category": "echecs_hors_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-32",
+        "category": "echecs_hors_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-33",
+        "category": "echecs_hors_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-34",
+        "category": "echecs_hors_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-35",
+        "category": "echecs_hors_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-36",
+        "category": "echecs_hors_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-37",
+        "category": "echecs_hors_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-38",
+        "category": "echecs_hors_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-39",
+        "category": "autre_outil",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-40",
+        "category": "autre_outil",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-41",
+        "category": "autre_outil",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-42",
+        "category": "autre_outil",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-43",
+        "category": "autre_outil",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-44",
+        "category": "autre_outil",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-45",
+        "category": "hors_sujet",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-46",
+        "category": "hors_sujet",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-47",
+        "category": "hors_sujet",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-48",
+        "category": "hors_sujet",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-49",
+        "category": "hors_sujet",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-50",
+        "category": "hors_sujet",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      }
+    ],
+    "session": "eval-decision50-fixed-qwen3_14b-20261022T171637"
+  },
+  "agent": {
+    "useless_rate": 0.2,
+    "missed_rate": 0.16666666666666666,
+    "by_category": {
+      "dans_corpus": {
+        "total": 30,
+        "searched": 25,
+        "useless_rate": null,
+        "missed_rate": 0.16666666666666666
+      },
+      "echecs_hors_corpus": {
+        "total": 8,
+        "searched": 4,
+        "useless_rate": 0.5,
+        "missed_rate": null
+      },
+      "autre_outil": {
+        "total": 6,
+        "searched": 0,
+        "useless_rate": 0.0,
+        "missed_rate": null
+      },
+      "hors_sujet": {
+        "total": 6,
+        "searched": 0,
+        "useless_rate": 0.0,
+        "missed_rate": null
+      }
+    },
+    "mean_latency_s": 13.3,
+    "tokens_in": 188771,
+    "tokens_out": 7340,
+    "cloud_equivalent_eur": 0.030465,
+    "rows": [
+      {
+        "id": "dec-01",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-02",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-03",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-04",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-05",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-06",
+        "category": "dans_corpus",
+        "searched": false,
+        "tools": [],
+        "useless": false,
+        "missed": true
+      },
+      {
+        "id": "dec-07",
+        "category": "dans_corpus",
+        "searched": false,
+        "tools": [
+          "get_opening_theory"
+        ],
+        "useless": false,
+        "missed": true
+      },
+      {
+        "id": "dec-08",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-09",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-10",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-11",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-12",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-13",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-14",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-15",
+        "category": "dans_corpus",
+        "searched": false,
+        "tools": [],
+        "useless": false,
+        "missed": true
+      },
+      {
+        "id": "dec-16",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-17",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-18",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-19",
+        "category": "dans_corpus",
+        "searched": false,
+        "tools": [],
+        "useless": false,
+        "missed": true
+      },
+      {
+        "id": "dec-20",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-21",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-22",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-23",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-24",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-25",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-26",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-27",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-28",
+        "category": "dans_corpus",
+        "searched": false,
+        "tools": [],
+        "useless": false,
+        "missed": true
+      },
+      {
+        "id": "dec-29",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-30",
+        "category": "dans_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-31",
+        "category": "echecs_hors_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-32",
+        "category": "echecs_hors_corpus",
+        "searched": false,
+        "tools": [],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-33",
+        "category": "echecs_hors_corpus",
+        "searched": false,
+        "tools": [],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-34",
+        "category": "echecs_hors_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-35",
+        "category": "echecs_hors_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-36",
+        "category": "echecs_hors_corpus",
+        "searched": true,
+        "tools": [
+          "search_opening_knowledge"
+        ],
+        "useless": true,
+        "missed": false
+      },
+      {
+        "id": "dec-37",
+        "category": "echecs_hors_corpus",
+        "searched": false,
+        "tools": [],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-38",
+        "category": "echecs_hors_corpus",
+        "searched": false,
+        "tools": [],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-39",
+        "category": "autre_outil",
+        "searched": false,
+        "tools": [
+          "evaluate_position"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-40",
+        "category": "autre_outil",
+        "searched": false,
+        "tools": [
+          "get_opening_theory"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-41",
+        "category": "autre_outil",
+        "searched": false,
+        "tools": [
+          "inspect_position"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-42",
+        "category": "autre_outil",
+        "searched": false,
+        "tools": [
+          "find_opening_videos"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-43",
+        "category": "autre_outil",
+        "searched": false,
+        "tools": [
+          "get_opening_theory",
+          "inspect_position"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-44",
+        "category": "autre_outil",
+        "searched": false,
+        "tools": [
+          "get_opening_theory"
+        ],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-45",
+        "category": "hors_sujet",
+        "searched": false,
+        "tools": [],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-46",
+        "category": "hors_sujet",
+        "searched": false,
+        "tools": [],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-47",
+        "category": "hors_sujet",
+        "searched": false,
+        "tools": [],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-48",
+        "category": "hors_sujet",
+        "searched": false,
+        "tools": [],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-49",
+        "category": "hors_sujet",
+        "searched": false,
+        "tools": [],
+        "useless": false,
+        "missed": false
+      },
+      {
+        "id": "dec-50",
+        "category": "hors_sujet",
+        "searched": false,
+        "tools": [],
+        "useless": false,
+        "missed": false
+      }
+    ],
+    "session": "eval-decision50-agent-qwen3_14b-20261022T171637"
+  }
+}

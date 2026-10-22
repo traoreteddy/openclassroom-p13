@@ -1,0 +1,28 @@
+{
+  "Phase 2 : récursif 512": {
+    "recall@5": 0.9,
+    "mrr": 0.692,
+    "context_tokens": 1803.0,
+    "recall_budget": 0.95,
+    "missed": [
+      "holdout-04",
+      "holdout-10"
+    ]
+  },
+  "Phase 3 : hiérarchique (parents ≤ 1 024)": {
+    "recall@5": 0.95,
+    "mrr": 0.764,
+    "context_tokens": 1888.0,
+    "recall_budget": 0.9,
+    "missed": [
+      "holdout-10"
+    ]
+  },
+  "Phase 4 : configuration gelée": {
+    "recall@5": 1.0,
+    "mrr": 0.875,
+    "context_tokens": 1640.0,
+    "recall_budget": 1.0,
+    "missed": []
+  }
+}

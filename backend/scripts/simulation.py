@@ -106,10 +106,14 @@ class SimKnowledge:
         await asyncio.sleep(self.latency)
         return [
             Passage(
-                text="Les Noirs développent le Fou en c5 et visent f2.",
+                chunk_id="recursive:partie-italienne:000",
+                article_id="partie-italienne",
+                title="Partie italienne",
                 opening=opening or "Italian Game",
+                opening_family="Italian Game",
                 section="Idées",
-                source_url="https://fr.wikichess.org/wiki/Partie_italienne",
+                text="Les Noirs développent le Fou en c5 et visent f2.",
+                source_url="https://fr.wikipedia.org/wiki/Partie_italienne",
                 score=0.8,
             )
         ][:limit]

@@ -93,6 +93,14 @@ def test_tools_catalog(client):
     assert all("input_schema" in tool for tool in response.json())
 
 
-def test_lifespan_builds_the_real_registry():
+def test_lifespan_builds_the_real_registry_and_warms_up(monkeypatch):
+    from app.tools.catalog import ToolDependencies
+
+    warm_ups: list[ToolDependencies] = []
+    # Le vrai préchauffage chargerait le modèle (1,2 Go) : on vérifie seulement l'appel.
+    monkeypatch.setattr(ToolDependencies, "start_warm_up", lambda deps: warm_ups.append(deps))
+
     with TestClient(app) as client:
         assert len(client.app.state.tool_registry.names) == 7
+
+    assert len(warm_ups) == 1

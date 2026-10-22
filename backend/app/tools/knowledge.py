@@ -1,4 +1,4 @@
-"""Outil `search_opening_knowledge` : recherche vectorielle dans la base Wikichess (Milvus).
+"""Outil `search_opening_knowledge` : recherche vectorielle dans le corpus Wikipédia FR (Milvus).
 
 L'outil dépend de deux interfaces :
 - `Embedder` : transforme la question en vecteur (sentence-transformers, étape 2) ;
@@ -13,6 +13,7 @@ from typing import Protocol
 
 from pydantic import ConfigDict, Field, field_validator
 
+from app.rag.text import normalize_query
 from app.tools.base import SideEffect, ToolInput, ToolOutput, ToolSpec
 from app.tools.resilience import ResiliencePolicy
 
@@ -21,7 +22,7 @@ DEFAULT_MIN_SCORE = 0.5
 _FEN_LIKE = re.compile(r"^([1-8pnbrqkPNBRQK]+/){7}[1-8pnbrqkPNBRQK]+(\s|$)")
 
 DESCRIPTION = """\
-Recherche dans la base de connaissances sur les ouvertures (articles Wikichess indexés
+Recherche dans la base de connaissances sur les ouvertures (articles Wikipédia indexés
 dans Milvus) les passages les plus proches d'une question : idées, plans typiques,
 pièges, histoire. Renvoie des extraits avec leur source.
 
@@ -64,9 +65,13 @@ class SearchKnowledgeInput(ToolInput):
 
 
 class Passage(ToolOutput):
-    text: str
+    chunk_id: str
+    article_id: str
+    title: str
     opening: str
+    opening_family: str
     section: str
+    text: str
     source_url: str
     score: float
 
@@ -95,7 +100,7 @@ class KnowledgeSearch:
         self._min_score = min_score
 
     async def search(self, params: SearchKnowledgeInput) -> SearchKnowledgeOutput:
-        vector = await self._embedder.embed(params.query)
+        vector = await self._embedder.embed(normalize_query(params.query))
         hits = await self._store.search(vector, limit=params.limit, opening=params.opening)
         relevant = sorted(
             (hit for hit in hits if hit.score >= self._min_score),

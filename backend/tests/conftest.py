@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from collections.abc import Callable
 from pathlib import Path
@@ -155,11 +156,16 @@ class StubVectorStore:
 
 
 def passage(text: str, score: float, opening: str = "Sicilian Defense") -> Passage:
+    digest = hashlib.sha1(text.encode()).hexdigest()[:8]  # identifiant unique par texte
     return Passage(
-        text=text,
+        chunk_id=f"parent:{opening.lower().replace(' ', '-')}:{digest}",
+        article_id=opening.lower().replace(" ", "-"),
+        title=opening,
         opening=opening,
+        opening_family=opening,
         section="Idées",
-        source_url="https://fr.wikichess.org/wiki/Sicilienne",
+        text=text,
+        source_url="https://fr.wikipedia.org/wiki/Défense_sicilienne",
         score=score,
     )
 
