@@ -144,6 +144,7 @@ Documentation :
 | [docs/outil-videos.md](docs/outil-videos.md) | Recherche de vidéos YouTube, quotas, mesure |
 | [docs/frontend.md](docs/frontend.md) | Front Angular : services, panneau, synchronisation |
 | [docs/deploiement.md](docs/deploiement.md) | Conteneurs, volumes, installation fraîche, démo |
+| [docs/note-mcp-vision.md](docs/note-mcp-vision.md) ([PDF](docs/note-mcp-vision.pdf)) | Note de cadrage : analyse vidéo par vision et serveur MCP, bénéfices, limites, architecture, coûts, alternatives |
 
 ## Services
 

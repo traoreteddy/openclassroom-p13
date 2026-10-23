@@ -331,7 +331,7 @@ frontend/src/app/
 
 ---
 
-## 4. Partie 2 : serveur MCP « vidéo par position »
+## 4. Partie 2 : serveur MCP « vidéo par position » ✅ (note rédigée : `docs/note-mcp-vision.md`, PDF `docs/note-mcp-vision.pdf`)
 
 **Le problème :** la recherche YouTube par texte renvoie par exemple une vidéo de
 45 minutes sur la Sicilienne, alors que le joueur veut l'explication du coup en cours.
