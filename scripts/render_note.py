@@ -1,23 +1,26 @@
-"""Rend la note de cadrage (Markdown) en page HTML prête à imprimer en PDF.
+"""Rend un document Markdown de `docs/` en page HTML prête à imprimer en PDF.
 
-    uv run --directory backend --with markdown python ../scripts/render_note.py
+    uv run --directory backend --with markdown python ../scripts/render_note.py [docs/x.md]
 
-Puis, dans un navigateur (ou Playwright) : imprimer `docs/.build/note-mcp-vision.html` en
-A4 vers `docs/note-mcp-vision.pdf`. Page de garde, sommaire, figures SVG en ligne,
-encadré de chiffres clés ; le Markdown reste la source unique.
+Sans argument : la note MCP. Puis, dans un navigateur (ou Playwright) : imprimer
+`docs/.build/<nom>.html` en A4 vers `docs/<nom>.pdf`. Page de garde (titre, sous-titre en
+gras, tableau de métadonnées), sommaire, figures SVG en ligne, captures PNG incorporées ;
+le Markdown reste la source unique.
 """
 
 from __future__ import annotations
 
+import base64
 import re
+import sys
 from pathlib import Path
 
 import markdown
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "docs" / "note-mcp-vision.md"
+SOURCE = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else ROOT / "docs" / "note-mcp-vision.md"
 OUT_DIR = ROOT / "docs" / ".build"
-OUT = OUT_DIR / "note-mcp-vision.html"
+OUT = OUT_DIR / f"{SOURCE.stem}.html"
 
 CSS = """
 body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 9.6pt; line-height: 1.35; color: #1f1f1f; margin: 0; }
@@ -49,6 +52,8 @@ hr { border: 0; border-top: 1px solid #c9c2b4; margin: 10pt 0; }
 /* figures */
 figure { margin: 8pt 0 12pt; page-break-inside: avoid; }
 figure svg { width: 88%; height: auto; display: block; margin: 0 auto; }
+figure img { max-width: 100%; max-height: 150mm; display: block; margin: 0 auto; border: 1px solid #d6d0c4; border-radius: 4pt; }
+figure.narrow img { max-width: 62%; }
 figcaption { font-size: 8.8pt; color: #555; margin-top: 4pt; text-align: center; font-style: italic; }
 
 /* chiffres clés */
@@ -90,9 +95,17 @@ def main() -> None:
     # Figures SVG en ligne (pas de dépendance au chemin des images dans le PDF)
     def inline_svg(match: re.Match[str]) -> str:
         alt, src = match.group(1), match.group(2)
-        svg = (SOURCE.parent / src).read_text(encoding="utf-8")
-        svg = re.sub(r"<\?xml[^>]*\?>", "", svg)
-        return f"<figure>{svg}<figcaption>{alt}</figcaption></figure>"
+        path = SOURCE.parent / src
+        if path.suffix.lower() == ".svg":
+            svg = re.sub(r"<\?xml[^>]*\?>", "", path.read_text(encoding="utf-8"))
+            return f"<figure>{svg}<figcaption>{alt}</figcaption></figure>"
+        # Capture PNG : incorporée en base64 pour que le HTML soit autonome
+        data = base64.b64encode(path.read_bytes()).decode("ascii")
+        css_class = ' class="narrow"' if "narrow" in alt.lower() or path.stem.endswith("-n") else ""
+        return (
+            f'<figure{css_class}><img alt="{alt}" src="data:image/png;base64,{data}">'
+            f"<figcaption>{alt}</figcaption></figure>"
+        )
 
     body = re.sub(r'<p><img alt="([^"]*)" src="([^"]+)"\s*/?></p>', inline_svg, body)
     body = body.replace("<h2>Résumé pour décision</h2>", '<div class="summary"><h2>Résumé pour décision</h2>', 1)
@@ -105,7 +118,7 @@ def main() -> None:
   <p class="cover__subtitle">{subtitle}</p>
   {meta_html}
   <nav class="toc"><h2>Sommaire</h2><ol>{"".join(toc_items)}</ol></nav>
-  <p class="cover__footer">Fédération française des échecs · projet « coach d'ouvertures » · document de travail pour décision</p>
+  <p class="cover__footer">Fédération française des échecs · projet « coach d'ouvertures »</p>
 </section>"""
 
     html = (

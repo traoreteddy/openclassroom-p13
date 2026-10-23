@@ -15,6 +15,14 @@ describe('RichTextPipe', () => {
     );
   });
 
+  it('transforme les liens Markdown http(s) en liens cliquables, et rien d’autre', () => {
+    expect(
+      pipe.transform('Voir [la vidéo](https://www.youtube.com/watch?v=abc) et [x](javascript:1)'),
+    ).toBe(
+      'Voir <a href="https://www.youtube.com/watch?v=abc" target="_blank" rel="noopener">la vidéo</a> et [x](javascript:1)',
+    );
+  });
+
   it('renvoie une chaîne vide sans texte', () => {
     expect(pipe.transform(null)).toBe('');
   });

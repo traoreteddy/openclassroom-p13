@@ -138,6 +138,7 @@ Documentation :
 
 | Document | Contenu |
 |---|---|
+| [docs/fonctionnalites.md](docs/fonctionnalites.md) ([PDF](docs/fonctionnalites.pdf)) | **Guide de A à Z** : toutes les fonctionnalités avec captures d'écran |
 | [docs/processus.md](docs/processus.md) | Processus, étapes, graphe de l'agent |
 | [docs/contrat-tools.md](docs/contrat-tools.md) | Les sept outils de l'agent et leur contrat |
 | [docs/outil-rag.md](docs/outil-rag.md) | RAG agentique, phases 0 à 7 et mesures |
