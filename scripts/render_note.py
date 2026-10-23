@@ -5,7 +5,8 @@
 Sans argument : la note MCP. Puis, dans un navigateur (ou Playwright) : imprimer
 `docs/.build/<nom>.html` en A4 vers `docs/<nom>.pdf`. Page de garde (titre, sous-titre en
 gras, tableau de métadonnées), sommaire, figures SVG en ligne, captures PNG incorporées ;
-le Markdown reste la source unique.
+le Markdown reste la source unique. Marqueurs facultatifs : `<!-- kicker: … -->` en première
+ligne (bandeau de couverture) et `<!-- page: paysage -->` avant une image (page A4 paysage).
 """
 
 from __future__ import annotations
@@ -52,6 +53,11 @@ hr { border: 0; border-top: 1px solid #c9c2b4; margin: 10pt 0; }
 /* figures */
 figure { margin: 8pt 0 12pt; page-break-inside: avoid; }
 figure svg { width: 88%; height: auto; display: block; margin: 0 auto; }
+/* page paysage dédiée à un schéma large (marqueur <!-- page: paysage --> avant l'image) */
+@page paysage { size: A4 landscape; }
+figure.landscape { page: paysage; page-break-before: always; page-break-after: always; margin: 0; }
+figure.landscape svg { width: 100%; max-height: 166mm; }
+figure.landscape figcaption { font-size: 9.5pt; margin-top: 6pt; }
 figure img { max-width: 100%; max-height: 150mm; display: block; margin: 0 auto; border: 1px solid #d6d0c4; border-radius: 4pt; }
 figure.narrow img { max-width: 62%; }
 figcaption { font-size: 8.8pt; color: #555; margin-top: 4pt; text-align: center; font-style: italic; }
@@ -70,6 +76,10 @@ figcaption { font-size: 8.8pt; color: #555; margin-top: 4pt; text-align: center;
 
 def main() -> None:
     text = SOURCE.read_text(encoding="utf-8")
+    kicker_match = re.search(r"^<!-- kicker: (.+?) -->\n", text)
+    kicker = kicker_match.group(1) if kicker_match else "Note de cadrage · système non implémenté"
+    if kicker_match:
+        text = text[kicker_match.end() :]
 
     # Page de garde : titre (h1), sous-titre (ligne en gras), tableau de métadonnées
     title = re.search(r"^# (.+)$", text, re.M).group(1)
@@ -108,12 +118,13 @@ def main() -> None:
         )
 
     body = re.sub(r'<p><img alt="([^"]*)" src="([^"]+)"\s*/?></p>', inline_svg, body)
+    body = re.sub(r"<!-- page: paysage -->\s*<figure>", '<figure class="landscape">', body)
     body = body.replace("<h2>Résumé pour décision</h2>", '<div class="summary"><h2>Résumé pour décision</h2>', 1)
     body = body.replace("<h2>1. Contexte", '</div><h2>1. Contexte', 1)
         
     cover = f"""
 <section class="cover">
-  <div class="cover__kicker">Note de cadrage · système non implémenté</div>
+  <div class="cover__kicker">{kicker}</div>
   <h1>{title}</h1>
   <p class="cover__subtitle">{subtitle}</p>
   {meta_html}

@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" width="1200" height="640" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="ga" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4a4a4a"/>
+    </marker>
+    <style>
+      .lane { fill: #fbfaf7; stroke: #9a9387; stroke-width: 1.3; stroke-dasharray: 7 4; }
+      .lane-label { fill: #6b6b6b; font-size: 13.5px; font-weight: 700; letter-spacing: .05em; }
+      .node { fill: #f6f1e7; stroke: #b9a98e; stroke-width: 1.5; rx: 9; }
+      .node-llm { fill: #8a5a2b; stroke: #6f4620; stroke-width: 1.5; rx: 9; }
+      .node-end { fill: #ffffff; stroke: #4a4a4a; stroke-width: 1.6; }
+      .cond { fill: #ffffff; stroke: #8a5a2b; stroke-width: 1.8; }
+      .name { font-family: Menlo, Consolas, monospace; font-size: 14px; font-weight: 700; fill: #1f1f1f; }
+      .name-light { font-family: Menlo, Consolas, monospace; font-size: 14px; font-weight: 700; fill: #ffffff; }
+      .tool { font-size: 12.5px; fill: #4a4a4a; }
+      .tool-light { font-size: 12.5px; fill: #fff5ea; }
+      .flow { stroke: #4a4a4a; stroke-width: 1.7; fill: none; marker-end: url(#ga); }
+      .join { stroke: #4a4a4a; stroke-width: 1.7; fill: none; }
+      .label { font-size: 12.5px; fill: #4a4a4a; }
+      .cond-text { font-size: 12.5px; font-weight: 700; fill: #1f1f1f; }
+      .note { font-size: 12.5px; fill: #555; font-style: italic; }
+    </style>
+  </defs>
+
+  <!-- START -->
+  <circle cx="50" cy="320" r="20" class="node-end"/>
+  <text x="50" y="324" text-anchor="middle" font-weight="700" font-size="11.5px">START</text>
+  <line x1="70" y1="320" x2="90" y2="320" class="flow"/>
+
+  <!-- Aiguillage d'entrée -->
+  <polygon points="92,320 150,280 208,320 150,360" class="cond"/>
+  <text x="150" y="316" text-anchor="middle" class="cond-text">position</text>
+  <text x="150" y="332" text-anchor="middle" class="cond-text">(FEN) fournie ?</text>
+
+  <!-- ===== Parcours position ===== -->
+  <rect x="240" y="30" width="760" height="246" class="lane"/>
+  <text x="256" y="52" class="lane-label">PARCOURS « POSITION » · ordre fixé par le code · POST /agent/analyze</text>
+
+  <path d="M 150 280 L 150 150 L 258 150" class="flow"/>
+  <text x="160" y="214" class="label">oui</text>
+
+  <rect x="260" y="124" width="120" height="52" class="node"/>
+  <text x="320" y="146" text-anchor="middle" class="name">inspect</text>
+  <text x="320" y="164" text-anchor="middle" class="tool">inspect_position</text>
+  <line x1="380" y1="150" x2="398" y2="150" class="flow"/>
+
+  <rect x="400" y="124" width="136" height="52" class="node"/>
+  <text x="468" y="146" text-anchor="middle" class="name">theory</text>
+  <text x="468" y="164" text-anchor="middle" class="tool">get_opening_theory</text>
+  <line x1="536" y1="150" x2="554" y2="150" class="flow"/>
+
+  <polygon points="556,150 606,112 656,150 606,188" class="cond"/>
+  <text x="606" y="146" text-anchor="middle" class="cond-text">position en</text>
+  <text x="606" y="162" text-anchor="middle" class="cond-text">théorie ?</text>
+
+  <!-- oui : évaluation rapide, encyclopédie, vidéos -->
+  <path d="M 606 112 L 606 92 L 668 92" class="flow"/>
+  <text x="620" y="106" class="label">oui</text>
+  <rect x="670" y="68" width="112" height="48" class="node"/>
+  <text x="726" y="88" text-anchor="middle" class="name" font-size="13px">quick_eval</text>
+  <text x="726" y="105" text-anchor="middle" class="tool" font-size="11.5px">evaluate_position</text>
+  <line x1="782" y1="92" x2="800" y2="92" class="flow"/>
+  <rect x="802" y="68" width="92" height="48" class="node"/>
+  <text x="848" y="88" text-anchor="middle" class="name" font-size="13px">context</text>
+  <text x="848" y="105" text-anchor="middle" class="tool" font-size="11.5px">encyclopédie</text>
+  <line x1="894" y1="92" x2="912" y2="92" class="flow"/>
+  <rect x="914" y="68" width="76" height="48" class="node"/>
+  <text x="952" y="88" text-anchor="middle" class="name" font-size="13px">videos</text>
+  <text x="952" y="105" text-anchor="middle" class="tool" font-size="11.5px">YouTube</text>
+
+  <!-- non : moteur approfondi -->
+  <path d="M 606 188 L 606 212 L 668 212" class="flow"/>
+  <text x="620" y="206" class="label">non</text>
+  <rect x="670" y="188" width="160" height="48" class="node"/>
+  <text x="750" y="208" text-anchor="middle" class="name">engine</text>
+  <text x="750" y="225" text-anchor="middle" class="tool">evaluate_position · 3 lignes</text>
+
+  <!-- jonctions vers answer -->
+  <path d="M 990 92 L 1072 92 L 1072 296" class="flow"/>
+  <path d="M 830 212 L 1072 212" class="join"/>
+
+  <text x="256" y="262" class="note">Lichess d'abord ; Stockfish approfondi seulement hors théorie. Pour une position connue, l'encyclopédie et les vidéos complètent le conseil.</text>
+
+  <!-- ===== Parcours question ===== -->
+  <rect x="240" y="368" width="760" height="246" class="lane"/>
+  <text x="256" y="390" class="lane-label">PARCOURS « QUESTION » · le modèle choisit ses outils · POST /agent/ask</text>
+
+  <path d="M 150 360 L 150 468 L 258 468" class="flow"/>
+  <text x="160" y="418" class="label">non</text>
+
+  <rect x="260" y="440" width="190" height="56" class="node-llm"/>
+  <text x="355" y="462" text-anchor="middle" class="name-light">decide</text>
+  <text x="355" y="480" text-anchor="middle" class="tool-light">modèle local · appel d'outils natif</text>
+
+  <!-- decide → tools → decide -->
+  <path d="M 450 455 L 538 455" class="flow"/>
+  <text x="494" y="447" text-anchor="middle" class="label">outil demandé</text>
+  <rect x="540" y="440" width="230" height="56" class="node"/>
+  <text x="655" y="462" text-anchor="middle" class="name">tools</text>
+  <text x="655" y="480" text-anchor="middle" class="tool">exécution via le registre des 7 outils</text>
+  <path d="M 540 483 L 452 483" class="flow"/>
+  <text x="494" y="508" text-anchor="middle" class="label">résultat · 3 appels au plus</text>
+
+  <!-- decide → answer -->
+  <path d="M 355 496 L 355 560 L 1072 560 L 1072 346" class="flow"/>
+  <text x="720" y="552" text-anchor="middle" class="label">budget épuisé ou aucun outil pertinent → rédaction</text>
+
+  <!-- decide → END : réponse directe -->
+  <path d="M 355 440 L 355 412 L 1170 412 L 1170 342" class="flow"/>
+  <text x="1040" y="406" text-anchor="end" class="label">réponse donnée directement, sans outil</text>
+
+  <text x="256" y="590" class="note">Recherche multi-sauts dans l'encyclopédie : la question brute est cherchée d'abord ; si le juge estime la réponse incomplète,</text>
+  <text x="256" y="606" class="note">le modèle reformule et relance (jusqu'à 3 recherches, 6 000 tokens).</text>
+
+  <!-- answer et END -->
+  <rect x="1008" y="296" width="128" height="50" class="node-llm"/>
+  <text x="1072" y="316" text-anchor="middle" class="name-light">answer</text>
+  <text x="1072" y="334" text-anchor="middle" class="tool-light">rédaction en français</text>
+  <line x1="1136" y1="320" x2="1150" y2="320" class="flow"/>
+  <circle cx="1170" cy="320" r="20" class="node-end"/>
+  <circle cx="1170" cy="320" r="13" fill="#4a4a4a"/>
+  <text x="1170" y="356" text-anchor="middle" font-weight="700" font-size="11.5px">END</text>
+</svg>
