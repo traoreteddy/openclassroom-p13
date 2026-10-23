@@ -24,7 +24,7 @@
 
 .layout {
   display: grid;
-  grid-template-columns: minmax(0, 640px) minmax(280px, 1fr);
+  grid-template-columns: minmax(0, 560px) minmax(320px, 1fr);
   gap: 24px;
   max-width: 1200px;
   margin: 0 auto;
@@ -43,6 +43,13 @@
   align-items: center;
   gap: 12px;
   min-width: 0;
+  // L'échiquier reste visible pendant la lecture des conseils
+  position: sticky;
+  top: 16px;
+
+  @media (max-width: 900px) {
+    position: static;
+  }
 }
 
 .controls {

@@ -24,10 +24,16 @@ DEFAULT_MODEL = "Qwen/Qwen3-Embedding-0.6B"
 
 class SentenceTransformerEmbedder:
     def __init__(
-        self, model_name: str = DEFAULT_MODEL, *, device: str | None = None, batch_size: int = 16
+        self,
+        model_name: str = DEFAULT_MODEL,
+        *,
+        device: str | None = None,
+        dtype: str = "auto",
+        batch_size: int = 16,
     ) -> None:
         self.model_name = model_name
         self._device = device
+        self._dtype = dtype
         self._batch_size = batch_size
         self._model: Any = None
         self._lock = threading.Lock()
@@ -89,15 +95,31 @@ class SentenceTransformerEmbedder:
         )
         return [vector.tolist() for vector in vectors]
 
+    def _torch_dtype(self) -> Any:
+        import torch
+
+        try:
+            return getattr(torch, self._dtype)
+        except AttributeError as exc:
+            raise ValueError(
+                f"EMBEDDING_DTYPE inconnu : {self._dtype!r} (auto, float32, bfloat16)"
+            ) from exc
+
     def _load(self) -> Any:
         with self._lock:
             if self._model is None:
                 try:
                     from sentence_transformers import SentenceTransformer
 
-                    # bfloat16 (défaut du modèle) gardé aussi sur CPU : mesuré plus rapide que
-                    # float32 sur Mac M (0,5 s contre 4,8 s par question une fois chaud)
-                    self._model = SentenceTransformer(self.model_name, device=self._device)
+                    # Précision des poids. « auto » = bfloat16 (défaut du modèle), plus rapide
+                    # sur GPU et sur Mac M (0,5 s contre 4,8 s par question). Dans le conteneur
+                    # Linux (CPU x86/ARM sans bf16 natif), un texte de 1 000 tokens prend 74 s
+                    # en bfloat16 contre 2,4 s en float32 : le compose impose float32.
+                    explicit = self._dtype not in ("", "auto")  # vide = variable non renseignée
+                    kwargs = {"model_kwargs": {"dtype": self._torch_dtype()}} if explicit else {}
+                    self._model = SentenceTransformer(
+                        self.model_name, device=self._device, **kwargs
+                    )
                 except OSError as exc:  # modèle absent du cache et pas de réseau
                     raise ToolUnavailableError(
                         code="embedding_unavailable",

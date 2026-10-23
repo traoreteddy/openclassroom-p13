@@ -970,7 +970,16 @@ Ollama (qwen3:14b) et par la construction de l'image Docker en parallèle. Corre
 réglage `EMBEDDING_DEVICE` (`cpu` pour les mesures, l'encodage d'une question courte y
 prend moins d'une seconde) et **préchauffage** de l'encodeur au démarrage (chargement +
 une phrase encodée) pour que le premier appel ne paie pas le chargement du modèle.
-bfloat16 est conservé sur CPU : float32 a été mesuré plus lent sur cette machine.
+bfloat16 est conservé sur CPU **du Mac** : float32 y a été mesuré plus lent.
+
+**Incident conteneur (23 octobre, test d'installation fraîche).** L'ingestion lancée dans
+le conteneur backend (Linux, CPU) a tourné 9 heures sans insérer une ligne. Mesure dans
+le conteneur : une question courte s'encode en 0,2 s, mais un texte de 1 000 tokens prend
+**74 s en bfloat16 contre 2,4 s en float32** (pas de bfloat16 natif sur ce CPU, repli
+logiciel). Correction : réglage `EMBEDDING_DTYPE` (`auto` = bfloat16, défaut sur l'hôte ;
+`float32` imposé par le compose dans le conteneur). Leçon : la précision des poids se
+mesure sur la machine cible et sur des textes de la longueur réelle, pas seulement sur
+des questions.
 
 Incidents corrigés au passage : `uv sync` échouait à la précompilation en bytecode d'une
 dépendance (désactivée : `UV_COMPILE_BYTECODE=0`) ; le healthcheck MongoDB (5 s) expirait

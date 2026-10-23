@@ -5,7 +5,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     # ../.env : fichier de la racine du projet quand l'API est lancée depuis backend/
-    model_config = SettingsConfigDict(env_file=("../.env", ".env"), extra="ignore")
+    # env_ignore_empty : une variable laissée vide dans .env (ex. OLLAMA_BASE_URL=) vaut
+    # « non renseignée » et prend la valeur par défaut, sur l'hôte comme dans le compose
+    model_config = SettingsConfigDict(
+        env_file=("../.env", ".env"), extra="ignore", env_ignore_empty=True
+    )
 
     app_name: str = "P13 Chess Openings API"
     app_env: str = "development"
@@ -42,6 +46,9 @@ class Settings(BaseSettings):
     # Périphérique de l'encodeur (None = choix automatique : GPU si disponible). « cpu »
     # évite la concurrence avec Ollama sur le GPU du Mac pendant les évaluations.
     embedding_device: str | None = None
+    # Précision des poids de l'encodeur : « auto » (bfloat16, rapide sur GPU et Mac M) ou
+    # « float32 » (indispensable sur CPU Linux : 30 fois plus rapide sur les textes longs)
+    embedding_dtype: str = "auto"
     # Similarité cosinus minimale pour qu'un passage soit jugé pertinent (calibrée en phase 4)
     rag_min_score: float = 0.6
     # Niveau maximal visible par l'agent (public < interne < confidentiel) : réglé par le

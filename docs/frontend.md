@@ -92,6 +92,18 @@ L'API est simulée avec `HttpTestingController` : aucun test ne touche le résea
 ## 6. Lancer
 
 ```bash
-docker compose up -d            # API sur http://localhost:8001 (Stockfish, Milvus, MongoDB)
-cd frontend && npm start        # http://localhost:4200, /api relayé vers le backend
+docker compose up -d --build    # tout en conteneurs : http://localhost:8080 (nginx → backend)
+# ou, pour développer le front avec rechargement à chaud :
+cd frontend && npm start        # http://localhost:4200, /api relayé vers le backend :8001
 ```
+
+## 7. Lisibilité du panneau (révision du 22 octobre 2026)
+
+| Avant | Après | Pourquoi |
+|---|---|---|
+| FEN et formulaire de chargement toujours visibles en tête | repliés dans « Position en notation FEN » ; les coups joués remontent dans la carte Position | la FEN est technique, les coups joués sont ce que l'enfant lit |
+| Tableau « B / N / N » avec trois pourcentages | **barre de résultats** blancs / nulles / noirs avec les pourcentages dedans, effectifs compacts (« 1,3 M parties »), légende d'une ligne | lecture d'un coup d'œil, comme sur Lichess |
+| Question et bouton « Demander conseil » sur deux lignes | champ + bouton sur une ligne (empilés sous 420 px), réponse dans un encadré à liseré | l'action principale est évidente |
+| Vidéos en colonne | grille de miniatures avec durée incrustée, titre, chaîne, vues | plus de vidéos visibles sans défiler |
+| Échiquier qui disparaît au défilement | colonne de l'échiquier **collante** (`position: sticky`) sur grand écran | on lit les conseils en regardant la position |
+| Texte 16 px, interlignes serrés | base 15 px, interligne 1,45, titres de cartes uniformes, pastilles d'état cohérentes | densité maîtrisée |

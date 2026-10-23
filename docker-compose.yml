@@ -1,4 +1,15 @@
 services:
+  frontend:
+    build:
+      context: ./frontend
+    container_name: p13-frontend
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
   backend:
     build:
       context: ./backend
@@ -16,6 +27,8 @@ services:
       # Ollama tourne sur la machine hôte (accès au GPU du Mac), hors Docker
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
       HF_HOME: /models/huggingface
+      # Encodeur sur CPU dans le conteneur : float32 (bfloat16 y est 30 fois plus lent)
+      EMBEDDING_DTYPE: ${EMBEDDING_DTYPE:-float32}
       # Traces (profil « tracing ») : sans clés, l'agent trace en local seulement
       LANGFUSE_BASE_URL: http://langfuse-web:3000
       LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
