@@ -55,7 +55,9 @@ async def main(collection: str, recreate: bool, skip_mongo: bool, summaries: boo
     articles = load_corpus(CORPUS_DIR)
     count = model_token_counter(settings.embedding_model)
     summary_map = await load_summaries(articles, count) if summaries else None
-    embedder = SentenceTransformerEmbedder(settings.embedding_model)
+    embedder = SentenceTransformerEmbedder(
+        settings.embedding_model, device=settings.embedding_device, dtype=settings.embedding_dtype
+    )
     store = MilvusVectorStore(settings.milvus_uri, collection, dimension=embedder.dimension)
 
     sink = None

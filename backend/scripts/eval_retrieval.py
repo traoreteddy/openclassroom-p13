@@ -25,7 +25,9 @@ RESULTS_DIR = EVAL_DIR / "results"
 async def main(collection: str, label: str) -> None:
     ref30 = load_jsonl(RefQuestion, EVAL_DIR / "ref30.jsonl")
     decision50 = load_jsonl(DecisionQuestion, EVAL_DIR / "decision50.jsonl")
-    embedder = SentenceTransformerEmbedder(settings.embedding_model)
+    embedder = SentenceTransformerEmbedder(
+        settings.embedding_model, device=settings.embedding_device, dtype=settings.embedding_dtype
+    )
     await embedder.warm_up()
     store = MilvusVectorStore(settings.milvus_uri, collection)
 

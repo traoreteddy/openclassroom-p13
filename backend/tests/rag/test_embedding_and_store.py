@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import threading
+from typing import ClassVar
 
 import numpy as np
 import pytest
@@ -410,3 +411,48 @@ def test_combine_ignores_empty_parts():
 
     assert combine("a == 1", None, "") == "(a == 1)"
     assert combine() == ""
+
+
+class FakeSentenceTransformer:
+    """Doublure de la classe sentence-transformers : capture les arguments de chargement."""
+
+    created: ClassVar[list[tuple[str, dict]]] = []
+
+    def __init__(self, model_name, **kwargs):
+        FakeSentenceTransformer.created.append((model_name, kwargs))
+
+    def get_embedding_dimension(self):
+        return 3
+
+
+@pytest.mark.parametrize(
+    ("dtype", "expected"),
+    [("auto", {}), ("float32", {"model_kwargs": {"dtype": "torch.float32"}})],
+    ids=["auto-bfloat16", "float32-cpu-linux"],
+)
+def test_dtype_setting_is_passed_to_the_model(monkeypatch, dtype, expected):
+    import sys
+    import types
+
+    module = types.ModuleType("sentence_transformers")
+    module.SentenceTransformer = FakeSentenceTransformer
+    monkeypatch.setitem(sys.modules, "sentence_transformers", module)
+    monkeypatch.setitem(sys.modules, "torch", types.SimpleNamespace(float32="torch.float32"))
+    FakeSentenceTransformer.created.clear()
+
+    SentenceTransformerEmbedder("modele-test", device="cpu", dtype=dtype)._load()
+
+    assert FakeSentenceTransformer.created == [("modele-test", {"device": "cpu", **expected})]
+
+
+def test_unknown_dtype_is_refused(monkeypatch):
+    import sys
+    import types
+
+    module = types.ModuleType("sentence_transformers")
+    module.SentenceTransformer = FakeSentenceTransformer
+    monkeypatch.setitem(sys.modules, "sentence_transformers", module)
+    monkeypatch.setitem(sys.modules, "torch", types.SimpleNamespace(float32="torch.float32"))
+
+    with pytest.raises(ValueError, match="EMBEDDING_DTYPE"):
+        SentenceTransformerEmbedder("modele-test", dtype="float128")._load()
