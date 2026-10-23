@@ -37,6 +37,13 @@ Ce que nous avons établi :
 - **Deux alternatives moins chères** existent (transcription audio ; chapitres et PGN
   fournis par les créateurs) et peuvent être combinées avec la vision.
 
+<div class="tiles">
+<div class="tile"><div class="tile__value">45 à 75 j</div><div class="tile__label">Construction : travail humain<br>(16 000 à 52 000 €)</div></div>
+<div class="tile"><div class="tile__value">40 à 140 €</div><div class="tile__label">Construction : machine<br>(GPU, CPU, stockage)</div></div>
+<div class="tile"><div class="tile__value">10 à 90 €</div><div class="tile__label">Fonctionnement par mois<br>(GPU à la demande, VM, stockage)</div></div>
+<div class="tile"><div class="tile__value">≥ 90 %</div><div class="tile__label">Critère d'arrêt de la preuve<br>de faisabilité (échiquiers exacts)</div></div>
+</div>
+
 **Recommandation** : lancer une preuve de faisabilité de 15 jours sur 20 vidéos annotées à
 la main, avec un critère d'arrêt chiffré (90 % de positions exactes), avant tout engagement
 sur le MVP. Ne pas investir dans l'industrialisation sans au moins 300 vidéos sous droits.
@@ -149,40 +156,13 @@ déploiement serveur (STDIO sert aux outils lancés localement ; SSE est dépré
 
 ### 4.2 Schéma d'architecture
 
-```
-┌───────────────────────── Application existante ─────────────────────────┐
-│  Angular (échiquier, panneau)  ──►  FastAPI  ──►  Agent LangGraph        │
-│                                                     │  registre d'outils │
-│                                                     │  (7 outils) +      │
-│                                                     │  client MCP        │
-└─────────────────────────────────────────────────────┼────────────────────┘
-                                                      │ Streamable HTTP (/mcp)
-                                                      ▼
-┌────────────────────── Serveur MCP « Vision » (FastMCP) ──────────────────┐
-│  outils : find_video_by_fen(placement, limit)   → segments + liens t=    │
-│           list_segments(video_id)               → positions d'une vidéo │
-│           index_video(url, source, licence)     → ticket (administration)│
-│  ressource : catalog://videos (vidéos indexées, licences, dates)         │
-└──────────────┬──────────────────────────────────────┬────────────────────┘
-               │ lecture                              │ écriture (ticket)
-               ▼                                      ▼
-   ┌──────────────────────┐              ┌─────────────────────────────┐
-   │ Index des positions  │              │ File de tâches (Redis / RQ) │
-   │ MongoDB (ou Postgres)│              └──────────────┬──────────────┘
-   │ {placement, video_id,│                             │
-   │  t_début, t_fin,     │                             ▼
-   │  confiance, vignette}│   ┌──────────────── Workers d'indexation ───────────────┐
-   │ index sur placement  │   │ 1. récupération du fichier (FFE, partenaire, CC)     │
-   └──────────▲───────────┘   │    → stockage objet temporaire, supprimé après       │
-              │               │ 2. ffmpeg : images aux changements de scène          │
-              │               │ 3. détecteur d'échiquier (OpenCV, puis YOLO si besoin)│
-              │               │ 4. board-to-FEN : 64 cases, classifieur 13 classes   │
-              │               │ 5. validation python-chess, cohérence temporelle     │
-              │               │ 6. regroupement en segments, vignettes → stockage    │
-              └───────────────┤ 7. écriture dans l'index                              │
-                              └──────────────────────────────────────────────────────┘
-                                   GPU à la demande (lot), pas de GPU permanent
-```
+![Architecture : application existante, serveur MCP Vision en ligne, pipeline d'indexation hors ligne](img/architecture-mcp.svg)
+
+Lecture du schéma : en haut, l'application livrée, dont l'agent devient client MCP ; au
+milieu, la seule brique nouvelle **en ligne**, le serveur FastMCP, qui ne fait que lire
+l'index ; en bas, le pipeline **hors ligne** qui transforme les fichiers remis par les
+ayants droit en segments, puis supprime les vidéos. Les flèches montrent les trois flux :
+requête MCP, lecture de l'index, écriture des segments par les workers.
 
 ### 4.3 Rôle de chaque brique
 
@@ -194,6 +174,12 @@ déploiement serveur (STDIO sert aux outils lancés localement ; SSE est dépré
 | File de tâches et workers | indexer en lot, reprendre après panne, limiter le GPU aux créneaux utiles | Redis + RQ (simple) ou Celery ; les workers sont des conteneurs éphémères avec GPU |
 | Stockage objet | fichiers vidéo le temps du traitement, vignettes des segments de façon durable | compatible S3 (Scaleway, OVHcloud) ; les vidéos sont **supprimées** après indexation, pour le droit et le coût |
 | Modules de vision | détection, lecture, validation | chaque module a une interface stable (image → coordonnées ; vignette de case → classe) et se remplace sans toucher au serveur ni à l'agent |
+
+Tout l'existant est réutilisé : le registre d'outils (contrat, délai, reprise, disjoncteur)
+accueille le client MCP ; l'outil `find_opening_videos` reste le repli et fournit les
+métadonnées du catalogue ; MongoDB héberge l'index ; la carte « Vidéos pour réviser » lit
+les segments avec le bon horodatage ; le journal de décision mesure l'usage des segments
+et le taux de repli.
 
 ### 4.4 Modularité et évolutivité
 
@@ -371,17 +357,7 @@ le stock de vidéos non documentées.
 
 ## 9. Étapes de développement et recommandation
 
-```
-  Phase 0            Phase 1                 Phase 2              Phase 3           Phase 4
-  Droits et PGN      Preuve de faisabilité   MVP vision + MCP     Industrialisation  Enrichissement
-  5 à 10 j           10 à 15 j               15 à 25 j            10 à 15 j          5 à 10 j
-  ───────────────►   ───────────────────►    ────────────────►    ──────────────►    ───────────►
-  ▲ critère : 50     ▲ critère : 90 % de     ▲ critère : 80 %     ▲ critère : 95 %   ▲ transcription
-    vidéos sous        positions exactes       des positions de     de vidéos          audio sur les
-    droits, 20 PGN     sur 500 images          théorie courante     indexées sans      segments
-    horodatés          réelles, < 2 % de       ont un segment       intervention
-                       faux positifs           (catalogue 200)
-```
+![Cinq phases avec leurs livrables et leurs critères d'arrêt](img/phases.svg)
 
 | Phase | Livrables | Critère d'arrêt (go / no go) |
 |---|---|---|
@@ -400,18 +376,7 @@ repli : elle fonctionne, elle est mesurée, et elle couvre les cas que l'index i
 
 ---
 
-## Annexe A. Ce que le système existant apporte déjà
-
-| Brique livrée | Réutilisation dans le projet vision |
-|---|---|
-| Registre d'outils avec contrat, délai, reprise, disjoncteur | le client MCP s'y branche comme un adaptateur : mêmes garanties |
-| Outil `find_opening_videos` (requêtes combinées, filtre qualité, cache, quota) | repli et source de candidates ; les métadonnées (titre, chaîne, licence) alimentent le catalogue |
-| MongoDB, stockage des caches, compteur de quota | héberge l'index des positions |
-| Carte « Vidéos pour réviser » avec lecteur intégré | affiche les segments avec `start` au bon horodatage |
-| Identification de la position et de l'ouverture (FEN, Lichess) | fournit le placement à chercher |
-| Journal de décision et traces OpenTelemetry | mesurent l'usage des segments et le taux de repli |
-
-## Annexe B. Sources consultées
+## Sources consultées
 
 - LiveChess2FEN : article (arXiv 2012.06858) et page NVIDIA Jetson (95 % de détection,
   92 % de classification) ; réimplémentation universitaire (96 % en conditions optimales).

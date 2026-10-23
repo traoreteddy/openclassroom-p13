@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 716" width="1000" height="716" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4a4a4a"/>
+    </marker>
+    <style>
+      .zone { fill: none; stroke: #9a9387; stroke-width: 1.2; stroke-dasharray: 6 4; }
+      .zone-label { fill: #6b6b6b; font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+      .box { stroke-width: 1.4; rx: 8; }
+      .existing { fill: #f6f1e7; stroke: #b9a98e; }
+      .new-online { fill: #8a5a2b; stroke: #6f4620; }
+      .new-offline { fill: #e8e4dc; stroke: #8f887c; }
+      .store { fill: #ffffff; stroke: #6b6b6b; }
+      .title { font-weight: 700; font-size: 14px; }
+      .title-light { font-weight: 700; font-size: 14px; fill: #ffffff; }
+      .text { font-size: 12px; fill: #2a2a2a; }
+      .text-light { font-size: 12px; fill: #fff5ea; }
+      .mono { font-family: Menlo, Consolas, monospace; font-size: 11.5px; }
+      .flow { stroke: #4a4a4a; stroke-width: 1.6; fill: none; marker-end: url(#arrow); }
+      .flow-label { font-size: 11.5px; fill: #4a4a4a; }
+      .step { font-size: 12px; fill: #2a2a2a; }
+      .num { font-weight: 700; fill: #8a5a2b; }
+    </style>
+  </defs>
+
+  <!-- Zone 1 : application existante -->
+  <rect x="20" y="22" width="960" height="118" class="zone"/>
+  <text x="34" y="40" class="zone-label">APPLICATION EXISTANTE (livrée)</text>
+
+  <rect x="40" y="58" width="220" height="64" class="box existing"/>
+  <text x="150" y="82" text-anchor="middle" class="title">Front Angular</text>
+  <text x="150" y="102" text-anchor="middle" class="text">échiquier, panneau, carte Vidéos</text>
+
+  <rect x="300" y="58" width="180" height="64" class="box existing"/>
+  <text x="390" y="82" text-anchor="middle" class="title">API FastAPI</text>
+  <text x="390" y="102" text-anchor="middle" class="text">/api/v1, nginx devant</text>
+
+  <rect x="520" y="52" width="440" height="76" class="box existing"/>
+  <text x="740" y="76" text-anchor="middle" class="title">Agent LangGraph</text>
+  <text x="740" y="96" text-anchor="middle" class="text">registre de 7 outils (Lichess, Stockfish, RAG, YouTube…)</text>
+  <text x="740" y="114" text-anchor="middle" class="text"><tspan font-weight="700">+ client MCP</tspan> : les outils du serveur Vision s'ajoutent au registre</text>
+
+  <line x1="260" y1="90" x2="298" y2="90" class="flow"/>
+  <line x1="480" y1="90" x2="518" y2="90" class="flow"/>
+
+  <!-- Flux MCP -->
+  <line x1="740" y1="128" x2="740" y2="186" class="flow"/>
+  <text x="752" y="152" class="flow-label">Streamable HTTP</text>
+  <text x="752" y="168" class="flow-label mono">POST /mcp (JSON-RPC)</text>
+
+  <!-- Zone 2 : serveur MCP (en ligne) -->
+  <rect x="20" y="190" width="960" height="146" class="zone"/>
+  <text x="34" y="208" class="zone-label">NOUVEAU · EN LIGNE</text>
+
+  <rect x="200" y="222" width="600" height="102" class="box new-online"/>
+  <text x="500" y="246" text-anchor="middle" class="title-light">Serveur MCP « Vision » (FastMCP 3.x)</text>
+  <text x="222" y="270" class="text-light mono">find_video_by_fen(placement, limit)  → segments, liens ?t=754s</text>
+  <text x="222" y="286" class="text-light mono">list_segments(video_id)              → positions d'une vidéo</text>
+  <text x="222" y="302" class="text-light mono">index_video(url, source, licence)    → ticket (jeton d'administration)</text>
+  <text x="222" y="318" class="text-light mono">ressource : catalog://videos        → vidéos indexées, licences, dates</text>
+
+  <!-- Flux vers index et file -->
+  <line x1="300" y1="324" x2="200" y2="406" class="flow"/>
+  <text x="236" y="358" class="flow-label" text-anchor="end">lecture (ms)</text>
+  <line x1="700" y1="324" x2="760" y2="406" class="flow"/>
+  <text x="746" y="358" class="flow-label">index_video → ticket</text>
+
+  <!-- Zone 3 : hors ligne -->
+  <rect x="20" y="386" width="960" height="326" class="zone"/>
+  <text x="34" y="404" class="zone-label">NOUVEAU · HORS LIGNE (indexation par lots, GPU à la demande)</text>
+
+  <!-- Index -->
+  <rect x="40" y="408" width="300" height="134" class="box store"/>
+  <text x="190" y="432" text-anchor="middle" class="title">Index des positions</text>
+  <text x="190" y="450" text-anchor="middle" class="text">MongoDB (déjà dans la pile)</text>
+  <text x="56" y="474" class="mono">{ placement, video_id, t_debut, t_fin,</text>
+  <text x="56" y="490" class="mono">  confiance, vignette, licence, source }</text>
+  <text x="190" y="514" text-anchor="middle" class="text">index sur « placement » et son miroir</text>
+
+  <!-- File de tâches -->
+  <rect x="640" y="408" width="300" height="56" class="box store"/>
+  <text x="790" y="432" text-anchor="middle" class="title">File de tâches</text>
+  <text x="790" y="452" text-anchor="middle" class="text">Redis + RQ (ou Celery), reprise sur panne</text>
+
+  <line x1="790" y1="464" x2="790" y2="486" class="flow"/>
+
+  <!-- Workers -->
+  <rect x="380" y="490" width="560" height="190" class="box new-offline"/>
+  <text x="660" y="512" text-anchor="middle" class="title">Workers d'indexation (conteneurs éphémères)</text>
+  <text x="396" y="536" class="step"><tspan class="num">1</tspan>  récupération du fichier remis (FFE, partenaire, Creative Commons)</text>
+  <text x="396" y="556" class="step"><tspan class="num">2</tspan>  ffmpeg : images aux changements de scène (60 à 150 par vidéo)</text>
+  <text x="396" y="576" class="step"><tspan class="num">3</tspan>  détection de l'échiquier : OpenCV (grille 8 × 8), YOLO nano si besoin</text>
+  <text x="396" y="596" class="step"><tspan class="num">4</tspan>  lecture de la position : 64 cases, classifieur à 13 classes</text>
+  <text x="396" y="616" class="step"><tspan class="num">5</tspan>  validation python-chess, cohérence sur 2 images, orientation</text>
+  <text x="396" y="636" class="step"><tspan class="num">6</tspan>  regroupement en segments [t_début, t_fin], vignette</text>
+  <text x="396" y="656" class="step"><tspan class="num">7</tspan>  écriture dans l'index ; suppression du fichier vidéo</text>
+
+  <line x1="380" y1="532" x2="344" y2="532" class="flow"/>
+  <text x="362" y="523" class="flow-label" text-anchor="middle" font-size="10">écriture</text>
+
+  <!-- Stockage objet et sources -->
+  <rect x="40" y="560" width="300" height="60" class="box store"/>
+  <text x="190" y="582" text-anchor="middle" class="title">Stockage objet (S3)</text>
+  <text x="190" y="602" text-anchor="middle" class="text">vidéos temporaires · vignettes durables</text>
+  <line x1="340" y1="590" x2="378" y2="590" class="flow"/>
+
+  <rect x="40" y="634" width="300" height="60" class="box existing"/>
+  <text x="190" y="656" text-anchor="middle" class="title">Sources sous droits</text>
+  <text x="190" y="676" text-anchor="middle" class="text">vidéos FFE · partenaires (accord) · CC (fichier remis)</text>
+  <line x1="340" y1="664" x2="378" y2="664" class="flow"/>
+
+  <!-- Légende -->
+  <rect x="560" y="690" width="14" height="14" class="box existing"/><text x="580" y="702" class="text">existant</text>
+  <rect x="660" y="690" width="14" height="14" class="box new-online"/><text x="680" y="702" class="text">nouveau, en ligne</text>
+  <rect x="810" y="690" width="14" height="14" class="box new-offline"/><text x="830" y="702" class="text">nouveau, hors ligne</text>
+</svg>

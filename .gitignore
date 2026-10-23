@@ -37,3 +37,4 @@ backend/data/journal/
 
 # Captures et instantanés Playwright (vérifications manuelles)
 .playwright-mcp/
+docs/.build/
