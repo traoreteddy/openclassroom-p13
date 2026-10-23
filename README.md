@@ -139,7 +139,7 @@ Documentation :
 | Document | Contenu |
 |---|---|
 | [docs/fonctionnalites.md](docs/fonctionnalites.md) ([PDF](docs/fonctionnalites.pdf)) | **Guide de A à Z** : toutes les fonctionnalités avec captures d'écran |
-| [docs/architecture.md](docs/architecture.md) ([PDF](docs/architecture.pdf)) | **Schéma d'architecture** : vue d'ensemble (pages paysage), graphe de l'agent, composants, flux, données, ports |
+| [docs/architecture.md](docs/architecture.md) ([PDF](docs/architecture.pdf)) | **Schéma d'architecture** : le PDF contient les 2 schémas seuls (vue d'ensemble, graphe de l'agent) ; le Markdown ajoute composants, flux, données, ports |
 | [docs/processus.md](docs/processus.md) | Processus, étapes, graphe de l'agent |
 | [docs/contrat-tools.md](docs/contrat-tools.md) | Les sept outils de l'agent et leur contrat |
 | [docs/outil-rag.md](docs/outil-rag.md) | RAG agentique, phases 0 à 7 et mesures |
