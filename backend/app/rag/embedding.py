@@ -115,11 +115,8 @@ class SentenceTransformerEmbedder:
                     # sur GPU et sur Mac M (0,5 s contre 4,8 s par question). Dans le conteneur
                     # Linux (CPU x86/ARM sans bf16 natif), un texte de 1 000 tokens prend 74 s
                     # en bfloat16 contre 2,4 s en float32 : le compose impose float32.
-                    kwargs = (
-                        {"model_kwargs": {"dtype": self._torch_dtype()}}
-                        if self._dtype != "auto"
-                        else {}
-                    )
+                    explicit = self._dtype not in ("", "auto")  # vide = variable non renseignée
+                    kwargs = {"model_kwargs": {"dtype": self._torch_dtype()}} if explicit else {}
                     self._model = SentenceTransformer(
                         self.model_name, device=self._device, **kwargs
                     )

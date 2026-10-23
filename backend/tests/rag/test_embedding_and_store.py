@@ -427,8 +427,8 @@ class FakeSentenceTransformer:
 
 @pytest.mark.parametrize(
     ("dtype", "expected"),
-    [("auto", {}), ("float32", {"model_kwargs": {"dtype": "torch.float32"}})],
-    ids=["auto-bfloat16", "float32-cpu-linux"],
+    [("auto", {}), ("", {}), ("float32", {"model_kwargs": {"dtype": "torch.float32"}})],
+    ids=["auto-bfloat16", "vide-auto", "float32-cpu-linux"],
 )
 def test_dtype_setting_is_passed_to_the_model(monkeypatch, dtype, expected):
     import sys
