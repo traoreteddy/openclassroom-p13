@@ -11,21 +11,24 @@ set -u
 BASE="${BASE:-http://localhost:${FRONTEND_PORT:-8080}}"
 API="$BASE/api/v1"
 ITALIAN="r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R%20b%20KQkq%20-%203%203"
-RARE="rnbqkbn1/pppppppp/7r/7p/P7/R7/1PPPPPPP/1NBQKBNR%20w%20Kq%20-%202%203"
+RARE="rnbqkbn1/ppppppp1/7r/7p/P7/6R1/1PPPPPPP/1NBQKBNR%20b%20Kq%20-%203%203"  # 1.a4 h5 2.Ta3 Th6 3.Tg3 : hors théorie, position légale
 failures=0
 
-check() {  # check <libellé> <commande python qui lit stdin et affiche un résumé ou lève>
+check() {  # check <libellé> <corps de réponse> <python qui lit stdin et affiche un résumé ou lève>
   local label="$1" body="$2" summary
   if summary=$(printf '%s' "$body" | python3 -c "$3" 2>&1); then
     printf '  ✓ %-42s %s\n' "$label" "$summary"
   else
     printf '  ✗ %-42s %s\n' "$label" "$(printf '%s' "$summary" | tail -1)"
+    printf '      réponse : %s\n' "$(printf '%s' "$body" | tr '\n' ' ' | cut -c1-200)"
     failures=$((failures + 1))
   fi
 }
 
-get() { curl -s -m "${2:-30}" "$1"; }
-post() { curl -s -m "${3:-300}" -H 'Content-Type: application/json' -d "$2" "$1"; }
+# Les réponses d'erreur (4xx, 5xx) sont renvoyées telles quelles : le JSON {"error": …}
+# ou le code HTTP apparaît alors dans la ligne « réponse ».
+get() { curl -s -m "${2:-30}" -w ' [HTTP %{http_code}]' "$1" | sed 's/ \[HTTP 200\]$//'; }
+post() { curl -s -m "${3:-300}" -w ' [HTTP %{http_code}]' -H 'Content-Type: application/json' -d "$2" "$1" | sed 's/ \[HTTP 200\]$//'; }
 
 echo "Vérification de bout en bout sur $BASE"
 
