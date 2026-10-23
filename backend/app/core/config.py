@@ -5,7 +5,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     # ../.env : fichier de la racine du projet quand l'API est lancée depuis backend/
-    model_config = SettingsConfigDict(env_file=("../.env", ".env"), extra="ignore")
+    # env_ignore_empty : une variable laissée vide dans .env (ex. OLLAMA_BASE_URL=) vaut
+    # « non renseignée » et prend la valeur par défaut, sur l'hôte comme dans le compose
+    model_config = SettingsConfigDict(
+        env_file=("../.env", ".env"), extra="ignore", env_ignore_empty=True
+    )
 
     app_name: str = "P13 Chess Openings API"
     app_env: str = "development"
