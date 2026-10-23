@@ -3,8 +3,8 @@
     uv run --directory backend python ../scripts/render_schemas.py
 
 Puis imprimer `docs/.build/architecture-schemas.html` en PDF (Playwright, `preferCSSPageSize`)
-vers `docs/architecture.pdf`. Le PDF ne contient que les schémas, sans texte d'accompagnement ;
-le détail est dans `docs/architecture.md`.
+vers `docs/architecture-schemas.pdf`. Ce PDF ne contient que les schémas, sans texte ;
+la version complète avec explications est `docs/architecture.pdf` (rendue par `render_note.py`).
 """
 
 from __future__ import annotations

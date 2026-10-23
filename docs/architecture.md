@@ -8,7 +8,7 @@ de la solution livrée**
 |---|---|
 | Destinataires | jury, équipe technique FFE, toute personne qui reprend le projet |
 | Version décrite | branche `main`, 23 octobre 2026 |
-| Lecture | 2 schémas (ensemble, graphe de l'agent) et 5 tableaux ; `docs/architecture.pdf` ne contient que les 2 schémas, en A4 paysage (`scripts/render_schemas.py`) |
+| Lecture | 2 schémas en pages paysage (ensemble, graphe de l'agent) et 5 tableaux ; version « schémas seuls » : `docs/architecture-schemas.pdf` |
 | Documents de détail | `docs/fonctionnalites.md` (guide de A à Z), `docs/deploiement.md`, `docs/contrat-tools.md`, `docs/outil-rag.md`, `docs/outil-videos.md`, `docs/frontend.md` |
 
 ---
