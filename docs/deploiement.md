@@ -60,6 +60,38 @@ YouTube, la carte Vidéos indique que la recherche n'est pas configurée ; sans 
 cartes « Coups des maîtres », « Analyse profonde » et « Vidéos » fonctionnent, seul le
 conseil rédigé et les questions libres échouent avec un message.
 
+### Test réalisé depuis une installation fraîche (23 octobre 2026)
+
+Protocole : clone du dépôt dans un dossier vide, `cp .env.example .env` (+ jeton Lichess
+et clé YouTube), projet Compose séparé (`-p p13fresh`, donc **volumes neufs** : modèle
+d'embedding retéléchargé, Milvus et MongoDB vides), la pile de travail arrêtée avant.
+
+| Étape | Résultat |
+|---|---|
+| `docker compose up -d --build` | images construites, **backend et frontend sains en 119 s** |
+| Ingestion du corpus dans le conteneur | première tentative : **9 h sans résultat** (encodeur bfloat16 sur CPU Linux, voir `docs/outil-rag.md` 5.2 bis) ; après correction (`EMBEDDING_DTYPE=float32` imposé par le compose) : **367 unités dont 138 résumés en 322 s** |
+| Volumes | 5 volumes `p13fresh_*` créés ; `docker volume inspect` donne le point de montage (`/var/lib/docker/volumes/p13fresh_mongodb_data/_data`, pilote `local`) |
+| `./scripts/smoke.sh` | **10 vérifications sur 10** : page, backend, MongoDB, Lichess (Italienne, Fc5 25 481 parties), Stockfish (évaluation et analyse différée à la profondeur 23 en 3 s), Milvus (2 passages), YouTube (2 vidéos), conseil complet de l'agent (5 outils, 859 caractères), question libre (RAG, 994 caractères) |
+| Persistance : `down` puis `up -d` | backend sain en 5 s, recherche vectorielle toujours servie (parents de l'Italienne), vidéos servies **depuis le cache** (`from_cache: true`, quota 201) |
+| Nettoyage `down -v` | 0 volume `p13fresh_*` restant |
+
+**Trois défauts trouvés par ce test, invisibles sur la machine de développement** (dont le
+`.env` avait été ajusté à la main au fil des phases) :
+
+| Défaut | Cause | Correction |
+|---|---|---|
+| Ingestion dans le conteneur sans fin (9 h, 0 ligne) | encodeur en bfloat16 sur CPU Linux : 74 s par texte de 1 000 tokens | `EMBEDDING_DTYPE` configurable, `float32` imposé par le compose (ingestion en 5 min) |
+| `float32` du compose sans effet | `.env.example` fixait `EMBEDDING_DTYPE=auto`, et une variable de `.env` prime sur le défaut `${VAR:-…}` du compose | variable laissée **vide** dans l'exemple ; vide = défaut |
+| Conseil de l'agent en **500** (`ConnectError` vers Ollama) | `OLLAMA_BASE_URL=http://localhost:11434` copié de l'exemple : dans le conteneur, `localhost` est le conteneur lui-même | variable laissée vide (défaut `host.docker.internal` dans le compose) ; `env_ignore_empty=True` côté pydantic-settings pour que le vide vaille « non renseigné » sur l'hôte aussi |
+
+Règle retenue pour `.env.example` : **ne préremplir que ce qui est identique sur l'hôte et
+dans Docker** ; tout ce qui dépend de l'endroit d'exécution reste vide et le compose
+fournit le défaut conteneur.
+
+Autres enseignements intégrés au README : attendre que tout soit « healthy » avant
+l'ingestion, compter 5 minutes d'ingestion dans le conteneur (30 s depuis le Mac avec le
+GPU), et vérifier la chaîne complète avec `scripts/smoke.sh` plutôt qu'à la main.
+
 ## 4. Positions de démo
 
 | Scénario | Comment l'obtenir | Ce que l'on voit |
@@ -79,3 +111,4 @@ conseil rédigé et les questions libres échouent avec un message.
 | 22 oct. 2026 | Application complète en conteneurs ouverte dans le navigateur (`http://localhost:8080`) : coups des maîtres chargés depuis Lichess via nginx → backend | ✅ |
 | 22 oct. 2026 | Volumes déclarés et présents (`docker volume ls`) | ✅ 10 volumes `p13_*`, tailles ci-dessus |
 | 22 oct. 2026 | **Persistance** : `docker compose down` (0 conteneur restant) puis `docker compose up -d`, backend et frontend sains après 15 s | ✅ avant / après identiques : MongoDB 12 articles, 11 entrées de cache vidéos, compteur de quota 2 211 ; Milvus répond à une recherche vectorielle avec 2 passages |
+| 23 oct. 2026 | **Installation fraîche** (clone neuf, volumes neufs), 4 itérations jusqu'au succès | ✅ services sains en 112 s, ingestion 367 unités en 451 s, `smoke.sh` 10/10, persistance après `down`/`up` (recherche vectorielle et cache vidéos conservés), `down -v` sans volume restant |

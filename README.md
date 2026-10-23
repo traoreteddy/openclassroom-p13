@@ -89,7 +89,8 @@ docker compose --profile tracing up -d   # facultatif : Langfuse sur http://loca
 |---|---|---|
 | `backend` reste « starting » | Milvus ou MongoDB pas encore sains, ou machine chargée | `docker compose ps`, attendre ; `docker compose logs backend` |
 | Carte « Coups des maîtres » en erreur 503 | Lichess injoignable ou limite de débit sans jeton | renseigner `LICHESS_TOKEN` |
-| Conseil de l'agent en erreur | Ollama absent ou modèle non téléchargé | `ollama list`, `ollama pull qwen3:14b` ; sous Linux, vérifier `host.docker.internal` |
+| Conseil de l'agent en erreur 500 | Ollama absent, modèle non téléchargé, ou `OLLAMA_BASE_URL` renseigné avec `localhost` dans `.env` (dans un conteneur, `localhost` est le conteneur) | `ollama list`, `ollama pull qwen3:14b` ; laisser `OLLAMA_BASE_URL` vide ; sous Linux, vérifier `host.docker.internal` |
+| Ingestion très lente dans le conteneur | encodeur en bfloat16 sur CPU | laisser `EMBEDDING_DTYPE` vide (le compose impose float32) |
 | « Vidéos : non configurée » | pas de clé YouTube | renseigner `YOUTUBE_API_KEY` |
 | Recherche vectorielle `not_indexed` | corpus non ingéré | lancer `scripts.ingest_corpus` |
 | Port déjà utilisé | un autre service écoute sur 8080, 8001, 27017 ou 19530 | changer `FRONTEND_PORT`, `BACKEND_PORT`, `MONGO_PORT`, `MILVUS_PORT` dans `.env` |
