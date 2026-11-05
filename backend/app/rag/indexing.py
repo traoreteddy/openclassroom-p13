@@ -1,4 +1,4 @@
-"""Unités d'index de production (configuration retenue en phase 4).
+"""Unités d'index de production.
 
 Chaque article devient un ensemble d'**unités** vectorisées, qui renvoient toutes à une
 **section parente** (≤ 1 024 tokens), le texte effectivement transmis à l'agent :
@@ -6,9 +6,6 @@ Chaque article devient un ensemble d'**unités** vectorisées, qui renvoient tou
 - `enfant` : morceau découpé selon le type de la section (texte, liste, partie), précédé
   de son fil d'Ariane ;
 - `resume` : résumé de la section généré par le LLM (index multi-vecteurs).
-
-Mesure (phase 4, 50 requêtes) : recall@5 = 0,90 contre 0,78 pour le RAG de la phase 2,
-6 requêtes gagnées, aucune perdue (McNemar, p = 0,031).
 """
 
 from __future__ import annotations

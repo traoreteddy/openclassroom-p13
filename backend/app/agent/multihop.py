@@ -1,4 +1,4 @@
-"""Recherche itérative multi-sauts sous budget (phase 6).
+"""Recherche itérative multi-sauts sous budget.
 
     question ──► première recherche : la question telle quelle (ou une sous-question
                  rédigée par le modèle avec `first_hop="plan"`)
@@ -44,9 +44,8 @@ class Budget:
     max_searches: int = 3
     max_context_tokens: int = 6000
     passages_per_search: int = 4
-    # Première recherche : la question telle quelle ("question") ou une sous-question
-    # rédigée par le modèle ("plan"). La mesure de la phase 7 a montré que la réécriture
-    # perd de l'information (coups, noms) que la question contenait déjà.
+    # Première recherche : la question telle quelle, ou une sous-question rédigée par le
+    # modèle ("plan", qui perd souvent des détails : coups, noms).
     first_hop: Literal["question", "plan"] = "question"
 
 

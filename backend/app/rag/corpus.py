@@ -1,10 +1,6 @@
 """Corpus du RAG : articles Wikipédia FR sur les ouvertures, figés avec leurs métadonnées.
 
-Wikichess.fr ne publie pas d'articles exploitables (application d'une seule page) ;
-l'énoncé accepte « toutes sources pertinentes » : on utilise Wikipédia FR (CC BY-SA).
-
-Chaque article est récupéré en trois formats, utilisés par les différentes stratégies de
-découpage de la phase 3 :
+Chaque article est récupéré en trois formats, un par famille de découpage :
 - `text`     : texte brut, titres au format wiki (« == Variantes == ») ;
 - `markdown` : même texte, titres convertis en Markdown (« ## Variantes ») ;
 - `html`     : HTML rendu de l'article (découpage par sections HTML).

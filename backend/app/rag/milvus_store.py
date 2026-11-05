@@ -44,18 +44,12 @@ class MetadataFilter:
     """Filtres de métadonnées appliqués par le **serveur** à toutes les recherches.
 
     Ils ne sont pas exposés au LLM : un modèle ne doit pas choisir son propre niveau
-    d'habilitation (une requête piégée pourrait demander les documents confidentiels).
-
-    | Champ             | Rôle                                                       |
-    |-------------------|------------------------------------------------------------|
-    | max_confidentiality | niveau maximal visible (public < interne < confidentiel) |
-    | services          | services émetteurs autorisés (None = tous)                 |
-    | date_from         | documents révisés à partir de cette date (ISO 8601)        |
+    d'habilitation.
     """
 
-    max_confidentiality: str = "public"
-    services: tuple[str, ...] | None = None
-    date_from: str | None = None
+    max_confidentiality: str = "public"  # public < interne < confidentiel
+    services: tuple[str, ...] | None = None  # None = tous
+    date_from: str | None = None  # ISO 8601
 
     def expression(self) -> str:
         if self.max_confidentiality not in CONFIDENTIALITY_LEVELS:

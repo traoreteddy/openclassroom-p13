@@ -5,8 +5,6 @@ un échiquier interactif (Angular) guidé par un agent IA s'appuyant sur la thé
 des ouvertures, Stockfish, les APIs Lichess, une base vectorielle Milvus et des
 vidéos YouTube.
 
-Le détail du besoin est décrit dans [docs/product_backlog.md](docs/product_backlog.md).
-
 ## Structure du projet
 
 ```
@@ -16,7 +14,7 @@ P13/
 │   ├── tests/           # Tests pytest
 │   └── Dockerfile
 ├── frontend/            # Application Angular 21 (voir frontend/README.md)
-├── docs/                # Documentation du projet
+├── docs/                # Note sur les bénéfices et limites du système (PDF)
 ├── docker-compose.yml   # Orchestration des services
 └── .env.example         # Modèle de configuration
 ```
@@ -138,15 +136,7 @@ Documentation :
 
 | Document | Contenu |
 |---|---|
-| [docs/fonctionnalites.md](docs/fonctionnalites.md) ([PDF](docs/fonctionnalites.pdf)) | **Guide de A à Z** : toutes les fonctionnalités avec captures d'écran |
-| [docs/architecture.md](docs/architecture.md) ([PDF complet](docs/architecture.pdf), [PDF schémas seuls](docs/architecture-schemas.pdf)) | **Architecture** : schéma d'ensemble, graphe de l'agent, puis composants, flux, données, ports et limites |
-| [docs/processus.md](docs/processus.md) | Processus, étapes, graphe de l'agent |
-| [docs/contrat-tools.md](docs/contrat-tools.md) | Les sept outils de l'agent et leur contrat |
-| [docs/outil-rag.md](docs/outil-rag.md) | RAG agentique, phases 0 à 7 et mesures |
-| [docs/outil-videos.md](docs/outil-videos.md) | Recherche de vidéos YouTube, quotas, mesure |
-| [docs/frontend.md](docs/frontend.md) | Front Angular : services, panneau, synchronisation |
-| [docs/deploiement.md](docs/deploiement.md) | Conteneurs, volumes, installation fraîche, démo |
-| [docs/note-mcp-vision.md](docs/note-mcp-vision.md) ([PDF](docs/note-mcp-vision.pdf)) | Note de cadrage : analyse vidéo par vision et serveur MCP, bénéfices, limites, architecture, coûts, alternatives |
+| [docs/architecture_bef_limit.pdf](docs/architecture_bef_limit.pdf) | Note détaillée sur les bénéfices et limites du système : schéma d'architecture technique, étude de faisabilité et estimation des coûts |
 
 ## Services
 

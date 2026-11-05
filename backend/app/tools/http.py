@@ -1,14 +1,5 @@
 """Appel HTTP commun aux outils, avec traduction des échecs dans la taxonomie d'erreurs.
 
-| Situation                         | Erreur levée                              |
-|-----------------------------------|-------------------------------------------|
-| délai dépassé / connexion coupée  | ToolTransientError (timeout, network_error)|
-| HTTP 5xx                          | ToolTransientError (upstream_error)       |
-| HTTP 429                          | ToolUnavailableError (rate_limited)       |
-| HTTP 401 / 403                    | ToolUnavailableError (auth_required)      |
-| HTTP 400 / 404 / 422              | ToolInputError (rejected_by_service)      |
-| réponse non JSON                  | ToolUnavailableError (bad_response)       |
-
 Le 429 n'est pas réessayé automatiquement : Lichess demande d'attendre une minute
 entière, et réessayer aggraverait le blocage.
 """

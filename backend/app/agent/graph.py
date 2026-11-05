@@ -8,21 +8,15 @@ Deux entrées, selon que la requête porte une position (FEN) ou non :
       │                    └─ non, ou Lichess en panne ─► engine (Stockfish) ► answer
       └─ non (question libre) ─► decide ⇄ tools ► answer
 
-**Parcours « position »** (énoncé, `docs/processus.md` § 2) : déterministe, aucun choix
-laissé au modèle. Lichess donne les coups théoriques ; si la position est sortie de la
-théorie (ou si Lichess est indisponible), Stockfish devient la source principale. En
-théorie, Stockfish est aussi appelé en complément, à profondeur réduite (grille
-d'évaluation : « Stockfish évalue les positions théoriques »). Le contexte (RAG) et les
-vidéos ne sont cherchés que si l'ouverture a un nom. Le modèle rédige ensuite la réponse
-à partir des résultats d'outils.
+Parcours « position » : déterministe. Hors théorie (ou Lichess indisponible), Stockfish
+devient la source principale ; en théorie, il complète à profondeur réduite. Contexte (RAG)
+et vidéos ne sont cherchés que si l'ouverture a un nom.
 
-**Parcours « question »** : retrieval décidé par l'agent (`selection` native ou
-structurée) ou à flot fixe (`retrieval="fixed"`, une recherche systématique), comparés en
-phase 5 de `docs/outil-rag.md`.
+Parcours « question » : outils décidés par le modèle (`selection` native ou structurée),
+ou flot fixe (`retrieval="fixed"` : une recherche systématique).
 
-Chaque étape est un span OpenTelemetry (`decision`, `tool_call`, `answer`) : le journal de
-décision et Langfuse en découlent. Le registre d'outils garantit validation, délais,
-tentatives et disjoncteur ; une erreur d'outil revient comme message et ne bloque rien.
+Chaque étape est un span OpenTelemetry (`decision`, `tool_call`, `answer`) ; une erreur
+d'outil revient comme message et ne bloque rien.
 """
 
 from __future__ import annotations
@@ -97,7 +91,7 @@ Réponds uniquement en JSON :
 class AgentConfig:
     retrieval: Retrieval = "agent"
     selection: Selection = "native"
-    max_tool_rounds: int = 3  # garde-fou du parcours « question » ; budget réel en phase 6
+    max_tool_rounds: int = 3  # garde-fou du parcours « question »
 
 
 DEFAULT_CONFIG = AgentConfig()
@@ -490,7 +484,7 @@ class ChessAgent:
                 outcome=str(response.content)[:120],
             )
         final = AIMessage(content=str(response.content))
-        final.usage_metadata = getattr(response, "usage_metadata", None)  # compté dans le résultat
+        final.usage_metadata = getattr(response, "usage_metadata", None)
         return {"step": step, "messages": [final]}
 
     # --- Résultat ---------------------------------------------------------------------------

@@ -46,10 +46,9 @@ class Settings(BaseSettings):
     # Périphérique de l'encodeur (None = choix automatique : GPU si disponible). « cpu »
     # évite la concurrence avec Ollama sur le GPU du Mac pendant les évaluations.
     embedding_device: str | None = None
-    # Précision des poids de l'encodeur : « auto » (bfloat16, rapide sur GPU et Mac M) ou
-    # « float32 » (indispensable sur CPU Linux : 30 fois plus rapide sur les textes longs)
+    # « auto » (bfloat16, GPU et Mac M) ou « float32 » (indispensable sur CPU Linux)
     embedding_dtype: str = "auto"
-    # Similarité cosinus minimale pour qu'un passage soit jugé pertinent (calibrée en phase 4)
+    # Similarité cosinus minimale pour qu'un passage soit jugé pertinent
     rag_min_score: float = 0.6
     # Niveau maximal visible par l'agent (public < interne < confidentiel) : réglé par le
     # serveur, jamais par le LLM
@@ -58,7 +57,6 @@ class Settings(BaseSettings):
     # LLM local (Ollama sur la machine hôte, hors Docker)
     ollama_base_url: str = "http://localhost:11434"
     llm_model: str = "phi4-mini"
-    # Modèle et mode de sélection de l'agent (choisis par la mesure en phase 5)
     agent_model: str = "qwen3:14b"
     agent_selection: str = "native"  # native (appel d'outils) ou structured (schéma JSON)
 

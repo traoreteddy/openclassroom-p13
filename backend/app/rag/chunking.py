@@ -1,4 +1,4 @@
-"""Découpage des articles en chunks (phase 2 : stratégie de référence).
+"""Découpage des articles en chunks.
 
 Stratégie de référence : **récursif, 512 tokens, recouvrement 10 %**, tokens comptés avec
 le tokenizer du modèle d'embedding (la limite porte sur ce que le modèle lit vraiment).
@@ -186,7 +186,7 @@ def chunk_article(
     return chunks
 
 
-# --- Briques de la stratégie hiérarchique (phases 3 et 4) ---------------------------------
+# --- Briques de la stratégie hiérarchique ------------------------------------------------
 
 HEADERS = [("#", "h1"), ("##", "h2"), ("###", "h3"), ("####", "h4")]
 

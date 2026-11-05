@@ -1,20 +1,13 @@
-"""Adaptateur ToolSpec → outil LangChain (option C du contrat, § 10.5).
+"""Adaptateur ToolSpec → outil LangChain.
 
 Les `ToolSpec` restent la source de vérité (nom, description, schéma Pydantic).
 Cet adaptateur les expose à LangGraph sous forme de `StructuredTool` standards
 (`llm.bind_tools(...)`, `ToolNode(...)`), en faisant passer chaque appel par le
 `ToolRegistry` : validation, timeout, retry, disjoncteur.
 
-Ce que reçoit le modèle (contenu du `ToolMessage`) :
-
-| Situation                         | Contenu                                   | status    |
-|-----------------------------------|-------------------------------------------|-----------|
-| succès                            | données JSON de l'outil                   | success   |
-| arguments invalides               | [invalid_arguments] … Exemple valide : {…}| error     |
-| panne / erreur de l'outil         | [code] message Conseil : …                | error     |
-
-L'application reçoit en plus, dans `ToolMessage.artifact`, le `ToolResult` complet
-(données structurées pour le front, durée, erreur détaillée).
+Le modèle reçoit le contenu formaté par `ToolResult` (données JSON, ou message d'erreur
+avec `status="error"`) ; l'application reçoit le `ToolResult` complet dans
+`ToolMessage.artifact`.
 """
 
 from __future__ import annotations

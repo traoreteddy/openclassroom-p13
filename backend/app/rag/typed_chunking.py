@@ -1,4 +1,4 @@
-"""Découpage adapté au type de contenu (phase 4, étape 4.4).
+"""Découpage adapté au type de contenu.
 
 Règle de décision : on détecte le type de chaque unité (section d'article, ou document
 entier pour les types « procédure », « code », « courriel »), puis on applique la règle

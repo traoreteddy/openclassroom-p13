@@ -3,23 +3,8 @@
 Une seule instrumentation (les spans) alimente deux sorties : Langfuse (visualisation)
 et ce journal (fichier JSON Lines + mémoire, pour les mesures et les tests).
 
-Schéma d'une entrée :
-
-| Champ        | Contenu                                                              |
-|--------------|----------------------------------------------------------------------|
-| timestamp    | début de l'étape, ISO 8601 UTC                                       |
-| session_id   | identifiant de session (regroupe les tours d'une même conversation)  |
-| trace_id     | identifiant OpenTelemetry du tour (même valeur dans Langfuse)        |
-| step         | numéro de l'étape dans le tour (1 = première décision)               |
-| kind         | `decision` (choix du LLM), `tool_call` (exécution), `answer` (réponse)|
-| choice       | outil choisi, ou `answer` / `none`                                   |
-| arguments    | arguments de l'appel (dict)                                          |
-| status       | `success`, `error`, `skipped`                                        |
-| duration_ms  | durée de l'étape                                                     |
-| tokens_in    | tokens d'entrée du LLM (0 pour un appel d'outil)                     |
-| tokens_out   | tokens de sortie du LLM                                              |
-| cost_eur     | coût : 0 en local ; estimation « équivalent cloud » si un tarif est réglé |
-| outcome      | issue courte : code d'erreur, nombre de passages, extrait de réponse |
+Une entrée (`DecisionEntry`) par span `decision`, `tool_call` ou `answer` ; le `trace_id`
+est celui de Langfuse.
 """
 
 from __future__ import annotations
@@ -37,7 +22,6 @@ from opentelemetry.sdk.trace import ReadableSpan, SpanProcessor
 Kind = Literal["decision", "tool_call", "answer"]
 Status = Literal["success", "error", "skipped"]
 
-# Préfixe des attributs de span lus par le journal
 ATTR = "p13."
 
 

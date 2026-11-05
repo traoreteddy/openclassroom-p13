@@ -1,8 +1,8 @@
 """Outil `search_opening_knowledge` : recherche vectorielle dans le corpus Wikipédia FR (Milvus).
 
 L'outil dépend de deux interfaces :
-- `Embedder` : transforme la question en vecteur (sentence-transformers, étape 2) ;
-- `VectorStore` : cherche les passages les plus proches (Milvus, étape 2).
+- `Embedder` : transforme la question en vecteur (sentence-transformers) ;
+- `VectorStore` : cherche les passages les plus proches (Milvus).
 Les tests les remplacent par des stubs ; aucun modèle ni serveur n'est nécessaire.
 """
 

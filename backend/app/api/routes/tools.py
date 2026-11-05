@@ -1,15 +1,7 @@
 """Routes HTTP adossées aux outils de l'agent.
 
-Les routes ne contiennent aucune logique métier : elles appellent l'outil et traduisent
-son `ToolResult` en réponse HTTP.
-
-| Résultat de l'outil      | Réponse HTTP                        |
-|--------------------------|-------------------------------------|
-| ok                       | 200 + données                       |
-| erreur `input`           | 422 + erreur                        |
-| erreur `unavailable`     | 503 + erreur (+ en-tête Retry-After)|
-| analyse lancée           | 202 + ticket (job_id)               |
-| job inconnu              | 404 + erreur                        |
+Aucune logique métier : chaque route appelle l'outil et traduit son `ToolResult` en
+réponse HTTP (voir `to_response`).
 """
 
 from typing import Annotated, Any, Literal

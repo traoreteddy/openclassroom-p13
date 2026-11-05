@@ -111,10 +111,8 @@ class SentenceTransformerEmbedder:
                 try:
                     from sentence_transformers import SentenceTransformer
 
-                    # Précision des poids. « auto » = bfloat16 (défaut du modèle), plus rapide
-                    # sur GPU et sur Mac M (0,5 s contre 4,8 s par question). Dans le conteneur
-                    # Linux (CPU x86/ARM sans bf16 natif), un texte de 1 000 tokens prend 74 s
-                    # en bfloat16 contre 2,4 s en float32 : le compose impose float32.
+                    # « auto » = bfloat16 (défaut du modèle), rapide sur GPU et Mac M mais
+                    # très lent sur CPU sans bf16 natif : le compose impose float32.
                     explicit = self._dtype not in ("", "auto")  # vide = variable non renseignée
                     kwargs = {"model_kwargs": {"dtype": self._torch_dtype()}} if explicit else {}
                     self._model = SentenceTransformer(
