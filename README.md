@@ -33,7 +33,7 @@ P13/
 ## Installation et démarrage
 
 ```bash
-git clone <dépôt> P13 && cd P13
+git clone https://github.com/traoreteddy/openclassroom-p13.git P13 && cd P13
 cp .env.example .env
 ```
 
